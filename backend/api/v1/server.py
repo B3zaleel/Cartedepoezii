@@ -14,8 +14,8 @@ inject_routers(app)
 
 if __name__ == '__main__':
     uvicorn.run(
-        'server:app',
+        'api.v1.server:app',
         host=os.getenv('HOST', '0.0.0.0'),
-        port=os.getenv('PORT', '5000'),
+        port=int(os.getenv('PORT', '5000')),
         log_level='info',
     )
