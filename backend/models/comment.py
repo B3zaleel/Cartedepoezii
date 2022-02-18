@@ -24,6 +24,6 @@ class Comment(BaseModel, Base):
         nullable=True
     )
     text = Column(
-        TEXT,
+        String(400),
         nullable=False
     )
