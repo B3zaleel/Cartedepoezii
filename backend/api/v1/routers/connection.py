@@ -132,7 +132,12 @@ async def change_connection(body: ConnectionForm):
         'message': 'Failed to follow user.'
     }
     auth_token = AuthToken.decode(body.authToken)
-    if auth_token is None or (auth_token.user_id != body.userId):
+    wrong_conditions = [
+        auth_token is None,
+        auth_token is not None and (auth_token.user_id != body.userId),
+        body.userId == body.followId
+    ]
+    if any(wrong_conditions):
         return response
     db_session = get_session()
     try:
