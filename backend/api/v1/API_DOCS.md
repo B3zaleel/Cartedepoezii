@@ -137,7 +137,7 @@ Response
 
 ### Connection
 
-`GET:` **{BASE_URL}***/followers?id&token*
+`GET:` **{BASE_URL}***/followers?id&token&span&after&before*
 <br/>Response
 ```javascript
 [
@@ -151,25 +151,7 @@ Response
 ]
 ```
 
-`GET:` **{BASE_URL}***/followers?id&full=1*
-<br/>Response
-```javascript
-[
-    {
-        userId: String,
-        joined: String,
-        name: String,
-        bio: String,
-        profilePhotoSrc: String,
-        followersCount: Number,
-        followingsCount: Number,
-        isFollowing: Boolean
-    }
-    ...
-]
-```
-
-`GET:` **{BASE_URL}***/followings?id&token*
+`GET:` **{BASE_URL}***/followings?id&token&span&after&before*
 <br/>Response
 ```javascript
 [
@@ -177,24 +159,6 @@ Response
         id: String,
         name: String,
         profilePhotoSrc: String,
-        isFollowing: Boolean
-    }
-    ...
-]
-```
-
-`GET:` **{BASE_URL}***/followings?id&token&full=1*
-<br/>Response
-```javascript
-[
-    {
-        userId: String,
-        joined: String,
-        name: String,
-        bio: String,
-        profilePhotoSrc: String,
-        followersCount: Number,
-        followingsCount: Number,
         isFollowing: Boolean
     }
     ...
@@ -206,7 +170,8 @@ Response
 ```javascript
 {
     authToken: String,
-    userId: String
+    userId: String,
+    followId: String
 }
 ```
 Response
