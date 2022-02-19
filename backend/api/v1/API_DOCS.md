@@ -134,7 +134,7 @@ Response
 {}
 ```
 
-### Connections
+### Connection
 
 `GET:` **{BASE_URL}***/followers?id&token*
 <br/>Response
@@ -314,7 +314,7 @@ Response
 ]
 ```
 
-### Comments
+### Comment
 
 `GET:` **{BASE_URL}***/poem-comments?id&token*
 <br/>Response
