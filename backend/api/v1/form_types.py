@@ -33,6 +33,7 @@ class UserDeleteForm(BaseModel):
 class ConnectionForm(BaseModel):
     authToken: str
     userId: str
+    followId: str
 
 
 class PoemAddForm(BaseModel):
@@ -60,10 +61,11 @@ class CommentAddForm(BaseModel):
     userId: str
     poemId: str
     text: str
-    repliesTo: Optional[str]
+    replyTo: Optional[str]
 
 
 class CommentDeleteForm(BaseModel):
     authToken: str
     userId: str
     commentId: str
+    poemId: str
