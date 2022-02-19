@@ -187,11 +187,13 @@ Response
 <br/>Response
 ```javascript
 {
-    authorId: String,
-    authorName: String,
-    authorprofilePhotoId: String,
+    user: {
+        id: String,
+        name: String,
+        profilePhotoId: String,
+    },
     title: String,
-    publishedDate: String,
+    publishedOn: String,
     verses: Array<String>,
     commentsCount: Number,
     likesCount: Number,
@@ -229,6 +231,22 @@ Response
 Response
 ```javascript
 {}
+```
+
+`PUT:` **{BASE_URL}***/like-poem*
+<br/>Body
+```javascript
+{
+    authToken: String,
+    userId: str,
+    poemId: str
+}
+```
+Response
+```javascript
+{
+    status: Boolean
+}
 ```
 
 `DELETE:` **{BASE_URL}***/poem*
@@ -285,34 +303,39 @@ Response
 
 ### Comment
 
-`GET:` **{BASE_URL}***/poem-comments?id&token*
-<br/>Response
-```javascript
-{
-    commentId: String,
-    userId: String,
-    userName: String,
-    userprofilePhotoId: String,
-    createdOn: String,
-    text: String,
-    repliesTo: String,
-    repliesCount: Number
-}
-```
-
-`GET:` **{BASE_URL}***/poem-comments?id&token&span&after&before*
+`GET:` **{BASE_URL}***/poem-comments?id&span&after&before*
 <br/>Response
 ```javascript
 [
     {
-        commentId: String,
-        userId: String,
-        userName: String,
-        userprofilePhotoId: String,
+        id: String,
+        user: {
+            id: String,
+            name: String,
+            profilePhotoId: String,
+        }
         createdOn: String,
         text: String,
-        repliesTo: String,
         repliesCount: Number
+    }
+    ...
+]
+```
+
+`GET:` **{BASE_URL}***/comment-replies?id&poemId&span&after&before*
+<br/>Response
+```javascript
+[
+    {
+        id: String,
+        user: {
+            id: String,
+            name: String,
+            profilePhotoId: String,
+        }
+        createdOn: String,
+        text: String,
+        replyTo: String
     }
     ...
 ]
@@ -326,15 +349,16 @@ Response
     userId: String,
     poemId: String,
     text: String,
-    repliesTo: String // optional
+    replyTo: String // optional
 }
 ```
 Response
 ```javascript
 {
-    commentId: String,
+    id: String,
     createdOn: String,
-    repliesTo: String,
+    poemId: String,
+    replyTo: String,
     repliesCount: Number
 }
 ```
@@ -345,7 +369,8 @@ Response
 {
     authToken: String,
     userId: String,
-    commentId: String
+    commentId: String,
+    poemId: String
 }
 ```
 Response
@@ -356,19 +381,24 @@ Response
 `GET:` **{BASE_URL}***/user-comments?token&span&after&before*
 <br/>Response
 ```javascript
-[
-    {
-        commentId: String,
-        userId: String,
-        userName: String,
-        userprofilePhotoId: String,
-        createdOn: String,
-        text: String,
-        repliesTo: String,
-        repliesCount: Number
-    }
-    ...
-]
+{
+    user: {
+        id: String,
+        name: String,
+        profilePhotoId: String
+    },
+    comments: [
+        {
+            id: String,
+            createdOn: String,
+            text: String,
+            poemId: String,
+            replyTo: String,
+            repliesCount: Number
+        }
+        ...
+    ]
+}
 ```
 
 ### Search
