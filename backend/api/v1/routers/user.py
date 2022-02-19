@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import os
+import email_validator
 from operator import and_
 from fastapi import APIRouter, UploadFile
 from imagekitio import ImageKit
@@ -88,6 +89,7 @@ async def update_user_info(
         url_endpoint=os.getenv('IMG_CDN_URL_EPT')
     )
     try:
+        email_validator.validate_email(email)
         profile_picture_file_id = profilePhotoId
         if removeProfilePhoto:
             imagekit.delete_file(profilePhotoId)
