@@ -49,7 +49,7 @@ async def get_users_followers(
                 obj = {
                     'id': user.id,
                     'name': user.name,
-                    'profilePhotoSrc': user.profile_photo_src,
+                    'profilePhotoId': user.profile_photo_id,
                     'isFollowing': cur_usr_ctn is not None,
                 }
                 new_result.append(obj)
@@ -105,7 +105,7 @@ async def get_users_followings(
                 obj = {
                     'id': user.id,
                     'name': user.name,
-                    'profilePhotoSrc': user.profile_photo_src,
+                    'profilePhotoId': user.profile_photo_id,
                     'isFollowing': cur_usr_ctn is not None,
                 }
                 new_result.append(obj)
