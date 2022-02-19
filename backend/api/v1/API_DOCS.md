@@ -92,11 +92,11 @@ Response
 <br/>Response
 ```javascript
 {
-    userId: String,
+    id: String,
     joined: String,
     name: String,
     bio: String,
-    profilePhotoSrc: String,
+    profilePhotoId: String,
     followersCount: Number,
     followingsCount: Number,
     isFollowing: Boolean
@@ -110,15 +110,15 @@ authToken: String
 userId: str
 name: String
 profilePhoto: BLOB
+removeProfilePhoto: Boolean
 bio: String
 email: String
-password: String
 ```
 Response
 ```javascript
 {
     authToken: String,
-    profilePhotoSrc: String
+    profilePhotoId: String
 }
 ```
 
@@ -144,7 +144,7 @@ Response
     {
         id: String,
         name: String,
-        profilePhotoSrc: String,
+        profilePhotoId: String,
         isFollowing: Boolean
     }
     ...
@@ -158,7 +158,7 @@ Response
     {
         id: String,
         name: String,
-        profilePhotoSrc: String,
+        profilePhotoId: String,
         isFollowing: Boolean
     }
     ...
@@ -189,7 +189,7 @@ Response
 {
     authorId: String,
     authorName: String,
-    authorProfilePhotoSrc: String,
+    authorprofilePhotoId: String,
     title: String,
     publishedDate: String,
     verses: Array<String>,
@@ -252,7 +252,7 @@ Response
     {
         authorId: String,
         authorName: String,
-        authorProfilePhotoSrc: String,
+        authorprofilePhotoId: String,
         title: String,
         publishedDate: String,
         verses: Array<String>,
@@ -271,7 +271,7 @@ Response
     {
         authorId: String,
         authorName: String,
-        authorProfilePhotoSrc: String,
+        authorprofilePhotoId: String,
         title: String,
         publishedDate: String,
         verses: Array<String>,
@@ -292,7 +292,7 @@ Response
     commentId: String,
     userId: String,
     userName: String,
-    userProfilePhotoSrc: String,
+    userprofilePhotoId: String,
     createdOn: String,
     text: String,
     repliesTo: String,
@@ -308,7 +308,7 @@ Response
         commentId: String,
         userId: String,
         userName: String,
-        userProfilePhotoSrc: String,
+        userprofilePhotoId: String,
         createdOn: String,
         text: String,
         repliesTo: String,
@@ -361,7 +361,7 @@ Response
         commentId: String,
         userId: String,
         userName: String,
-        userProfilePhotoSrc: String,
+        userprofilePhotoId: String,
         createdOn: String,
         text: String,
         repliesTo: String,
@@ -380,7 +380,7 @@ Response
     {
         authorId: String,
         authorName: String,
-        authorProfilePhotoSrc: String,
+        authorprofilePhotoId: String,
         title: String,
         publishedDate: String,
         verses: Array<String>,
@@ -397,7 +397,7 @@ Response (type: *people*)
     {
         userId: String,
         name: String,
-        profilePhotoSrc: String,
+        profilePhotoId: String,
         isFollowing: Boolean
     }
     ...
