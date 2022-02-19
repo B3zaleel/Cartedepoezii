@@ -107,6 +107,7 @@ Response
 <br/>Body (as FormData)
 ```yaml
 authToken: String
+userId: str
 name: String
 profilePhoto: BLOB
 bio: String
@@ -238,6 +239,7 @@ Response
 ```javascript
 {
     authToken: String,
+    userId: str,
     title: String,
     verses: Array<String>
 }
@@ -254,6 +256,7 @@ Response
 ```javascript
 {
     authToken: String,
+    userId: str,
     title: String,
     verses: Array<String>
 }
@@ -268,6 +271,7 @@ Response
 ```javascript
 {
     authToken: String,
+    userId: String,
     poemId: String
 }
 ```
@@ -354,9 +358,10 @@ Response
 ```javascript
 {
     authToken: String,
+    userId: String,
     poemId: String,
     text: String,
-    repliesTo: String
+    repliesTo: String // optional
 }
 ```
 Response
@@ -374,6 +379,7 @@ Response
 ```javascript
 {
     authToken: String,
+    userId: String,
     commentId: String
 }
 ```
