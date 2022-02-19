@@ -14,7 +14,7 @@ class User(BaseModel, Base):
         unique=True,
         index=True
     )
-    name = Column(String(128))
+    name = Column(String(60))
     bio = Column(String(256), default='')
     has_profile_photo = Column(Boolean, default=True)
     password_hash = Column(
