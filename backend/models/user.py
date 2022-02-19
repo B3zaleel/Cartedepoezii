@@ -16,7 +16,11 @@ class User(BaseModel, Base):
     )
     name = Column(String(60))
     bio = Column(String(256), default='')
-    has_profile_photo = Column(Boolean, default=True)
+    profile_photo_id = Column(
+        TEXT,
+        nullable=False,
+        default=''
+    )
     password_hash = Column(
         TEXT,
         nullable=False
