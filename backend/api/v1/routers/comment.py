@@ -4,8 +4,8 @@ from operator import and_
 import uuid
 from fastapi import APIRouter
 
-from ..form_types import ConnectionForm, CommentAddForm, CommentDeleteForm
-from ..database import get_session, User, UserFollowing, Comment, Poem
+from ..form_types import CommentAddForm, CommentDeleteForm
+from ..database import get_session, User, Comment
 from ..utils.token_handlers import AuthToken
 from ..utils.pagination import extract_page
 
@@ -116,7 +116,7 @@ async def get_comment_replies(
                     'createdOn': item.created_on.isoformat(),
                     'text': item.text,
                     'poemId': poemId,
-                    'repliesTo': id
+                    'replyTo': id
                 }
                 new_result.append(obj)
         response = {
