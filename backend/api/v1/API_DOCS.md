@@ -1,0 +1,438 @@
+# Version 1 of Cartedepoezii's API Documentation
+
+**BASE_URL:** `/api/v1`
+
+## What You Should Know
+
+A successful response from the API server should yield a response that looks like this:
+```javascript
+{
+    success: Boolean, // will be true
+    data: Object | Array
+}
+```
+The `data` key above would contain the responses of the endpoints described below.
+
+If there was an error with your response, you should get a response that looks like this:
+```javascript
+{
+    success: Boolean, // will be false
+    message: String
+}
+```
+
+## Endpoints
+
+### Authentication
+
+`POST:` **{BASE_URL}***/sign-up*
+<br/>Body
+```javascript
+{
+    name: String,
+    email: String,
+    password: String
+}
+```
+Response
+```javascript
+{
+    userId: String,
+    authToken: String
+}
+```
+
+`POST:` **{BASE_URL}***/sign-in*
+<br/>Body
+```javascript
+{
+    email: String,
+    password: String
+}
+```
+Response
+```javascript
+{
+    userId: String,
+    authToken: String
+}
+```
+
+`POST:` **{BASE_URL}***/reset-password*
+<br/>Body
+```javascript
+{
+    email: String
+}
+```
+Response
+```javascript
+{}
+```
+
+`PUT:` **{BASE_URL}***/reset-password*
+<br/>Body
+```javascript
+{
+    email: String,
+    password: String,
+    resetToken: String
+}
+```
+Response
+```javascript
+{
+    authToken: String
+}
+```
+
+### User
+
+`GET:` **{BASE_URL}***/user?id&token*
+<br/>Response
+```javascript
+{
+    userId: String,
+    joined: String,
+    name: String,
+    bio: String,
+    profilePhotoSrc: String,
+    followersCount: Number,
+    followingsCount: Number,
+    isFollowing: Boolean
+}
+```
+
+`PUT:` **{BASE_URL}***/user*
+<br/>Body (as FormData)
+```yaml
+authToken: String
+name: String
+profilePhoto: BLOB
+bio: String
+email: String
+password: String
+```
+Response
+```javascript
+{
+    authToken: String,
+    profilePhotoSrc: String
+}
+```
+
+`DELETE:` **{BASE_URL}***/user*
+<br/>Body
+```javascript
+{
+    authToken: String,
+    userId: String
+}
+```
+Response
+```javascript
+{}
+```
+
+### Connections
+
+`GET:` **{BASE_URL}***/followers?id&token*
+<br/>Response
+```javascript
+[
+    {
+        id: String,
+        name: String,
+        profilePhotoSrc: String,
+        isFollowing: Boolean
+    }
+    ...
+]
+```
+
+`GET:` **{BASE_URL}***/followers?id&full=1*
+<br/>Response
+```javascript
+[
+    {
+        userId: String,
+        joined: String,
+        name: String,
+        bio: String,
+        profilePhotoSrc: String,
+        followersCount: Number,
+        followingsCount: Number,
+        isFollowing: Boolean
+    }
+    ...
+]
+```
+
+`GET:` **{BASE_URL}***/followings?id&token*
+<br/>Response
+```javascript
+[
+    {
+        id: String,
+        name: String,
+        profilePhotoSrc: String,
+        isFollowing: Boolean
+    }
+    ...
+]
+```
+
+`GET:` **{BASE_URL}***/followings?id&token&full=1*
+<br/>Response
+```javascript
+[
+    {
+        userId: String,
+        joined: String,
+        name: String,
+        bio: String,
+        profilePhotoSrc: String,
+        followersCount: Number,
+        followingsCount: Number,
+        isFollowing: Boolean
+    }
+    ...
+]
+```
+
+`PUT:` **{BASE_URL}***/follow*
+<br/>Body
+```javascript
+{
+    authToken: String,
+    userId: String
+}
+```
+Response
+```javascript
+{
+    status: Boolean
+}
+```
+
+### Poem
+
+`GET:` **{BASE_URL}***/poem?id&token*
+<br/>Response
+```javascript
+{
+    authorId: String,
+    authorName: String,
+    authorProfilePhotoSrc: String,
+    title: String,
+    publishedDate: String,
+    verses: Array<String>,
+    commentsCount: Number,
+    likesCount: Number,
+    isLiked: Boolean
+}
+```
+
+`POST:` **{BASE_URL}***/poem*
+<br/>Body
+```javascript
+{
+    authToken: String,
+    title: String,
+    verses: Array<String>
+}
+```
+Response
+```javascript
+{
+    poemId: String
+}
+```
+
+`PUT:` **{BASE_URL}***/poem*
+<br/>Body
+```javascript
+{
+    authToken: String,
+    title: String,
+    verses: Array<String>
+}
+```
+Response
+```javascript
+{}
+```
+
+`DELETE:` **{BASE_URL}***/poem*
+<br/>Body
+```javascript
+{
+    authToken: String,
+    poemId: String
+}
+```
+Response
+```javascript
+{}
+```
+
+`GET:` **{BASE_URL}***/user-poems?userId&token&span&after&before*
+<br/>Response
+```javascript
+[
+    {
+        authorId: String,
+        authorName: String,
+        authorProfilePhotoSrc: String,
+        title: String,
+        publishedDate: String,
+        verses: Array<String>,
+        commentsCount: Number,
+        likesCount: Number,
+        isLiked: Boolean
+    }
+    ...
+]
+```
+
+`GET:` **{BASE_URL}***/poems-channel?token&span&after&before*
+<br/>Response
+```javascript
+[
+    {
+        authorId: String,
+        authorName: String,
+        authorProfilePhotoSrc: String,
+        title: String,
+        publishedDate: String,
+        verses: Array<String>,
+        commentsCount: Number,
+        likesCount: Number,
+        isLiked: Boolean
+    }
+    ...
+]
+```
+
+### Comments
+
+`GET:` **{BASE_URL}***/poem-comments?id&token*
+<br/>Response
+```javascript
+{
+    commentId: String,
+    userId: String,
+    userName: String,
+    userProfilePhotoSrc: String,
+    createdOn: String,
+    text: String,
+    repliesTo: String,
+    repliesCount: Number
+}
+```
+
+`GET:` **{BASE_URL}***/poem-comments?id&token&span&after&before*
+<br/>Response
+```javascript
+[
+    {
+        commentId: String,
+        userId: String,
+        userName: String,
+        userProfilePhotoSrc: String,
+        createdOn: String,
+        text: String,
+        repliesTo: String,
+        repliesCount: Number
+    }
+    ...
+]
+```
+
+`POST:` **{BASE_URL}***/poem-comments*
+<br/>Body
+```javascript
+{
+    authToken: String,
+    poemId: String,
+    text: String,
+    repliesTo: String
+}
+```
+Response
+```javascript
+{
+    commentId: String,
+    createdOn: String,
+    repliesTo: String,
+    repliesCount: Number
+}
+```
+
+`DELETE:` **{BASE_URL}***/poem-comments*
+<br/>Body
+```javascript
+{
+    authToken: String,
+    commentId: String
+}
+```
+Response
+```javascript
+{}
+```
+
+`GET:` **{BASE_URL}***/user-comments?token&span&after&before*
+<br/>Response
+```javascript
+[
+    {
+        commentId: String,
+        userId: String,
+        userName: String,
+        userProfilePhotoSrc: String,
+        createdOn: String,
+        text: String,
+        repliesTo: String,
+        repliesCount: Number
+    }
+    ...
+]
+```
+
+### Search
+
+`GET:` **{BASE_URL}***/search?q&token&type&span&after&before*
+<br/>Response (type: *poems*)
+```javascript
+[
+    {
+        authorId: String,
+        authorName: String,
+        authorProfilePhotoSrc: String,
+        title: String,
+        publishedDate: String,
+        verses: Array<String>,
+        commentsCount: Number,
+        likesCount: Number,
+        isLiked: Boolean
+    }
+    ...
+]
+```
+Response (type: *people*)
+```javascript
+[
+    {
+        userId: String,
+        name: String,
+        profilePhotoSrc: String,
+        isFollowing: Boolean
+    }
+    ...
+]
+```
+
+### Explore
+
+TBD
