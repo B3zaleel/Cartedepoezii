@@ -192,6 +192,7 @@ Response
         name: String,
         profilePhotoId: String,
     },
+    id: String,
     title: String,
     publishedOn: String,
     verses: Array<String>,
@@ -207,6 +208,7 @@ Response
 {
     authToken: String,
     userId: str,
+    poemId: str,
     title: String,
     verses: Array<String>
 }
@@ -214,7 +216,10 @@ Response
 Response
 ```javascript
 {
-    poemId: String
+    id: String,
+    createdOn: String,
+    repliesCount: Number,
+    likesCount: Number
 }
 ```
 
@@ -224,6 +229,7 @@ Response
 {
     authToken: String,
     userId: str,
+    poemId: str,
     title: String,
     verses: Array<String>
 }
@@ -266,39 +272,49 @@ Response
 `GET:` **{BASE_URL}***/user-poems?userId&token&span&after&before*
 <br/>Response
 ```javascript
-[
-    {
-        authorId: String,
-        authorName: String,
-        authorprofilePhotoId: String,
-        title: String,
-        publishedDate: String,
-        verses: Array<String>,
-        commentsCount: Number,
-        likesCount: Number,
-        isLiked: Boolean
-    }
-    ...
-]
+{
+    user: {
+        id: String,
+        name: String,
+        profilePhotoId: String
+    },
+    poems: [
+        {
+            id: String,
+            title: String,
+            publishedDate: String,
+            verses: Array<String>,
+            commentsCount: Number,
+            likesCount: Number,
+            isLiked: Boolean
+        }
+        ...
+    ]
+}
 ```
 
 `GET:` **{BASE_URL}***/poems-channel?token&span&after&before*
 <br/>Response
 ```javascript
-[
-    {
-        authorId: String,
-        authorName: String,
-        authorprofilePhotoId: String,
-        title: String,
-        publishedDate: String,
-        verses: Array<String>,
-        commentsCount: Number,
-        likesCount: Number,
-        isLiked: Boolean
-    }
-    ...
-]
+{
+    user: {
+        id: String,
+        name: String,
+        profilePhotoId: String
+    },
+    poems: [
+        {
+            id: String,
+            title: String,
+            publishedDate: String,
+            verses: Array<String>,
+            commentsCount: Number,
+            likesCount: Number,
+            isLiked: Boolean
+        }
+        ...
+    ]
+}
 ```
 
 ### Comment
