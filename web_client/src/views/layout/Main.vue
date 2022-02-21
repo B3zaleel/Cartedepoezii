@@ -367,6 +367,56 @@ export default class MainLayout extends Vue {
   }
 }
 
+.header-pane {
+  > div {
+    display: grid;
+    column-gap: 10px;
+    grid-template-columns: auto 1fr;
+
+    > :first-child {
+      > button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2.5px;
+        border-radius: 50%;
+        border: 1px solid gray;
+        cursor: pointer;
+
+        &:hover {
+          background: #d6d6d6c5;
+        }
+      }
+    }
+
+    > :last-child {
+      display: flex;
+      flex-flow: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+
+      > h2 {
+        margin: 0;
+        font-size: 1.2em;
+        cursor: context-menu;
+      }
+
+      > h3 {
+        margin: 0;
+        font-size: 1.2em;
+        cursor: context-menu;
+      }
+
+      > h5 {
+        margin: 0;
+        font-size: 0.8em;
+        font-weight: normal;
+        cursor: context-menu;
+      }
+    }
+  }
+}
+
 .poem-post-dialog {
   position: fixed;
   display: flex;
