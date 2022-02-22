@@ -131,7 +131,7 @@ export default class MainLayout extends Vue {
 
     if (leftPane) {
       const childHeight = leftPane.clientHeight;
-      const child = leftPane.childNodes.item(0);
+      const child = leftPane.getElementsByTagName('div').item(0);
 
       leftPane.style.height = `${window.innerHeight}px`;
       if (child) {
@@ -140,7 +140,7 @@ export default class MainLayout extends Vue {
     }
     if (rightPane) {
       const childHeight = rightPane.clientHeight;
-      const child = rightPane.childNodes.item(0);
+      const child = rightPane.getElementsByTagName('div').item(0);
 
       rightPane.style.height = `${window.innerHeight}px`;
       if (child) {
