@@ -75,9 +75,9 @@ import { Component, Vue } from 'vue-property-decorator';
   },
 })
 export default class SignInView extends Vue {
-  email!: string
+  email = '';
 
-  password!: string;
+  password = '';
 
   isSigningIn = false;
 
@@ -104,9 +104,9 @@ export default class SignInView extends Vue {
       };
 
       this.isSigningIn = true;
-      fetch(`${BASE_URL}/sign-up`, {
+      fetch(`${BASE_URL}/sign-in`, {
         method: 'POST',
-        mode: 'no-cors',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -114,9 +114,10 @@ export default class SignInView extends Vue {
       })
         .then((response) => response.json())
         .then((res) => {
-          if (res.code === 200) {
+          if (res.success) {
             this.$store.commit('signIn', {
               token: res.data.authToken,
+              id: res.data.userId,
             });
             this.$router.push('/');
           } else {
