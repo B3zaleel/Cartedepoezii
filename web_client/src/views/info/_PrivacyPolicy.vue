@@ -1,12 +1,12 @@
 <template>
-  <div class="app-privacy-policy">
+  <article class="app-privacy-policy">
     <p>
       Lorem ipsum dolor sit, amet consectetur adipisicing elit.
       Optio quibusdam soluta id molestias nam ipsa ipsam assumenda
       quis voluptates totam tenetur cupiditate repellendus doloribus,
       incidunt harum cum commodi ex impedit!
     </p>
-  </div>
+  </article>
 </template>
 
 <script lang="ts">

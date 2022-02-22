@@ -20,7 +20,7 @@
         <MainContent/>
       </template>
     </MainLayout>
-    <MainAltLayout v-if="!isAuthenticated">
+    <MainAltLayout v-if="!isAuthenticated()">
       <MainContent/>
     </MainAltLayout>
   </div>
@@ -29,7 +29,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import MainLayout from '@/views/layout/Main.vue';
-import GuestLayout from '@/views/layout/MainAlt.vue';
+import MainAltLayout from '@/views/layout/MainAlt.vue';
 import ArrowLeftIcon from '@/assets/icons/ArrowLeft.vue';
 import MainContent from './_About.vue';
 
@@ -37,7 +37,7 @@ import MainContent from './_About.vue';
   name: 'AboutView',
   components: {
     MainLayout,
-    GuestLayout,
+    MainAltLayout,
     ArrowLeftIcon,
     MainContent,
   },
