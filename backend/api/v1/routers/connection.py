@@ -1,8 +1,8 @@
 #!/usr/bin/python3
-from datetime import datetime
-from operator import and_
 import uuid
+from datetime import datetime
 from fastapi import APIRouter
+from sqlalchemy import and_
 
 from ..form_types import ConnectionForm
 from ..database import get_session, User, UserFollowing
@@ -147,7 +147,7 @@ async def change_connection(body: ConnectionForm):
                     UserFollowing.follower_id == auth_token.user_id,
                     UserFollowing.following_id == body.followId,
             )).first()
-        if cur_usr_ctn is not None:
+        if cur_usr_ctn:
             # remove
             db_session.query(UserFollowing).filter(and_(
                     UserFollowing.follower_id == auth_token.user_id,

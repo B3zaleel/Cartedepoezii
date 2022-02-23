@@ -1,8 +1,8 @@
 #!/usr/bin/python3
-from datetime import datetime
-from operator import and_
 import uuid
+from datetime import datetime
 from fastapi import APIRouter
+from sqlalchemy import and_
 
 from ..form_types import CommentAddForm, CommentDeleteForm
 from ..database import get_session, User, Comment
