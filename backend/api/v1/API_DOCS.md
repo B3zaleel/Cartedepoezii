@@ -62,6 +62,7 @@ Response
 <br/>Body
 ```javascript
 {
+    userId: String,
     email: String
 }
 ```
@@ -74,6 +75,7 @@ Response
 <br/>Body
 ```javascript
 {
+    userId: String,
     email: String,
     password: String,
     resetToken: String
@@ -99,6 +101,9 @@ Response
     profilePhotoId: String,
     followersCount: Number,
     followingsCount: Number,
+    poemsCount: Number,
+    commentsCount: Number,
+    likesCount: Number,
     isFollowing: Boolean
 }
 ```
@@ -272,49 +277,40 @@ Response
 `GET:` **{BASE_URL}***/user-poems?userId&token&span&after&before*
 <br/>Response
 ```javascript
-{
-    user: {
+[
+    {
         id: String,
-        name: String,
-        profilePhotoId: String
-    },
-    poems: [
-        {
-            id: String,
-            title: String,
-            publishedDate: String,
-            verses: Array<String>,
-            commentsCount: Number,
-            likesCount: Number,
-            isLiked: Boolean
-        }
-        ...
-    ]
-}
+        title: String,
+        publishedOn: String,
+        verses: Array<String>,
+        commentsCount: Number,
+        likesCount: Number,
+        isLiked: Boolean
+    }
+    ...
+]
 ```
 
 `GET:` **{BASE_URL}***/poems-channel?token&span&after&before*
 <br/>Response
 ```javascript
-{
-    user: {
-        id: String,
-        name: String,
-        profilePhotoId: String
-    },
-    poems: [
-        {
+[
+    {
+        user: {
             id: String,
-            title: String,
-            publishedDate: String,
-            verses: Array<String>,
-            commentsCount: Number,
-            likesCount: Number,
-            isLiked: Boolean
-        }
-        ...
-    ]
-}
+            name: String,
+            profilePhotoId: String
+        },
+        id: String,
+        title: String,
+        publishedOn: String,
+        verses: Array<String>,
+        commentsCount: Number,
+        likesCount: Number,
+        isLiked: Boolean
+    }
+    ...
+]
 ```
 
 ### Comment
@@ -424,11 +420,14 @@ Response
 ```javascript
 [
     {
-        authorId: String,
-        authorName: String,
-        authorprofilePhotoId: String,
+        user: {
+            id: String,
+            name: String,
+            profilePhotoId: String,
+        },
+        id: String,
         title: String,
-        publishedDate: String,
+        publishedOn: String,
         verses: Array<String>,
         commentsCount: Number,
         likesCount: Number,
@@ -441,7 +440,7 @@ Response (type: *people*)
 ```javascript
 [
     {
-        userId: String,
+        id: String,
         name: String,
         profilePhotoId: String,
         isFollowing: Boolean
@@ -452,4 +451,4 @@ Response (type: *people*)
 
 ### Explore
 
-TBD
+**TBD**
