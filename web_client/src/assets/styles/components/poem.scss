@@ -1,0 +1,214 @@
+.poem {
+  position: relative;
+  display: flex;
+  border-top: 1px solid gainsboro;
+  border-bottom: 1px solid gainsboro;
+  height: fit-content;
+  min-height: 60px;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+
+  > .sect {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    height: 100%;
+  }
+
+  > .sect:nth-child(2) {
+    flex-flow: column;
+    padding: 10px;
+
+    h4 {
+      margin: 5px;
+    }
+
+    > button {
+      padding: 2px 5px;
+    }
+  }
+
+  > .sect:nth-child(3) {
+    flex-flow: column;
+    width: 100%;
+    padding: 5px;
+
+    > div {
+      display: flex;
+      width: 100%;
+
+      &.header {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        justify-content: center;
+        column-gap: 5px;
+
+        > div:nth-child(1) {
+          > a {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
+            border: 2px solid greenyellow;
+            border-radius: 50%;
+
+            > svg {
+              width: 30px;
+              height: 30px;
+            }
+          }
+        }
+
+        > div:nth-child(2) {
+          > a {
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: auto;
+            text-overflow: ellipsis;
+          }
+        }
+
+        > div:nth-child(3) {
+          position: relative;
+
+          > button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            background: none;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition-property: background;
+            transition-duration: 300ms;
+            transition-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1);
+
+            &:hover {
+              border-color: gainsboro;
+              background: rgb(172, 172, 172);
+            }
+          }
+        }
+      }
+
+      &.main {
+        margin: 0 40px;
+        width: calc(100% - 2 * 40px);
+        flex-flow: column;
+
+        > h4 {
+          margin: 5px 0;
+        }
+
+        > div {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: max-content;
+          min-height: 80px;
+          margin: 0 0 5px 0;
+          background: ghostwhite;
+          border-radius: 10px;
+          border: 1px solid gainsboro;
+
+          > p {
+            margin: 10px max(40px, 25%);
+            min-height: 100%;
+            white-space: pre-line;
+          }
+
+          > .nav-btn {
+            position: absolute;
+            width: fit-content;
+            padding: 2px;
+            margin: 0;
+            top: calc(50% - (10px + 2px + 1px));
+            border-radius: 50%;
+            border: 1px solid gainsboro;
+            box-shadow: 0 0 2px 1px gainsboro;
+            z-index: 5;
+
+            > svg {
+              width: 20px;
+              height: 20px;
+            }
+
+            &.left {
+              left: 5px;
+            }
+
+            &.right {
+              right: 5px;
+            }
+
+            &.hidden {
+              display: none;
+            }
+
+            &:hover {
+              background: gainsboro;
+            }
+          }
+
+          > .page-info {
+            position: absolute;
+            display: flex;
+            right: 5px;
+            bottom: 5px;
+            padding: 2px;
+            font-size: 0.8em;
+            background: gainsboro;
+            border-radius: 2px;
+            cursor: context-menu;
+
+            &.hidden {
+              display: none;
+            }
+          }
+        }
+      }
+
+      &.interactions {
+        display: flex;
+        padding: 5px 5px 0 5px;
+        align-items: center;
+        justify-content: center;
+        border-top: 1px solid gainsboro;
+
+        > button {
+          display: grid;
+          padding: 5px;
+          margin: 0 5px;
+          grid-template-columns: auto calc(4 * 0.8em);
+          align-items: center;
+          justify-content: center;
+          background: none;
+          border: 1px solid transparent;
+          border-radius: 5px;
+          cursor: pointer;
+          outline: none;
+
+          > span {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+          }
+          &:hover {
+            border: 1px solid gainsboro;
+          }
+        }
+      }
+    }
+  }
+
+  > .sect.active {
+    display: flex;
+  }
+}
