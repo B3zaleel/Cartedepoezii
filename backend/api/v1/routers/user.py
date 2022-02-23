@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 import os
 import email_validator
-from operator import and_
+from datetime import datetime
 from fastapi import APIRouter, UploadFile
 from imagekitio import ImageKit
+from sqlalchemy import and_
 
 from ..form_types import UserDeleteForm
-from ..database import get_session, User, UserFollowing
+from ..database import get_session, User, UserFollowing, Poem, PoemLike, Comment
 from ..utils.token_handlers import AuthToken
 
 
@@ -34,6 +35,15 @@ async def get_user(id: str, token=''):
             followings = db_session.query(
                     UserFollowing).filter(
                         UserFollowing.follower_id == user.id).all()
+            poems = db_session.query(
+                    Poem).filter(
+                        Poem.user_id == user.id).all()
+            likes = db_session.query(
+                    PoemLike).filter(
+                        PoemLike.user_id == user.id).all()
+            comments = db_session.query(
+                    PoemLike).filter(
+                        PoemLike.user_id == user.id).all()
             cur_usr_ctn = db_session.query(
                 UserFollowing).filter(
                     and_(
@@ -42,6 +52,9 @@ async def get_user(id: str, token=''):
                 )).first()
             followers_count = len(followers) if followers else 0
             followings_count = len(followings) if followings else 0
+            poems_count = len(poems) if poems else 0
+            likes_count = len(likes) if likes else 0
+            comments_count = len(comments) if comments else 0
             response = {
                 'success': True,
                 'data': {
@@ -52,6 +65,9 @@ async def get_user(id: str, token=''):
                     'profilePhotoId': user.profile_photo_id,
                     'followersCount': followers_count,
                     'followingsCount': followings_count,
+                    'poemsCount': poems_count,
+                    'likesCount': likes_count,
+                    'commentsCount': comments_count,
                     'isFollowing': cur_usr_ctn is not None,
                 }
             }
@@ -110,6 +126,7 @@ async def update_user_info(
                 raise ValueError(img_kit_res['error']['message'])
         db_session.query(User).filter(User.id == userId).update(
             {
+                User.updated_on: datetime.utcnow(),
                 User.name: name,
                 User.email: email,
                 User.bio: bio
