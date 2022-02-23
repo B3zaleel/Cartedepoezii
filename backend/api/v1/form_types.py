@@ -16,10 +16,12 @@ class SignUpForm(BaseModel):
 
 
 class PasswordResetRequestForm(BaseModel):
+    userId: str
     email: str
 
 
 class PasswordResetForm(BaseModel):
+    userId: str
     email: str
     password: str
     resetToken: str
@@ -46,11 +48,18 @@ class PoemAddForm(BaseModel):
 class PoemUpdateForm(BaseModel):
     authToken: str
     userId: str
+    poemId: str
     title: str
     verses: List[str]
 
 
 class PoemDeleteForm(BaseModel):
+    authToken: str
+    userId: str
+    poemId: str
+
+
+class PoemLikeForm(BaseModel):
     authToken: str
     userId: str
     poemId: str
