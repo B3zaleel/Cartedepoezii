@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy import Column, TIMESTAMP, String
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -29,7 +30,8 @@ class BaseModel:
     updated_on = Column(
         TIMESTAMP(True),
         nullable=False,
-        default=datetime.utcnow()
+        default=datetime.utcnow(),
+        onupdate=datetime.utcnow()
     )
 
     def __init__(self, **kwargs):

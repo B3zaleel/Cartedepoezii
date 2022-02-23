@@ -1,8 +1,10 @@
 #!/usr/bin/python3
+from datetime import datetime
 from sqlalchemy import (
     Column,
     ForeignKey,
     String,
+    TIMESTAMP,
     UniqueConstraint
 )
 
@@ -18,6 +20,17 @@ class PoemLike(BaseModel, Base):
             'user_id',
             name='unique_reaction'
         ),
+    )
+    id = Column(
+        String(64),
+        unique=True,
+        nullable=False,
+        primary_key=True
+    )
+    created_on = Column(
+        TIMESTAMP(True),
+        nullable=False,
+        default=datetime.utcnow()
     )
     poem_id = Column(
         String(64),
