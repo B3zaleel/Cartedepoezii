@@ -27,6 +27,11 @@ class User(BaseModel, Base):
     )
     sign_in_attempts = Column(Integer, nullable=False, default=0)
     is_active = Column(Boolean, default=True)
+    account_reset_token = Column(
+        TEXT,
+        nullable=True,
+        default=''
+    )
     poems = relationship(
         'Poem',
         cascade='all, delete, delete-orphan',

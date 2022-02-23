@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from sqlalchemy import Column, TEXT, ForeignKey, String
+from sqlalchemy import Column, ForeignKey, TEXT, String
 from sqlalchemy.orm import relationship
 
 from . import Base, BaseModel
@@ -14,13 +14,15 @@ class Poem(BaseModel, Base):
         nullable=False
     )
     title = Column(
-        TEXT,
+        String(256),
         nullable=False,
-        default=''
+        default='',
+        index=True
     )
     text = Column(
         TEXT,
-        nullable=False
+        nullable=False,
+        index=True
     )
     comments = relationship(
         'Comment',
