@@ -6,7 +6,7 @@
     <div>
       <div class="header">
         <div>
-          <b>{{ modalTitle }}</b>
+          <h3>{{ modalTitle }}</h3>
         </div>
         <div>
           <button @click="closeDialog" class="close-btn">
@@ -71,8 +71,7 @@ import CloseIcon from '@/assets/icons/Close.vue';
     display: flex;
     flex-flow: column;
     width: fit-content;
-    max-width: 80%;
-    height: clamp(100px, 100%, calc(100% - 2 * 20px));
+    max-height: calc(100% - 2 * 20px);
     max-width: 600px;
     background: white;
     border-radius: 10px;
@@ -81,9 +80,10 @@ import CloseIcon from '@/assets/icons/Close.vue';
     > .header {
       display: grid;
       grid-template-columns: calc(100% - 60px) 60px;
-      box-shadow: 0px 0px 1px 2px rgba(220, 220, 220, 0.767);
+      box-shadow: 0px 0px 1px 2px #dcdcdcc4;
       border-top-left-radius: inherit;
       border-top-right-radius: inherit;
+      cursor: context-menu;
 
       b {
         font-size: 14pt;
@@ -143,7 +143,8 @@ import CloseIcon from '@/assets/icons/Close.vue';
     > .footer {
       display: flex;
       justify-content: flex-end;
-      box-shadow: 0px 0px 1px 2px var(--shadow-color);
+      padding: 10px 5px;
+      box-shadow: 0px 0px 1px 2px #dcdcdcc4;
       border-bottom-left-radius: inherit;
       border-bottom-right-radius: inherit;
 
