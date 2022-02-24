@@ -134,5 +134,5 @@ export default class SignInView extends Vue {
 </script>
 
 <style lang="scss">
-@use "../../assets/styles/auth.scss";
+@use "@/assets/styles/views/auth/auth";
 </style>
