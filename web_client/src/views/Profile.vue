@@ -26,7 +26,7 @@
                 <img :src="getProfilePhotoURL()" @error="imageLoadError"/>
               </button>
 
-              <button class="account-action-btn">
+              <button class="account-action-btn" @click="execAction">
                 {{ actionText }}
               </button>
             </div>
@@ -41,21 +41,55 @@
             </div>
 
             <div class="connections-sect">
-              <button>
+              <button @click="viewFollowers">
                 <b>{{ MathUtils.formatNumber(user.followersCount) }}</b>
                 <b>Followers</b>
               </button>
-              <button>
+              <button @click="viewFollowings">
                 <b>{{ MathUtils.formatNumber(user.followingsCount) }}</b>
                 <b>Followings</b>
               </button>
             </div>
 
-            <div class="bio-sect">
+            <div class="bio-sect" v-show="user.bio.length > 0">
               {{ user.bio }}
             </div>
           </div>
         </div>
+
+        <ModalLayout
+          :modalOpen="openDialog"
+          :modalTitle="dialogTitle"
+          :hasHeader="hasHeader"
+          v-on:request-close="closeDialog"
+        >
+          <template v-slot:modal-body>
+            <div>
+              <div class="followers" v-show="dialogState === DialogStates.Followers">
+                <UserItem :user="userTest"/>
+              </div>
+              <div class="followings" v-show="dialogState === DialogStates.Followings">
+                <UserItem :user="userTest"/>
+              </div>
+              <div class="edit-profile" v-show="dialogState === DialogStates.EditProfile">
+                <EditProfileView :user="user"/>
+              </div>
+              <!-- <div class="followings" v-show="dialogState === DialogStates.ProfilePhoto">
+                <UserItem :user="userTest"/>
+              </div> -->
+            </div>
+          </template>
+
+          <template v-slot:modal-action-panel>
+            <div v-show="dialogState === DialogStates.EditProfile">
+              <div>
+                <button>
+                  Save
+                </button>
+              </div>
+            </div>
+          </template>
+        </ModalLayout>
 
         <TabsLayout
           :items="tabItems"
@@ -81,23 +115,29 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { User } from '@/assets/scripts/type_defs';
+import { User, UserMin } from '@/assets/scripts/type_defs';
 import MathUtils from '@/assets/scripts/math_utils';
 import MainLayout from '@/views/layout/Main.vue';
 import TabsLayout from '@/views/layout/Tabs.vue';
+import ModalLayout from '@/views/layout/Modal.vue';
 import Poem from '@/components/Poem.vue';
 import Comment from '@/components/Comment.vue';
+import UserItem from '@/components/UserItem.vue';
 import ArrowLeftIcon from '@/assets/icons/ArrowLeft.vue';
 import AccountIcon from '@/assets/icons/Account.vue';
 import CalendarMonthIcon from '@/assets/icons/CalendarMonth.vue';
+import EditProfileView from './settings/EditProfile.vue';
 
 @Component({
   name: 'ProfileView',
   components: {
     MainLayout,
     TabsLayout,
+    ModalLayout,
+    EditProfileView,
     Poem,
     Comment,
+    UserItem,
     ArrowLeftIcon,
     AccountIcon,
     CalendarMonthIcon,
@@ -105,6 +145,24 @@ import CalendarMonthIcon from '@/assets/icons/CalendarMonth.vue';
 })
 export default class ProfileView extends Vue {
   actionText = '';
+
+  hasHeader = true;
+
+  hasFooter = true;
+
+  dialogTitle = '';
+
+  openDialog = false;
+
+  dialogState!: number;
+
+  DialogStates = {
+    None: 0,
+    Followers: 1,
+    Followings: 2,
+    EditProfile: 3,
+    ProfilePhoto: 4,
+  }
 
   MathUtils = MathUtils;
 
@@ -126,6 +184,8 @@ export default class ProfileView extends Vue {
   selectedId = 1;
 
   user!: User;
+
+  userTest!: UserMin;
 
   imageLoadFailed = false;
 
@@ -161,18 +221,24 @@ export default class ProfileView extends Vue {
     return `Joined ${months[joinDateStr.getMonth()]} ${joinDateStr.getFullYear()}`;
   }
 
-  checkAction() {
-    const options = ['Edit Profile', 'Unfollow', 'Follow'];
-    let idx = -1;
-
+  onMouseEnterAction(): void {
     if (this.user.id === this.$store.state.user.id) {
-      idx = 0;
+      this.actionText = 'Edit Profile';
     } else if (this.user.isFollowing) {
-      idx = 1;
+      this.actionText = 'Unfollow';
     } else {
-      idx = 2;
+      this.actionText = 'Follow';
     }
-    return { id: idx, value: options[idx] };
+  }
+
+  onMouseLeaveAction(): void {
+    if (this.user.id === this.$store.state.user.id) {
+      this.actionText = 'Edit Profile';
+    } else if (this.user.isFollowing) {
+      this.actionText = 'Following';
+    } else {
+      this.actionText = 'Follow';
+    }
   }
 
   getSubTitle(): string {
@@ -194,11 +260,59 @@ export default class ProfileView extends Vue {
     }
   }
 
+  execAction(): void {
+    let actionId = -1;
+    if (this.user.id === this.$store.state.user.id) {
+      actionId = 0;
+    } else if (this.user.isFollowing) {
+      actionId = 1;
+    } else {
+      actionId = 2;
+    }
+    switch (actionId) {
+      case 0: {
+        this.viewEditProfile();
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  viewFollowers(): void {
+    this.openDialog = true;
+    this.dialogTitle = 'Followed by';
+    this.hasHeader = true;
+    this.hasFooter = false;
+    this.dialogState = this.DialogStates.Followers;
+  }
+
+  viewFollowings(): void {
+    this.openDialog = true;
+    this.dialogTitle = 'Following';
+    this.hasHeader = true;
+    this.hasFooter = false;
+    this.dialogState = this.DialogStates.Followings;
+  }
+
+  viewEditProfile(): void {
+    this.openDialog = true;
+    this.dialogTitle = 'Edit Profile';
+    this.hasHeader = true;
+    this.hasFooter = true;
+    this.dialogState = this.DialogStates.EditProfile;
+  }
+
+  closeDialog(): void {
+    this.openDialog = false;
+  }
+
   created(): void {
     this.user = {
       id: this.$route.params.id,
       joinDate: new Date(),
       name: 'Beza',
+      email: 'Beza',
       bio: '',
       profilePhotoId: '',
       followersCount: 0,
@@ -208,7 +322,20 @@ export default class ProfileView extends Vue {
       likesCount: 0,
       commentsCount: 5,
     };
-    this.actionText = this.checkAction().value;
+    this.userTest = {
+      id: 'fggiish-',
+      name: 'John',
+      profilePhotoId: '455',
+      isFollowing: false,
+    };
+    if (this.user.id === this.$store.state.user.id) {
+      this.actionText = 'Edit Profile';
+    } else if (this.user.isFollowing) {
+      this.actionText = 'Following';
+    } else {
+      this.actionText = 'Follow';
+    }
+    this.dialogState = this.DialogStates.None;
   }
 
   // loadUserInfo() {}
