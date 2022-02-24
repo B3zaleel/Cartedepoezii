@@ -64,6 +64,16 @@ const routes: Array<RouteConfig> = [
     component: () => import('../views/Profile.vue'),
   },
   {
+    path: '/poem/:id',
+    props: { id: String },
+    name: 'Poem',
+    meta: {
+      title: 'Poem',
+      requiresAuth: true,
+    },
+    component: () => import('../views/Poem.vue'),
+  },
+  {
     path: '/search/:q',
     props: { q: String },
     name: 'Search',
@@ -74,7 +84,7 @@ const routes: Array<RouteConfig> = [
     component: () => import('../views/Search.vue'),
   },
   {
-    path: '/tos',
+    path: '/terms-of-service',
     name: 'TOS',
     meta: {
       title: 'Terms of Service',
