@@ -1,0 +1,45 @@
+@use '@/assets/styles/form-txb';
+
+.auth {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  min-height: calc(100% - 2 * 10%);
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  padding: 10%;
+  overflow: auto;
+
+  .close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+  }
+
+  > div {
+    width: clamp(120px, 80%, 400px);
+    // height: clamp(300px, calc(80% - 2 * 10px), 400px);
+    border-radius: 10px;
+    border: 2px groove gray;
+    background: #cdd;
+    padding: 10px;
+
+    h2 {
+      font-size: 1em;
+    }
+    > form > .action{
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 5px;
+    }
+  }
+}
