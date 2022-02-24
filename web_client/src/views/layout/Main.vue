@@ -59,6 +59,28 @@
 
       <div>
         <slot name="main"></slot>
+          <ModalLayout
+            :modalOpen="isWritingPoem"
+            :modalTitle="dialogTitle"
+            :hasHeader="hasHeader"
+            v-on:request-close="closeDialog"
+          >
+            <template v-slot:modal-body>
+              <div>
+                <PoemEdit/>
+              </div>
+            </template>
+
+            <template v-slot:modal-action-panel>
+              <div>
+                <div>
+                  <button>
+                    Done
+                  </button>
+                </div>
+              </div>
+            </template>
+          </ModalLayout>
       </div>
     </div>
 
@@ -71,20 +93,6 @@
         </div>
       </div>
     </div>
-
-    <div
-      class="poem-post-dialog"
-      id="top-dialog"
-      v-show="isDialogOpen"
-      @mousedown.self="closeDialog"
-    >
-      <div>
-        <slot name="dialog"></slot>
-        <div v-show="isWritingPoem">
-          <PoemEdit/>
-        </div>
-      </div>
-    </div>
   </main>
 </template>
 
@@ -93,6 +101,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import PoemEdit from '@/components/PoemEdit.vue';
 import CartedepoeziiLogo from '@/assets/icons/Logo.vue';
 import PenIcon from '@/assets/icons/Pen.vue';
+import ModalLayout from './Modal.vue';
 
 @Component({
   name: 'MainLayout',
@@ -114,6 +123,7 @@ import PenIcon from '@/assets/icons/Pen.vue';
   },
   // watch: {},
   components: {
+    ModalLayout,
     PoemEdit,
     CartedepoeziiLogo,
     PenIcon,
@@ -122,7 +132,9 @@ import PenIcon from '@/assets/icons/Pen.vue';
 export default class MainLayout extends Vue {
   isWritingPoem = false;
 
-  isDialogOpen = false;
+  hasHeader = true;
+
+  dialogTitle = 'Create Poem';
 
   adjustPanes = (): void => {
     const leftPane = document.getElementById('left-pane_main-layout');
@@ -172,17 +184,10 @@ export default class MainLayout extends Vue {
 
   openPoemDialog(): void {
     this.isWritingPoem = true;
-    this.openDialog();
-  }
-
-  openDialog(): void {
-    this.isDialogOpen = true;
   }
 
   closeDialog(): void {
     this.isWritingPoem = false;
-    this.isDialogOpen = false;
-    this.$emit('dialog-closed');
   }
 }
 </script>
