@@ -1,6 +1,7 @@
 export interface User {
   id: string,
   name: string,
+  email: string,
   bio: string,
   joinDate: Date,
   profilePhotoId: string,
@@ -12,9 +13,16 @@ export interface User {
   isFollowing: boolean,
 }
 
+export interface UserMin {
+  id: string,
+  name: string,
+  profilePhotoId: string,
+  isFollowing: boolean,
+}
+
 export interface Poem {
   id: string,
-  user: User,
+  user: UserMin,
   title: string,
   publishedDate: Date,
   verses: Array<string>,
@@ -25,8 +33,8 @@ export interface Poem {
 
 export interface Comment {
   id: string,
-  user: User,
-  poem: Poem,
+  user: UserMin,
+  poemId: string,
   createdDate: Date,
   text: string,
   repliesTo: string,
