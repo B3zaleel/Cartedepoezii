@@ -1,0 +1,56 @@
+
+/* #region Text box with an over label */
+.txb-label-over {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+
+  > .label {
+    position: absolute;
+    width: calc(100% - 2 * 12px);
+    user-select: none;
+    z-index: 5;
+    left: 12px;
+    font-size: 0.9em;
+    cursor: text;
+    color: gray;
+
+    > div {
+      display: grid;
+      grid-template-columns: 1fr auto;
+    }
+
+    &.roll-up {
+      top: calc(0.1em + 0.35em);
+      font-size: 0.7em;
+    }
+  }
+
+
+  > input {
+    width: 100%;
+    padding: calc(0.7em + 8px) 10px 5px 10px;
+    border-radius: 5px;
+    border: 2px solid var(--primary-color);
+    background: inherit;
+    outline: none;
+  }
+
+  > input:focus {
+    color: var(--primary-color-200);
+    border: 2px solid var(--primary-color);
+  }
+}
+
+@keyframes txt-label-over-focus-anim {
+  from {
+    top: 15px;
+    font-size: 0.8em;
+  }
+  to {
+    top: 5px;
+    font-size: 0.7em;
+  }
+}
+/* #endregion */
