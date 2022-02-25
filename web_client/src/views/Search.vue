@@ -7,7 +7,7 @@
             placeholder="Search Cartedepoezii"
             v-model="searchQuery"
           />
-          <button>
+          <button class="cdp-btn icon">
             <MagnifyIcon/>
           </button>
         </div>
@@ -15,7 +15,7 @@
     </template>
 
     <template v-slot:main>
-      <div class="user-home">
+      <div class="user-search">
         <div>
           <TabsLayout
             :items="tabItems"
@@ -83,20 +83,5 @@ export default class SearchView extends Vue {
 </script>
 
 <style lang="scss">
-.header-pane {
-  > .search-pane {
-    position: absolute;
-    display: grid;
-    align-items: center;
-    width: calc(100% - 2 * 5px);
-    left: 5px;
-    grid-template-columns: 1fr auto;
-
-    > input {
-      padding: 5px 10px;
-      border-radius: 15px;
-      border: 2px solid rgb(59, 230, 144);
-    }
-  }
-}
+@use "@/assets/styles/views/search";
 </style>
