@@ -1,4 +1,5 @@
-@use '@/assets/styles/form-txb';
+@use '@/assets/styles/textboxes';
+@use '@/assets/styles/globals';
 
 .auth {
   position: fixed;
@@ -26,11 +27,11 @@
 
   > div {
     width: clamp(120px, 80%, 400px);
-    // height: clamp(300px, calc(80% - 2 * 10px), 400px);
-    border-radius: 10px;
-    border: 2px groove gray;
-    background: #cdd;
     padding: 10px;
+    border-radius: 10px;
+    border: 2px groove globals.$primary-color;
+    background: white;
+    box-shadow: 0 0 1.5px 1.5px globals.$primary-color-lighter;
 
     h2 {
       font-size: 1em;
