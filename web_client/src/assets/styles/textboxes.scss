@@ -1,5 +1,5 @@
+@use "./globals";
 
-/* #region Text box with an over label */
 .txb-label-over {
   position: relative;
   display: flex;
@@ -32,14 +32,14 @@
     width: 100%;
     padding: calc(0.7em + 8px) 10px 5px 10px;
     border-radius: 5px;
-    border: 2px solid var(--primary-color);
+    border: 2px solid gainsboro;
     background: inherit;
     outline: none;
   }
 
   > input:focus {
-    color: var(--primary-color-200);
-    border: 2px solid var(--primary-color);
+    color: black;
+    border: 2px solid globals.$primary-color-lighter;
   }
 }
 
