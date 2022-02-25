@@ -6,20 +6,7 @@
 
 <style lang="scss">
 @use "@/assets/styles/globals";
-// @font-face{
-//   src: url("@/assets/fonts/sans-serif/Quicksand-VariableFont_wght.ttf") format("truetype");
-//   font-family: CartedepoeziiFont;
-// }
-
-// @font-face{
-//   src: url("@/assets/fonts/serif/ZenAntique-Regular.ttf") format("truetype");
-//   font-family: CartedepoeziiSerifFont;
-// }
-
-:root {
-  --primary-color-light: #537494;
-  --primary-color: #2c3e50;
-}
+@use "@/assets/styles/buttons";
 
 html, body {
   margin: 0;
@@ -58,23 +45,4 @@ h2 {
   }
 }
 
-.btn-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 12px;
-  border: 1px solid gray;
-  border-radius: 16px;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.btn-link.bold {
-  color: white;
-  background: #2c3e50;
-}
-
-.btn-link:hover {
-  opacity: 0.8;
-}
 </style>
