@@ -1,7 +1,8 @@
 #!/usr/bin/python3
+import io
 import os
 from fastapi import APIRouter
-from fastapi.responses import FileResponse, RedirectResponse
+from starlette.responses import FileResponse
 from imagekitio import ImageKit
 
 
@@ -20,13 +21,21 @@ async def root():
     }
 
 
-@home_router.get('/favicon.ico', response_class=FileResponse)
+@home_router.get('/favicon')
+@home_router.get('/favicon.ico')
 async def favicon():
-    favicon_path = '../static/Logo.png'
-    return favicon_path
+    favicon_path = 'api/v1/static/Logo.png'
+    # favicon_data = []
+    # with open(favicon_path, 'rb') as file:
+    #     favicon_data = file.read()
+    favicon_content = FileResponse(
+        path=favicon_path,
+        media_type="image/png"
+    )
+    return favicon_content
 
 
-@home_router.get('/api/v1/profile-photo', response_class=RedirectResponse)
+@home_router.get('/api/v1/profile-photo')
 async def get_profile_photo(imgId: str):
     imagekit = ImageKit(
         private_key=os.getenv('IMG_CDN_PRI_KEY'),
@@ -35,7 +44,7 @@ async def get_profile_photo(imgId: str):
     )
     response = {
         'success': False,
-        'message': 'Failed to find URL'
+        'message': 'Failed to find URL.'
     }
     try:
         img_kit_res = imagekit.get_file_details(imgId)
