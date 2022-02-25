@@ -6,10 +6,10 @@
         <AccountIcon/>
       </div>
       <div>
-        <button @click="removeImage">
+        <button class="cdp-btn icon danger" @click="removeImage">
           <DeleteIcon/>
         </button>
-        <button @click="changeImage">
+        <button class="cdp-btn icon" @click="changeImage">
           <SyncIcon/>
           <input
             class="file-input"
@@ -206,6 +206,6 @@ export default class EditProfileView extends Vue {
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/form-txb';
+@use '@/assets/styles/textboxes';
 @use '@/assets/styles/views/settings/edit_profile';
 </style>
