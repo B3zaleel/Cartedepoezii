@@ -67,14 +67,14 @@
           >
             <template v-slot:modal-body>
               <div>
-                <PoemEdit/>
+                <PoemEdit :poem="newPoem"/>
               </div>
             </template>
 
             <template v-slot:modal-action-panel>
               <div>
                 <div>
-                  <button>
+                  <button class="cdp-btn text">
                     Done
                   </button>
                 </div>
@@ -86,10 +86,20 @@
 
     <div class="right-pane" id="right-pane_main-layout">
       <div>
-        <div></div>
+        <div :class="{search: true, hidden: canHideSearchPanel()}">
+          <input placeholder="Search Cartedepoezii" v-model="searchQuery"/>
+          <button class="cdp-btn icon">
+            <MagnifyIcon/>
+          </button>
+        </div>
 
-        <div>
-          This is the right pane
+        <div class="info">
+          <router-link to="/terms-of-service">Terms of Service</router-link>
+          <router-link to="/privacy-policy">Privacy Policy</router-link>
+          <router-link to="/about">About</router-link>
+          <span>
+            &copy; {{ new Date().getFullYear() }} Cartedepoezii
+          </span>
         </div>
       </div>
     </div>
@@ -98,9 +108,11 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { Poem } from '@/assets/scripts/type_defs';
 import PoemEdit from '@/components/PoemEdit.vue';
 import CartedepoeziiLogo from '@/assets/icons/Logo.vue';
 import PenIcon from '@/assets/icons/Pen.vue';
+import MagnifyIcon from '@/assets/icons/Magnify.vue';
 import ModalLayout from './Modal.vue';
 
 @Component({
@@ -127,6 +139,7 @@ import ModalLayout from './Modal.vue';
     PoemEdit,
     CartedepoeziiLogo,
     PenIcon,
+    MagnifyIcon,
   },
 })
 export default class MainLayout extends Vue {
@@ -135,6 +148,24 @@ export default class MainLayout extends Vue {
   hasHeader = true;
 
   dialogTitle = 'Create Poem';
+
+  searchQuery = '';
+
+  newPoem: Poem = {
+    id: '',
+    title: '',
+    user: {
+      id: this.$store.state.user.id,
+      name: '',
+      isFollowing: false,
+      profilePhotoId: '',
+    },
+    publishedDate: new Date(),
+    commentsCount: 0,
+    likesCount: 0,
+    isLiked: false,
+    verses: [''],
+  };
 
   adjustPanes = (): void => {
     const leftPane = document.getElementById('left-pane_main-layout');
@@ -165,6 +196,13 @@ export default class MainLayout extends Vue {
     }
   };
 
+  canHideSearchPanel(): boolean {
+    if (this.$route.path.startsWith('/search')) {
+      return true;
+    }
+    return this.$route.path.startsWith('/explore');
+  }
+
   mounted(): void {
     this.adjustPanes();
     window.addEventListener('resize', () => {
@@ -183,6 +221,21 @@ export default class MainLayout extends Vue {
   }
 
   openPoemDialog(): void {
+    this.newPoem = {
+      id: '',
+      title: '',
+      user: {
+        id: this.$store.state.user.id,
+        name: '',
+        isFollowing: false,
+        profilePhotoId: '',
+      },
+      publishedDate: new Date(),
+      commentsCount: 0,
+      likesCount: 0,
+      isLiked: false,
+      verses: [''],
+    };
     this.isWritingPoem = true;
   }
 
