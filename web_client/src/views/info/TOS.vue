@@ -5,12 +5,12 @@
         <div class="header-pane">
           <div>
             <div>
-              <button @click="goBack">
+              <button class="cdp-btn icon" @click="goBack">
                 <ArrowLeftIcon/>
               </button>
             </div>
             <div>
-              <h3>Terms of Service</h3>
+              <h1>Terms of Service</h1>
             </div>
           </div>
         </div>
@@ -53,4 +53,6 @@ export default class TOSView extends Vue {
 }
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+@use "@/assets/styles/views/info";
+</style>

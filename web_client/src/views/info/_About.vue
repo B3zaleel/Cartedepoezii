@@ -1,12 +1,12 @@
 <template>
-  <article class='app-about'>
+  <article class='info about'>
     <h1>About</h1>
     <p>
       Lorem ipsum dolor sit, amet consectetur adipisicing elit. Optio quibusdam soluta id molestias
       nam ipsa ipsam assumenda quis voluptates totam tenetur cupiditate repellendus doloribus,
       incidunt harum cum commodi ex impedit!
     </p>
-    <pre>
+    <p>
 The MIT License (MIT)
 
 Copyright (c) 2013 Mike Gehard, Exercism
@@ -28,7 +28,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-    </pre>
+    </p>
   </article>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-  <article class="app-tos">
+  <article class="info tos">
     <p>
       Lorem ipsum dolor sit, amet consectetur adipisicing elit.
       Optio quibusdam soluta id molestias nam ipsa ipsam assumenda
