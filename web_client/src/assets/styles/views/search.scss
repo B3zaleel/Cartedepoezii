@@ -1,0 +1,25 @@
+@use "@/assets/styles/globals";
+
+.header-pane {
+  > .search-pane {
+    position: absolute;
+    display: grid;
+    align-items: center;
+    width: calc(100% - 2 * 5px);
+    left: 5px;
+    grid-template-columns: 1fr auto;
+    column-gap: 5px;
+
+    > input {
+      padding: 5px 10px;
+      border-radius: 15px;
+      border: 2px solid gainsboro;
+      outline: none;
+      min-width: 50px;
+
+      &:focus {
+        border: 2px solid globals.$primary-color-lighter;
+      }
+    }
+  }
+}
