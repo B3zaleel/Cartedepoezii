@@ -96,13 +96,20 @@ async def add_poem(body: PoemAddForm):
     try:
         gen_id = str(uuid.uuid4())
         cur_time = datetime.utcnow()
-        poem = Comment(
+        adjusted_verses = []
+        txt_fill = '\n\xa0'
+        trimmed_verses = map(lambda x: x.strip(), body.verses)
+        max_line = max(map(lambda x: x.count('\n'), trimmed_verses))
+        for verse in trimmed_verses:
+            new_verse = '{}{}'.format(verse, txt_fill * (max_line - verse.count('\n')))
+            adjusted_verses.append(new_verse)
+        poem = Poem(
             id=gen_id,
             created_on=cur_time,
             updated_on=cur_time,
             user_id=body.userId,
             title=body.title,
-            text=json.JSONEncoder().encode(body.verses)
+            text=json.JSONEncoder().encode(adjusted_verses)
         )
         db_session.add(poem)
         db_session.commit()
@@ -142,11 +149,18 @@ async def update_poem(body: PoemUpdateForm):
     db_session = get_session()
     try:
         cur_time = datetime.utcnow()
+        adjusted_verses = []
+        txt_fill = '\n\xa0'
+        trimmed_verses = map(lambda x: x.strip(), body.verses)
+        max_line = max(map(lambda x: x.count('\n'), trimmed_verses))
+        for verse in trimmed_verses:
+            new_verse = '{}{}'.format(verse, txt_fill * (max_line - verse.count('\n')))
+            adjusted_verses.append(new_verse)
         db_session.query(Poem).filter(Poem.id == body.poemId).update(
             {
                 Poem.title: body.title,
                 Poem.updated_on: cur_time,
-                Poem.text: json.JSONEncoder().encode(body.verses)
+                Poem.text: json.JSONEncoder().encode(adjusted_verses)
             },
             synchronize_session=False
         )
