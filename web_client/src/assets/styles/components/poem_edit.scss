@@ -1,0 +1,28 @@
+.poem-edit {
+  > .verses-pane {
+    display: grid;
+    grid-template-columns: 1fr auto;
+
+    > div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 5px;
+    }
+  }
+
+  > .verses-nav-pane {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    > .page-status {
+      margin: 5px;
+      padding: 2px 5px;
+      border-radius: 2px;
+      background: gainsboro;
+      cursor: context-menu;
+    }
+  }
+}
