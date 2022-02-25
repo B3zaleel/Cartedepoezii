@@ -17,7 +17,7 @@
           <div>
             <h1>It's poetic</h1>
             <h2>Join Cartedepoezii today.</h2>
-            <router-link class="btn-link bold" to="/sign-up">Sign up with email</router-link>
+            <router-link class="cdp-btn text" to="/sign-up">Sign up with email</router-link>
             <div>
               <h4>
                 By signing up, you agree to our
@@ -29,7 +29,7 @@
 
           <div>
             <h3>Already have an account?</h3>
-            <router-link class="btn-link" to="/sign-in">Sign In</router-link>
+            <router-link class="cdp-btn text" to="/sign-in">Sign In</router-link>
           </div>
         </div>
       </div>
@@ -93,10 +93,24 @@ export default class GuestHomeView extends Vue {}
 
     > div:nth-child(2) {
       padding: 20px;
+
+      > div {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    h1 {
+      font-size: 2.5em;
+    }
+
+    h2 {
+      font-size: clamp(18px, 2.0em, 25px);
     }
 
     h3 {
-      font-size: 0.7em;
+      font-size: clamp(12px, 1.2em, 18px);
     }
 
     h4 {
