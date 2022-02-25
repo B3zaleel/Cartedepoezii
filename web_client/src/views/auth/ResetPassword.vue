@@ -151,5 +151,5 @@ export default class ForgotPasswordView extends Vue {
 </script>
 
 <style lang="scss">
-@use "@/assets/styles/views/auth/auth";
+@use "@/assets/styles/views/auth";
 </style>
