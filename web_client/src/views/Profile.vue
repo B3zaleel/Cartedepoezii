@@ -4,7 +4,7 @@
       <div class="header-pane">
         <div>
           <div>
-            <button>
+            <button class="cdp-btn icon">
               <ArrowLeftIcon/>
             </button>
           </div>
@@ -83,7 +83,7 @@
           <template v-slot:modal-action-panel>
             <div v-show="dialogState === DialogStates.EditProfile">
               <div>
-                <button>
+                <button class="cdp-btn text">
                   Save
                 </button>
               </div>
