@@ -41,42 +41,5 @@ export default class TabsLayout extends Vue {
 </script>
 
 <style lang="scss">
-.tabs-layout {
-  > .tab-header {
-    display: flex;
-    flex-flow: row;
-    justify-content: space-evenly;
-    height: 40px;
-
-    > .tab-btn {
-      position: relative;
-      width: calc(100%);
-      height: 100%;
-      border: none;
-      border-radius: 0;
-      background: none;
-      cursor: pointer;
-      transition-property: background;
-      transition-duration: 300ms;
-
-      > .selected-notif {
-        position: absolute;
-        display: inline-block;
-        height: 5px;
-        width: 80%;
-        bottom: 0;
-        left: 10%;
-        border-radius: 5px;
-        background: #6bd39f;
-      }
-
-      &:hover {
-        background: rgb(199, 199, 199);
-      }
-    }
-  }
-  > .tab-content {
-    border-top: 2px solid gray;
-  }
-}
+@use "@/assets/styles/views/layout/tabs";
 </style>
