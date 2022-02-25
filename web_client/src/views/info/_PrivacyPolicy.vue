@@ -1,5 +1,5 @@
 <template>
-  <article class="app-privacy-policy">
+  <article class="info privacy-policy">
     <p>
       Lorem ipsum dolor sit, amet consectetur adipisicing elit.
       Optio quibusdam soluta id molestias nam ipsa ipsam assumenda

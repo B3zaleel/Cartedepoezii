@@ -5,12 +5,12 @@
         <div class="header-pane">
           <div>
             <div>
-              <button @click="goBack">
+              <button class="cdp-btn icon" @click="goBack">
                 <ArrowLeftIcon/>
               </button>
             </div>
             <div>
-              <h3>About Cartedepoezii</h3>
+              <h1>About Cartedepoezii</h1>
             </div>
           </div>
         </div>
@@ -60,9 +60,5 @@ export default class AboutView extends Vue {
 </script>
 
 <style lang="scss">
-.app-about {
-  p {
-    padding: 10px;
-  }
-}
+@use "@/assets/styles/views/info";
 </style>
