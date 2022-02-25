@@ -1,0 +1,45 @@
+@use "./globals";
+
+.cdp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px;
+  border: 1px solid transparent;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+  transition-property: background;
+  transition-duration: 300ms;
+
+  &.text {
+    padding: 2px 10px;
+    border-color: globals.$primary-color;
+    border-radius: 15px;
+    background: globals.$primary-color;
+    color: white;
+    font-weight: 700;
+
+    &:hover {
+      opacity: 0.85;
+      box-shadow: 0 0 2px 2px gainsboro;
+    }
+  }
+
+  &.icon {
+    padding: 2px;
+    border-radius: 50%;
+    background: none;
+
+    &:hover {
+      background: gainsboro;
+    }
+  }
+
+  &.danger:hover {
+    // background: globals.$danger-color;
+    color: white;
+    fill: globals.$danger-color-light;
+    transition-duration: 700ms;
+  }
+}
