@@ -9,7 +9,7 @@
           <h3>{{ modalTitle }}</h3>
         </div>
         <div>
-          <button @click="closeDialog" class="close-btn">
+          <button @click="closeDialog" class="cdp-btn icon danger">
             <CloseIcon />
           </button>
         </div>
@@ -52,110 +52,5 @@ import CloseIcon from '@/assets/icons/Close.vue';
 </script>
 
 <style lang="scss">
-.modal-view {
-  position: fixed;
-  display: flex;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-  justify-items: center;
-  z-index: 600;
-  background: hsla(0, 0%, 80%, 0.4);
-
-  > div {
-    position: relative;
-    display: flex;
-    flex-flow: column;
-    width: fit-content;
-    max-height: calc(100% - 2 * 20px);
-    max-width: 600px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 0 2px 2px var(--shadow-color);
-
-    > .header {
-      display: grid;
-      grid-template-columns: calc(100% - 60px) 60px;
-      box-shadow: 0px 0px 1px 2px #dcdcdcc4;
-      border-top-left-radius: inherit;
-      border-top-right-radius: inherit;
-      cursor: context-menu;
-
-      b {
-        font-size: 14pt;
-      }
-
-      > div:nth-child(2) {
-        display: flex;
-        justify-content: flex-end;
-      }
-
-      > div:nth-child(1) {
-        display: flex;
-        align-items: center;
-        justify-items: flex-start;
-        padding: 5px 10px;
-      }
-
-      > div:nth-child(2) {
-        display: flex;
-        align-items: center;
-        justify-items: center;
-        padding: 5px 10px;
-      }
-
-      &.hidden {
-        display: none;
-      }
-    }
-
-    .close-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2.5px;
-      background: gray;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-
-      &:hover {
-        background: gainsboro;
-        color: white;
-        fill: var(--primary-color-full);
-      }
-
-      > svg {
-        width: 25px;
-        height: 25px;
-      }
-    }
-
-    > .content {
-      padding: 10px;
-      overflow: auto;
-    }
-
-    > .footer {
-      display: flex;
-      justify-content: flex-end;
-      padding: 10px 5px;
-      box-shadow: 0px 0px 1px 2px #dcdcdcc4;
-      border-bottom-left-radius: inherit;
-      border-bottom-right-radius: inherit;
-
-      &.hidden {
-        display: none;
-      }
-    }
-  }
-
-  &.hidden {
-    display: none;
-  }
-}
+@use "@/assets/styles/views/layout/modal";
 </style>
