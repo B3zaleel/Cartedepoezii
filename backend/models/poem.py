@@ -1,8 +1,16 @@
 #!/usr/bin/python3
-from sqlalchemy import Column, ForeignKey, TEXT, String
+from sqlalchemy import (
+    Index,
+    Column,
+    ForeignKey,
+    TEXT,
+    String
+)
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func, cast
 
-from . import Base, BaseModel
+from . import Base, BaseModel, create_tsvector
 
 
 class Poem(BaseModel, Base):
@@ -33,4 +41,22 @@ class Poem(BaseModel, Base):
         'PoemLike',
         cascade='all, delete, delete-orphan',
         backref='poem'
+    )
+    __ts_text_vector__ = create_tsvector(
+        cast(func.coalesce(text, ''), postgresql.TEXT)
+    )
+    __ts_title_vector__ = create_tsvector(
+        cast(func.coalesce(title,  ''), postgresql.TEXT)
+    )
+    __table_args__ = (
+        Index(
+            'idx_poem_text_tsv',
+            __ts_text_vector__,
+            postgresql_using='gin'
+        ),
+        Index(
+            'idx_poem_title_tsv',
+            __ts_title_vector__,
+            postgresql_using='gin'
+        ),
     )

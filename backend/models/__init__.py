@@ -2,10 +2,11 @@
 import os
 from datetime import datetime
 from sqlalchemy import create_engine
-from sqlalchemy import Column, TIMESTAMP, String
-from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy import Column, TIMESTAMP, text, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import func
+
 
 SQLALCHEMY_DATABASE_URL = '{}://{}:{}@{}:{}/{}'.format(
     os.getenv('DB_DIALECT_DRIVER'),
@@ -37,3 +38,12 @@ class BaseModel:
     def __init__(self, **kwargs):
         for key, val in kwargs.items():
             setattr(self, key, val)
+
+
+def create_tsvector(*args):
+    '''Creates a TSVector column with the given table columns.
+    '''
+    exp = args[0]
+    for e in args[1:]:
+        exp += ' ' + e
+    return func.to_tsvector('english', exp)
