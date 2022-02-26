@@ -11,7 +11,14 @@ from ..form_types import (
     PoemLikeForm,
     PoemDeleteForm
 )
-from ..database import get_session, User, Comment, Poem, PoemLike, UserFollowing
+from ..database import (
+    get_session,
+    User,
+    Comment,
+    Poem,
+    PoemLike,
+    UserFollowing
+)
 from ..utils.token_handlers import AuthToken
 from ..utils.pagination import extract_page
 
@@ -288,31 +295,33 @@ async def get_user_poems(
     user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
-        result = db_session.query(
-            Poem).filter(
-                Poem.user_id == userId).all()
-        new_result = []
+        result = db_session.query(Poem).filter(
+            Poem.user_id == userId
+        ).all()
+        user_poems = []
         if result is not None:
-            user = db_session.query(
-                User).filter(User.id == userId).first()
+            user = db_session.query(User).filter(
+                User.id == userId
+            ).first()
             if not user:
                 return response
             for item in result:
-                comments = db_session.query(
-                    Comment).filter(
-                        Comment.poem_id == item.id).all()
+                comments = db_session.query(Comment).filter(
+                    Comment.poem_id == item.id
+                ).all()
                 comments_count = len(comments) if comments else 0
-                likes = db_session.query(
-                    PoemLike).filter(
-                        PoemLike.poem_id == item.id).all()
+                likes = db_session.query(PoemLike).filter(
+                    PoemLike.poem_id == item.id
+                ).all()
                 likes_count = len(likes) if likes else 0
                 is_liked_by_user = False
                 if user_id:
-                    poem_interaction = db_session.query(
-                        PoemLike).filter(and_(
+                    poem_interaction = db_session.query(PoemLike).filter(
+                        and_(
                             PoemLike.poem_id == item.id,
                             PoemLike.user_id == user_id
-                        )).first()
+                        )
+                    ).first()
                     if poem_interaction:
                         is_liked_by_user = True
                 obj = {
@@ -324,15 +333,18 @@ async def get_user_poems(
                     'likesCount': likes_count,
                     'isLiked': is_liked_by_user
                 }
-                new_result.append(obj)
+                user_poems.append(obj)
+        user_poems.sort(
+            key=lambda x: datetime.fromisoformat(x['publishedOn'])
+        )
         response = {
             'success': True,
             'data': extract_page(
-                new_result,
+                user_poems,
                 span,
                 after,
                 before,
-                False,
+                True,
                 lambda x: x['id']
             )
         }
@@ -341,7 +353,6 @@ async def get_user_poems(
     return response
 
 
-# TODO: Work on this feature
 @router.get('/poems-channel')
 async def get_channel_poems(
     token='',
@@ -359,70 +370,69 @@ async def get_channel_poems(
         return response
     auth_token = AuthToken.decode(token)
     user_id = auth_token.user_id if auth_token is not None else None
+    if not user_id:
+        return response
     db_session = get_session()
     try:
         followings = db_session.query(
             UserFollowing).filter(UserFollowing.follower_id == user_id).all()
-        new_result = []
+        max_size = 2**32 - 1
+        m = len(followings) + 1 if followings else 1
+        n = max_size // m
+        poem_users_ids = [user_id]
         if followings:
-            followings = list(map(lambda x: x.following_id, followings))
-            followings.append(user_id)
-            followings_poems = []
-            for id in followings:
-                poems = db_session.query(
-                    Poem).filter(
-                        Poem.user_id == id).all()
-                user = db_session.query(
-                    User).filter(User.id == id).first()
-                user_poems = []
-                for poem in poems:
-                    comments = db_session.query(
-                        Comment).filter(and_(
-                                Comment.poem_id == poem.id,
-                                Comment.comment_id == None
-                            )).all()
-                    comments_count = len(comments) if comments else 0
-                    likes = db_session.query(
-                        PoemLike).filter(
-                            PoemLike.poem_id == poem.id).all()
-                    likes_count = len(likes) if likes else 0
-                    is_liked_by_user = False
-                    if user_id:
-                        poem_interaction = db_session.query(
-                            PoemLike).filter(and_(
-                                PoemLike.poem_id == poem.id,
-                                PoemLike.user_id == user_id
-                            )).first()
-                        if poem_interaction:
-                            is_liked_by_user = True
-                    obj = {
-                        'id': item.id,
-                        'title': item.title,
-                        'publishedOn': item.created_on.isoformat(),
-                        'verses': json.JSONDecoder().decode(item.text),
-                        'commentsCount': comments_count,
-                        'likesCount': likes_count,
-                        'isLiked': is_liked_by_user
-                    }
-                    user_poems.append(obj)
-                followings_poems.append(
-                    {
-                        'user': {
-                            'id': user.id,
-                            'name': user.name,
-                            'profilePhotoId': user.profile_photo_id
-                        },
-                        'poems': user_poems
-                    }
-                )
+            poem_users_ids.extend(list(map(lambda x: x.following_id, followings)))
+        users_poems = []
+        for id in poem_users_ids:
+            poems = db_session.query(Poem).filter(
+                Poem.user_id == id
+            ).limit(n).all()
+            user = db_session.query(User).filter(
+                User.id == id
+            ).first()
+            for poem in poems:
+                comments = db_session.query(Comment).filter(and_(
+                    Comment.poem_id == poem.id,
+                    Comment.comment_id == None
+                )).all()
+                comments_count = len(comments) if comments else 0
+                likes = db_session.query(PoemLike).filter(
+                    PoemLike.poem_id == poem.id
+                ).all()
+                likes_count = len(likes) if likes else 0
+                is_liked_by_user = False
+                if user_id:
+                    poem_interaction = db_session.query(PoemLike).filter(and_(
+                        PoemLike.poem_id == poem.id,
+                        PoemLike.user_id == user_id
+                    )).first()
+                    if poem_interaction:
+                        is_liked_by_user = True
+                obj = {
+                    'user': {
+                        'id': user.id,
+                        'name': user.name,
+                        'profilePhotoId': user.profile_photo_id
+                    },
+                    'id': poem.id,
+                    'title': poem.title,
+                    'publishedOn': poem.created_on.isoformat(),
+                    'verses': json.JSONDecoder().decode(poem.text),
+                    'commentsCount': comments_count,
+                    'likesCount': likes_count,
+                    'isLiked': is_liked_by_user
+                }
+                users_poems.append(obj)
+        # stable sort based on creation time
+        users_poems.sort(key=lambda x: datetime.fromisoformat(x['publishedOn']))
         response = {
             'success': True,
             'data': extract_page(
-                new_result,
+                users_poems,
                 span,
                 after,
                 before,
-                False,
+                True,
                 lambda x: x['id']
             )
         }
