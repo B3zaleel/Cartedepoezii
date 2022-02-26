@@ -7,7 +7,13 @@ from imagekitio import ImageKit
 from sqlalchemy import and_
 
 from ..form_types import UserDeleteForm
-from ..database import get_session, User, UserFollowing, Poem, PoemLike, Comment
+from ..database import (
+    get_session,
+    User,
+    UserFollowing,
+    Poem,
+    PoemLike
+)
 from ..utils.token_handlers import AuthToken
 
 
@@ -59,8 +65,9 @@ async def get_user(id: str, token=''):
                 'success': True,
                 'data': {
                     'id': user.id,
-                    'joined': user.name,
+                    'joined': user.created_on.isoformat(),
                     'name': user.name,
+                    'email': user.email if user_id else '',
                     'bio': user.bio,
                     'profilePhotoId': user.profile_photo_id,
                     'followersCount': followers_count,
