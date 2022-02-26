@@ -1,8 +1,17 @@
 #!/usr/bin/python3
-from sqlalchemy import Boolean, Column, TEXT, Integer, String
+from sqlalchemy import (
+    Boolean,
+    Index,
+    Column,
+    TEXT,
+    Integer,
+    String
+)
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func, cast
 
-from . import Base, BaseModel
+from . import Base, BaseModel, create_tsvector
 
 
 class User(BaseModel, Base):
@@ -41,4 +50,22 @@ class User(BaseModel, Base):
         'Comment',
         cascade='all, delete, delete-orphan',
         backref='user'
+    )
+    __ts_name_vector__ = create_tsvector(
+        cast(func.coalesce(name, ''), postgresql.TEXT)
+    )
+    __ts_bio_vector__ = create_tsvector(
+        cast(func.coalesce(bio, ''), postgresql.TEXT)
+    )
+    __table_args__ = (
+        Index(
+            'idx_user_name_tsv',
+            __ts_name_vector__,
+            postgresql_using='gin'
+        ),
+        Index(
+            'idx_user_bio_tsv',
+            __ts_bio_vector__,
+            postgresql_using='gin'
+        ),
     )
