@@ -67,7 +67,6 @@ async def get_user(id: str, token=''):
                     'id': user.id,
                     'joined': user.created_on.isoformat(),
                     'name': user.name,
-                    'email': user.email if user_id else '',
                     'bio': user.bio,
                     'profilePhotoId': user.profile_photo_id,
                     'followersCount': followers_count,
