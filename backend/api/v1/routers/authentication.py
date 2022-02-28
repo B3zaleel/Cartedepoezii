@@ -6,7 +6,6 @@ import uuid
 from datetime import datetime
 from fastapi import APIRouter
 from sqlalchemy import and_
-# import mailer
 
 from ..form_types import (
     SignInForm,
@@ -31,15 +30,15 @@ async def sign_in(body: SignInForm):
     db_session = get_session()
     try:
         email_validator.validate_email(body.email)
-        result = db_session.query(User).filter(User.email == body.email).first()
-        if result is not None:
+        user = db_session.query(User).filter(User.email == body.email).first()
+        if user:
             max_sign_in_attempts = int(os.getenv('APP_MAX_SIGNIN_TRIES'))
             try:
-                if result.sign_in_attempts >= max_sign_in_attempts:
+                if user.sign_in_attempts >= max_sign_in_attempts:
                     return response
                 ph = argon2.PasswordHasher()
-                ph.verify(result.password_hash, body.password)
-                if result.sign_in_attempts > 1:
+                ph.verify(user.password_hash, body.password)
+                if user.sign_in_attempts > 1:
                     db_session.query(User).filter(User.email == body.email).update(
                         {
                             User.updated_on: datetime.utcnow(),
@@ -49,23 +48,26 @@ async def sign_in(body: SignInForm):
                     )
                     db_session.commit()
                 auth_token = AuthToken(
-                    user_id=result.id,
-                    email=result.email,
-                    secure_text=result.password_hash,
+                    user_id=user.id,
+                    email=user.email,
+                    secure_text=user.password_hash,
                 )
                 response = {
                     'success': True,
                     'data': {
-                        'userId': result.id,
+                        'userId': user.id,
+                        'name': user.name,
                         'authToken': AuthToken.encode(auth_token),
                     }
                 }
             except argon2.exceptions.VerificationError:
-                is_active = False if result.sign_in_attempts + 1 == max_sign_in_attempts else True
+                is_active = True
+                if user.sign_in_attempts + 1 == max_sign_in_attempts:
+                    is_active = False
                 db_session.query(User).filter(User.email == body.email).update(
                     {
                         User.updated_on: datetime.utcnow(),
-                        User.sign_in_attempts: result.sign_in_attempts + 1,
+                        User.sign_in_attempts: user.sign_in_attempts + 1,
                         User.is_active: is_active,
                     },
                     synchronize_session=False
@@ -114,6 +116,7 @@ async def sign_up(body: SignUpForm):
                 'success': True,
                 'data': {
                     'userId': gen_id,
+                    'name': body.name,
                     'authToken': AuthToken.encode(auth_token)
                 }
             }
@@ -145,14 +148,13 @@ async def request_reset_password(body: PasswordResetRequestForm):
     db_session = get_session()
     try:
         email_validator.validate_email(body.email)
-        result = db_session.query(User).filter(and_(
-            User.id == body.userId,
+        result = db_session.query(User).filter(
             User.email == body.email
-        )).first()
+        ).first()
         if result:
-            reset_token = ResetToken(user_id=body.userId, email=body.email, message='password_reset')
+            reset_token = ResetToken(user_id=result.user_id, email=body.email, message='password_reset')
             db_session.query(User).filter(and_(
-                User.id == body.userId,
+                User.id == result.user_id,
                 User.email == body.email
             )).update(
                 {
@@ -183,10 +185,9 @@ async def reset_password(body: PasswordResetForm):
     db_session = get_session()
     try:
         email_validator.validate_email(body.email)
-        user = db_session.query(User).filter(and_(
-            User.id == body.userId,
+        user = db_session.query(User).filter(
             User.email == body.email
-        )).first()
+        ).first()
         reset_token = ResetToken.decode(body.resetToken)
         if not reset_token:
             return response
@@ -197,7 +198,6 @@ async def reset_password(body: PasswordResetForm):
             }
             return response
         valid_conditions = [
-            reset_token.user_id == body.userId,
             reset_token.email == body.email,
             len(body.password.strip()) > 8,
             reset_token.message == 'password_reset'
@@ -222,8 +222,9 @@ async def reset_password(body: PasswordResetForm):
             response = {
                 'success': True,
                 'data': {
-                    'authToken': AuthToken.encode(auth_token),
-                    'userId': user.id
+                    'userId': user.id,
+                    'name': user.name,
+                    'authToken': AuthToken.encode(auth_token)
                 }
             }
             # TODO: Send a password changed confirmation message
