@@ -1,0 +1,2235 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "0.1.0",
+    "title": "Cartedepoezii API Specification",
+    "contact": {
+      "name": "Bezaleel Olakunori",
+      "email": "bezaleeloci@gmail.com",
+      "url": "https://github.com/B3zaleel"
+    },
+    "description": "The specification for the Cartedepoezii REST API version 1.",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "localhost:5000/api/v1"
+    }
+  ],
+  "paths": {
+    "/sign-up": {
+      "post": {
+        "summary": "Create a new user.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the new user."
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 320,
+                    "description": "The new user's email."
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "description": "The new user's password."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication token for a user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "data": {
+                      "properties": {
+                        "userId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "The user's id."
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "The user's name."
+                        },
+                        "authToken": {
+                          "type": "string",
+                          "description": "The user's authentication token."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sign-in": {
+      "post": {
+        "summary": "Authenticate an existing user.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 320,
+                    "description": "The user's email."
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "description": "The user's password."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication token for a user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "data": {
+                      "properties": {
+                        "userId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "The user's id."
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "The user's name."
+                        },
+                        "authToken": {
+                          "type": "string",
+                          "description": "The user's authentication token."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reset-password": {
+      "post": {
+        "summary": "Create a password reset token for an existing user.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 320,
+                    "description": "The user's email."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset token info for a user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Reset the user's password.",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "The user's email."
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "description": "The user's new password."
+                  },
+                  "resetToken": {
+                    "type": "string",
+                    "description": "The reset token sent to the user's email."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "data": {
+                      "properties": {
+                        "userId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "The user's id."
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "The user's name."
+                        },
+                        "authToken": {
+                          "type": "string",
+                          "description": "The user's new authentication token."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "summary": "Retrieve details about a user.",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The id of the user.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "The authentication token of the current user.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details about a user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update details about a user.",
+        "tags": ["User"],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "authToken": {
+                    "type": "string",
+                    "description": "The user's authentication token."
+                  },
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The user's id."
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 60,
+                    "description": "The user's name."
+                  },
+                  "profilePhoto": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The user's profile photo."
+                  },
+                  "removeProfilePhoto": {
+                    "type": "boolean",
+                    "description": "Specifies the removal of the user's profile photo."
+                  },
+                  "bio": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "description": "The user's bio."
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 320,
+                    "description": "The user's email."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated user info.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "properties": {
+                        "authToken": {
+                          "type": "string",
+                          "description": "The user's authentication token."
+                        },
+                        "profilePhotoId": {
+                          "type": "string",
+                          "description": "The user's profile photo id."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove a user.",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "authToken",
+            "in": "query",
+            "description": "The authentication token of the current user.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The id of the current user.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details about the removed user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/followers": {
+      "get": {
+        "summary": "Retrieve a user's followers.",
+        "tags": ["Connection"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The id of the user.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "The current user's authentication token.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of users to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the user from which the returned users should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the user from which the returned users should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Followers of a user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/UserMin"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/followings": {
+      "get": {
+        "summary": "Retrieve a user's followings.",
+        "tags": ["Connection"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The id of the user.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "The current user's authentication token.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of users to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the user from which the returned users should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the user from which the returned users should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "People followed by a user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/UserMin"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/follow": {
+      "put": {
+        "summary": "Toggle the connection between two users.",
+        "tags": ["Connection"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "authToken",
+                  "userId",
+                  "followId"
+                ],
+                "properties": {
+                  "authToken": {
+                    "type": "string",
+                    "description": "The current user's authentication token."
+                  },
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The id of the current user."
+                  },
+                  "followId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The id of the other user."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connection status between two users.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "properties": {
+                        "status": {
+                          "type": "boolean",
+                          "description": "Specifies if the current user is following the other user."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/poem": {
+      "get": {
+        "summary": "Retrieve details about a poem.",
+        "tags": ["Poem"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The id of the poem.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "The authentication token of the current user.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details about a poem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Poem"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a poem.",
+        "tags": ["Poem"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "authToken",
+                  "userId",
+                  "title",
+                  "verses"
+                ],
+                "properties": {
+                  "authToken": {
+                    "type": "string",
+                    "description": "The user's authentication token."
+                  },
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The user's id."
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "description": "The title of the poem."
+                  },
+                  "verses": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1,
+                    "description": "Verses in the poem."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Details about the created poem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "data": {
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "The id of the poem."
+                        },
+                        "createdOn": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "The time the poem was created."
+                        },
+                        "repliesCount": {
+                          "type": "integer",
+                          "format": "int32",
+                          "description": "The number of replies the poem has."
+                        },
+                        "likesCount": {
+                          "type": "integer",
+                          "format": "int32",
+                          "description": "The number of likes the poem has."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Edit an existing poem.",
+        "tags": ["Poem"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "authToken",
+                  "userId",
+                  "poemId",
+                  "title",
+                  "verses"
+                ],
+                "properties": {
+                  "authToken": {
+                    "type": "string",
+                    "description": "The user's authentication token."
+                  },
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The user's id."
+                  },
+                  "poemId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The id of the poem to edit."
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "description": "The title of the poem."
+                  },
+                  "verses": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "description": "The verses in the poem."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Details about the edited poem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove a poem.",
+        "tags": ["Poem"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "authToken",
+                  "userId",
+                  "poemId"
+                ],
+                "properties": {
+                  "authToken": {
+                    "type": "string",
+                    "description": "The user's authentication token."
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "The user's id."
+                  },
+                  "poemId": {
+                    "type": "string",
+                    "description": "The id of the poem to remove."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Details of the poem deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/like-poem": {
+      "put": {
+        "summary": "Toggle a user's reaction on a poem.",
+        "tags": ["Poem"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "authToken",
+                  "userId",
+                  "poemId"
+                ],
+                "properties": {
+                  "authToken": {
+                    "type": "string",
+                    "description": "The user's authentication token."
+                  },
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The user's id."
+                  },
+                  "poemId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The id of the poem being reacted upon."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User's reaction status on a poem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "properties": {
+                        "status": {
+                          "description": "Specifies if the current user likes the poem.",
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/poems-user-created": {
+      "get": {
+        "summary": "Retrieve poems created by a user.",
+        "tags": ["Poem"],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "The id of the user.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "The authentication token of the current user.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of poems to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the poem from which the returned poems should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the poem from which the returned poems should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Poems posted by a user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PoemMin"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/poems-user-likes": {
+      "get": {
+        "summary": "Retrieve poems liked by a user.",
+        "tags": ["Poem"],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "The id of the user.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "The authentication token of the current user.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of poems to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the poem from which the returned poems should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the poem from which the returned poems should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Poems liked by a user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Poem"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/poems-channel": {
+      "get": {
+        "summary": "Retrieve poems for a user's home channel.",
+        "tags": ["Poem"],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "description": "The authentication token of the current user.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of poems to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the poem from which the returned poems should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the poem from which the returned poems should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Poems for a user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/Poem"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comments": {
+      "get": {
+        "summary": "Retrieve comments of a poem.",
+        "tags": ["Comment"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The id of the poem.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of comments to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the comment from which the returned comments should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the comment from which the returned comments should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments of the given poem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/Comment"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a comment on a poem.",
+        "tags": ["Comment"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "authToken",
+                  "userId",
+                  "poemId",
+                  "text"
+                ],
+                "properties": {
+                  "authToken": {
+                    "type": "string",
+                    "description": "The user's authentication token."
+                  },
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The user's id."
+                  },
+                  "poemId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The id of the poem to comment on."
+                  },
+                  "text": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "description": "The comment's content."
+                  },
+                  "replyTo": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true,
+                    "description": "The comment being replied to."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Details of the comment created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "data": {
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "The id of the created comment."
+                        },
+                        "createdOn": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "The time the comment was created."
+                        },
+                        "poemId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "The id of the poem commented on."
+                        },
+                        "replyTo": {
+                          "type": "string",
+                          "format": "uuid",
+                          "nullable": true,
+                          "description": "The id of the comment replied to."
+                        },
+                        "repliesCount": {
+                          "type": "integer",
+                          "format": "int32",
+                          "description": "The number of replies on the comment."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove a comment on a poem.",
+        "tags": ["Comment"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "authToken",
+                  "userId",
+                  "poemId",
+                  "commentId"
+                ],
+                "properties": {
+                  "authToken": {
+                    "type": "string",
+                    "description": "The user's authenctication token."
+                  },
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The user's id."
+                  },
+                  "poemId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The id of the poem that was commented upon."
+                  },
+                  "commentId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The id of the comment to remove."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Details of the comment deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comment-replies": {
+      "get": {
+        "summary": "Retrieve replies to a comment on a poem.",
+        "tags": ["Comment"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The id of the comment.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "poemId",
+            "in": "query",
+            "description": "The id of the poem.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of comments to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the comment from which the returned comments should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the comment from which the returned comments should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments of the given poem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/Comment"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comments-by-user": {
+      "get": {
+        "summary": "Retrieve comments of a user.",
+        "tags": ["Comment"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The id of the user's comments to retrieve.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "The current user's authentication token.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of comments to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the comment from which the returned comments should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the comment from which the returned comments should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments of the given user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/UserMin"
+                        },
+                        "comments": {
+                          "items": {
+                            "$ref": "#/components/schemas/CommentMin"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search-poems": {
+      "get": {
+        "summary": "Retrieve poems based on a query.",
+        "tags": ["Search"],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "The search query.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "The user's authentication token.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of poems to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the poem from which the returned poems should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the poem from which the returned poems should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Poems that match the query.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/Poem"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search-people": {
+      "get": {
+        "summary": "Retrieve users based on a query.",
+        "tags": ["Search"],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "The search query.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "The user's authentication token.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of users to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the user from which the returned users should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the user from which the returned users should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users that match the query.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/UserMin"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": [
+          "id",
+          "joined",
+          "name",
+          "bio",
+          "profilePhotoId",
+          "followersCount",
+          "followingsCount",
+          "poemsCount",
+          "likesCount",
+          "commentsCount",
+          "isFollowing"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "joined": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "bio": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "profilePhotoId": {
+            "type": "string"
+          },
+          "followersCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "followingsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "poemsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "likesCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "commentsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isFollowing": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserMin": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "profilePhotoId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "profilePhotoId": {
+            "type": "string"
+          },
+          "isFollowing": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "description": "Represents a comment on a poem.",
+        "required": [
+          "id",
+          "user",
+          "createdOn",
+          "text",
+          "poemId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserMin"
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "poemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "replyTo": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "repliesCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CommentMin": {
+        "type": "object",
+        "description": "Represents a comment on a poem (minified).",
+        "required": [
+          "id",
+          "user",
+          "createdOn",
+          "text",
+          "poemId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "poemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "replyTo": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "repliesCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Poem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserMin"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "publishedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "verses": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 1
+            },
+            "minItems": 1
+          },
+          "commentsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "likesCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isLiked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PoemMin": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "publishedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "verses": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "commentsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "likesCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isLiked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "success",
+          "message"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "default": false,
+            "description": "The request status."
+          },
+          "message": {
+            "type": "string",
+            "default": "",
+            "description": "The error message."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "BasicAuth": []
+    }
+  ]
+}
