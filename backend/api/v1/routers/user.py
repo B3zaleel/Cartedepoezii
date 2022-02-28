@@ -32,30 +32,27 @@ async def get_user(id: str, token=''):
     user_id = auth_token.user_id if auth_token is not None else ''
     db_session = get_session()
     try:
-        user = db_session.query(
-            User).filter(User.id == id).first()
+        user = db_session.query(User).filter(User.id == id).first()
         if user:
-            followers = db_session.query(
-                    UserFollowing).filter(
-                        UserFollowing.following_id == user.id).all()
-            followings = db_session.query(
-                    UserFollowing).filter(
-                        UserFollowing.follower_id == user.id).all()
-            poems = db_session.query(
-                    Poem).filter(
-                        Poem.user_id == user.id).all()
-            likes = db_session.query(
-                    PoemLike).filter(
-                        PoemLike.user_id == user.id).all()
-            comments = db_session.query(
-                    PoemLike).filter(
-                        PoemLike.user_id == user.id).all()
-            cur_usr_ctn = db_session.query(
-                UserFollowing).filter(
-                    and_(
-                        UserFollowing.follower_id == user_id,
-                        UserFollowing.following_id == user.id,
-                )).first()
+            followers = db_session.query(UserFollowing).filter(
+                UserFollowing.following_id == user.id
+            ).all()
+            followings = db_session.query(UserFollowing).filter(
+                UserFollowing.follower_id == user.id
+            ).all()
+            poems = db_session.query(Poem).filter(
+                Poem.user_id == user.id
+            ).all()
+            likes = db_session.query(PoemLike).filter(
+                PoemLike.user_id == user.id
+            ).all()
+            comments = db_session.query(PoemLike).filter(
+                PoemLike.user_id == user.id
+            ).all()
+            cur_usr_ctn = db_session.query(UserFollowing).filter(and_(
+                UserFollowing.follower_id == user_id,
+                UserFollowing.following_id == user.id,
+            )).first()
             followers_count = len(followers) if followers else 0
             followings_count = len(followings) if followings else 0
             poems_count = len(poems) if poems else 0
@@ -172,8 +169,8 @@ async def remove_user(body: UserDeleteForm):
     db_session = get_session()
     try:
         db_session.query(UserFollowing).filter(and_(
-                UserFollowing.follower_id == auth_token.user_id,
-                UserFollowing.following_id == body.followId,
+            UserFollowing.follower_id == auth_token.user_id,
+            UserFollowing.following_id == body.followId,
         )).delete(
             synchronize_session=False
         )
