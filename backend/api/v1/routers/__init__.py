@@ -46,6 +46,8 @@ async def get_profile_photo(imgId: str):
         'success': False,
         'message': 'Failed to find URL.'
     }
+    if not imgId:
+        return response
     try:
         img_kit_res = imagekit.get_file_details(imgId)
         img_url = ''
@@ -55,7 +57,9 @@ async def get_profile_photo(imgId: str):
             raise ValueError(img_kit_res['error']['message'])
         response = {
             'success': True,
-            'data': img_url
+            'data': {
+                'url': img_url
+            }
         }
     except Exception as ex:
         print(ex.args[0])
