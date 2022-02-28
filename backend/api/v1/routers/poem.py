@@ -351,52 +351,58 @@ async def get_liked_poems(userId, token='', span=12, after='', before=''):
     user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
-        result = db_session.query(Poem).filter(
-            Poem.user_id == userId
+        likes = db_session.query(PoemLike).filter(
+            PoemLike.user_id == userId
         ).all()
-        user_poems = []
-        if result is not None:
-            user = db_session.query(User).filter(
-                User.id == userId
+        user_poems_liked = []
+        for poem_like in likes:
+            poem = db_session.query(Poem).filter(
+                Poem.id == poem_like.poem_id
             ).first()
-            if not user:
-                return response
-            for item in result:
-                comments = db_session.query(Comment).filter(
-                    Comment.poem_id == item.id
-                ).all()
-                comments_count = len(comments) if comments else 0
-                likes = db_session.query(PoemLike).filter(
-                    PoemLike.poem_id == item.id
-                ).all()
-                likes_count = len(likes) if likes else 0
-                is_liked_by_user = False
-                if user_id:
-                    poem_interaction = db_session.query(PoemLike).filter(
-                        and_(
-                            PoemLike.poem_id == item.id,
-                            PoemLike.user_id == user_id
-                        )
-                    ).first()
-                    if poem_interaction:
-                        is_liked_by_user = True
-                obj = {
-                    'id': item.id,
-                    'title': item.title,
-                    'publishedOn': item.created_on.isoformat(),
-                    'verses': json.JSONDecoder().decode(item.text),
-                    'commentsCount': comments_count,
-                    'likesCount': likes_count,
-                    'isLiked': is_liked_by_user
-                }
-                user_poems.append(obj)
-        user_poems.sort(
+            user = db_session.query(User).filter(
+                User.id == poem.user_id
+            ).first()
+            comments = db_session.query(Comment).filter(and_(
+                Comment.poem_id == poem.id,
+                Comment.comment_id == None
+            )).all()
+            comments_count = len(comments) if comments else 0
+            likes = db_session.query(PoemLike).filter(
+                PoemLike.poem_id == poem.id
+            ).all()
+            likes_count = len(likes) if likes else 0
+            is_liked_by_user = False
+            if user_id != userId:
+                poem_interaction = db_session.query(PoemLike).filter(and_(
+                    PoemLike.poem_id == poem.id,
+                    PoemLike.user_id == user_id
+                )).first()
+                if poem_interaction:
+                    is_liked_by_user = True
+            else:
+                is_liked_by_user = True
+            obj = {
+                'id': poem.id,
+                'user': {
+                    'id': user.id,
+                    'name': user.name,
+                    'profilePhotoId': user.pro,
+                },
+                'title': poem.title,
+                'publishedOn': poem.created_on.isoformat(),
+                'verses': json.JSONDecoder().decode(poem.text),
+                'commentsCount': comments_count,
+                'likesCount': likes_count,
+                'isLiked': is_liked_by_user
+            }
+            user_poems_liked.append(obj)
+        user_poems_liked.sort(
             key=lambda x: datetime.fromisoformat(x['publishedOn'])
         )
         response = {
             'success': True,
             'data': extract_page(
-                user_poems,
+                user_poems_liked,
                 span,
                 after,
                 before,
