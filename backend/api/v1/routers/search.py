@@ -3,7 +3,6 @@ import json
 from fastapi import APIRouter
 from sqlalchemy import and_
 from sqlalchemy.exc import SQLAlchemyError
-
 from typing import List
 
 from ..database import (
@@ -105,23 +104,79 @@ def get_unique_users(
     return results
 
 
-@router.get('/search')
-async def get_poems_or_users(
-    q='',
-    token='',
-    type='poems',
-    span=12,
-    after='',
-    before=''
-    ):
-    '''Retrieves a list of poems or users that match a given query.
+@router.get('/search-poems')
+async def find_poems(q='', token='', span=12, after='', before=''):
+    '''Retrieves a list of poems that match a given query.
     '''
     response = {
         'success': False,
-        'message': 'type must be one of ["poems", "people"].'
+        'message': 'Failed to find poems.'
     }
-    if type not in ('poems', 'people'):
-        return response
+    if span < 0:
+        span = -span
+    auth_token = AuthToken.decode(token)
+    user_id = auth_token.user_id if auth_token is not None else None
+    db_session = get_session()
+    try:
+        if not q or (q and q.strip() == ''):
+            return response
+        text_search_results = db_session.query(Poem).filter(
+            Poem.__ts_text_vector__.match(
+                q,
+                postgresql_regconfig='english'
+            )
+        ).all()
+        title_search_results = db_session.query(Poem).filter(
+            Poem.__ts_title_vector__.match(
+                q,
+                postgresql_regconfig='english'
+            )
+        ).all()
+        new_result = []
+        poems_seen_ids = []
+        if text_search_results:
+            new_result.extend(
+                get_unique_poems(
+                    text_search_results,
+                    poems_seen_ids,
+                    db_session,
+                    user_id
+                )
+            )
+        if title_search_results:
+            new_result.extend(
+                get_unique_poems(
+                    title_search_results,
+                    poems_seen_ids,
+                    db_session,
+                    user_id
+                )
+            )
+        response = {
+            'success': True,
+            'data': extract_page(
+                new_result,
+                span,
+                after,
+                before,
+                False,
+                lambda x: x['id']
+            )
+        }
+    except SQLAlchemyError:
+        response = {
+            'success': False,
+            'message': 'Invalid search query.'
+        }
+    finally:
+        db_session.close()
+    return response
+
+
+@router.get('/search-people')
+async def find_users(q='', token='', span=12, after='', before=''):
+    '''Retrieves a list of users that match a given query.
+    '''
     response = {
         'success': False,
         'message': 'Failed to find {}.'.format(type)
@@ -134,95 +189,50 @@ async def get_poems_or_users(
     try:
         if not q or (q and q.strip() == ''):
             return response
-        if type == 'poems':
-            text_search_results = db_session.query(Poem).filter(
-                Poem.__ts_text_vector__.match(
-                    q,
-                    postgresql_regconfig='english'
+        name_search_results = db_session.query(User).filter(
+            User.__ts_name_vector__.match(
+                q,
+                postgresql_regconfig='english'
+            )
+        ).all()
+        bio_search_results = db_session.query(User).filter(
+            User.__ts_bio_vector__.match(
+                q,
+                postgresql_regconfig='english'
+            )
+        ).all()
+        bio_search_results = []
+        new_result = []
+        users_seen_ids = []
+        if name_search_results:
+            new_result.extend(
+                get_unique_users(
+                    name_search_results,
+                    users_seen_ids,
+                    db_session,
+                    user_id
                 )
-            ).all()
-            title_search_results = db_session.query(Poem).filter(
-                Poem.__ts_title_vector__.match(
-                    q,
-                    postgresql_regconfig='english'
+            )
+        if bio_search_results:
+            new_result.extend(
+                get_unique_users(
+                    bio_search_results,
+                    users_seen_ids,
+                    db_session,
+                    user_id
                 )
-            ).all()
-            new_result = []
-            poems_seen_ids = []
-            if text_search_results:
-                new_result.extend(
-                    get_unique_poems(
-                        text_search_results,
-                        poems_seen_ids,
-                        db_session,
-                        user_id
-                    )
-                )
-            if title_search_results:
-                new_result.extend(
-                    get_unique_poems(
-                        title_search_results,
-                        poems_seen_ids,
-                        db_session,
-                        user_id
-                    )
-                )
-            response = {
-                'success': True,
-                'data': extract_page(
-                    new_result,
-                    span,
-                    after,
-                    before,
-                    False,
-                    lambda x: x['id']
-                )
-            }
-        elif type == 'people':
-            name_search_results = db_session.query(User).filter(
-                User.__ts_name_vector__.match(
-                    q,
-                    postgresql_regconfig='english'
-                )
-            ).all()
-            bio_search_results = db_session.query(User).filter(
-                User.__ts_bio_vector__.match(
-                    q,
-                    postgresql_regconfig='english'
-                )
-            ).all()
-            bio_search_results = []
-            new_result = []
-            users_seen_ids = []
-            if name_search_results:
-                new_result.extend(
-                    get_unique_users(
-                        name_search_results,
-                        users_seen_ids,
-                        db_session,
-                        user_id
-                    )
-                )
-            if bio_search_results:
-                new_result.extend(
-                    get_unique_users(
-                        bio_search_results,
-                        users_seen_ids,
-                        db_session,
-                        user_id
-                    )
-                )
-            response = {
-                'success': True,
-                'data': extract_page(
-                    new_result,
-                    span,
-                    after,
-                    before,
-                    False,
-                    lambda x: x['id']
-                )
-            }
+            )
+        response = {
+            'success': True,
+            'data': extract_page(
+                new_result,
+                span,
+                after,
+                before,
+                False,
+                lambda x: x['id']
+            )
+        }
     except SQLAlchemyError:
         response = {
             'success': False,
