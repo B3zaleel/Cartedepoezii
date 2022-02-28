@@ -13,13 +13,8 @@ from ..utils.pagination import extract_page
 router = APIRouter(prefix='/api/v1')
 
 
-@router.get('/poem-comments')
-async def get_poem_comments(
-    id='',
-    span=12,
-    after='',
-    before=''
-    ):
+@router.get('/comments')
+async def get_poem_comments(id='', span=12, after='', before=''):
     response = {
         'success': False,
         'message': 'Failed to find comments.'
@@ -77,13 +72,7 @@ async def get_poem_comments(
 
 
 @router.get('/comment-replies')
-async def get_comment_replies(
-    id='',
-    poemId='',
-    span=12,
-    after='',
-    before=''
-    ):
+async def get_comment_replies(id='', poemId='', span=12, after='', before=''):
     response = {
         'success': False,
         'message': 'Failed to find replies to comment.'
@@ -94,16 +83,16 @@ async def get_comment_replies(
         return response
     db_session = get_session()
     try:
-        result = db_session.query(
-            Comment).filter(and_(
-                Comment.poem_id == poemId,
-                Comment.comment_id == id
-            )).all()
+        result = db_session.query(Comment).filter(and_(
+            Comment.poem_id == poemId,
+            Comment.comment_id == id
+        )).all()
         new_result = []
         if result is not None:
             for item in result:
-                user = db_session.query(
-                    User).filter(User.id == item.user_id).first()
+                user = db_session.query(User).filter(
+                    User.id == item.user_id
+                ).first()
                 if not user:
                     continue
                 obj = {
@@ -126,7 +115,7 @@ async def get_comment_replies(
                 span,
                 after,
                 before,
-                False,
+                True,
                 lambda x: x['id']
             )
         }
@@ -135,13 +124,14 @@ async def get_comment_replies(
     return response
 
 
-@router.get('/user-comments')
-async def get_user_comments(
-    token='',
-    span=12,
-    after='',
-    before=''
-    ):
+@router.get('/comments-by-user')
+async def get_comments_by_user(id='', token='', span=12, after='', before=''):
+    response = {
+        'success': False,
+        'message': 'User id is required.'
+    }
+    if not id:
+        return response
     response = {
         'success': False,
         'message': 'Failed to find comments.'
@@ -151,19 +141,18 @@ async def get_user_comments(
         span = -span
     db_session = get_session()
     try:
-        result = db_session.query(
-            Comment).filter(
-                Comment.user_id == auth_token.user_id).all()
-        user = db_session.query(
-            User).filter(User.id == auth_token.user_id).first()
+        user = db_session.query(User).filter(User.id == id).first()
         if not user:
             return response
+        result = db_session.query(Comment).filter(
+            Comment.user_id == auth_token.user_id
+        ).all()
         new_result = []
         if result is not None:
             for item in result:
-                replies = db_session.query(
-                    Comment).filter(
-                        Comment.comment_id == item.id).all()
+                replies = db_session.query(Comment).filter(
+                    Comment.comment_id == item.id
+                ).all()
                 replies_count = len(replies) if replies else 0
                 obj = {
                     'id': item.id,
@@ -187,7 +176,7 @@ async def get_user_comments(
                     span,
                     after,
                     before,
-                    False,
+                    True,
                     lambda x: x['id']
                 )
             }
@@ -197,7 +186,7 @@ async def get_user_comments(
     return response
 
 
-@router.post('/poem-comments')
+@router.post('/comments')
 async def add_comment(body: CommentAddForm):
     response = {
         'success': False,
@@ -214,12 +203,10 @@ async def add_comment(body: CommentAddForm):
     db_session = get_session()
     try:
         if body.replyTo:
-            result = db_session.query(
-                Comment).filter(
-                    and_(
-                        Comment.poem_id == body.poemId,
-                        Comment.comment_id == None
-                )).first()
+            result = db_session.query(Comment).filter(and_(
+                Comment.poem_id == body.poemId,
+                Comment.comment_id == None
+            )).first()
             if not result:
                 db_session.close()
                 return response
@@ -253,8 +240,8 @@ async def add_comment(body: CommentAddForm):
     return response
 
 
-@router.delete('/poem-comments')
-async def remove_user(body: CommentDeleteForm):
+@router.delete('/comments')
+async def remove_comment(body: CommentDeleteForm):
     response = {
         'success': False,
         'message': 'Failed to remove comment.'
@@ -265,14 +252,14 @@ async def remove_user(body: CommentDeleteForm):
     db_session = get_session()
     try:
         db_session.query(Comment).filter(and_(
-                Comment.poem_id == body.poemId,
-                Comment.comment_id == body.commentId,
+            Comment.poem_id == body.poemId,
+            Comment.comment_id == body.commentId,
         )).delete(
             synchronize_session=False
         )
         db_session.query(Comment).filter(and_(
-                Comment.poem_id == body.poemId,
-                Comment.id == body.commentId,
+            Comment.poem_id == body.poemId,
+            Comment.id == body.commentId,
         )).delete(
             synchronize_session=False
         )
