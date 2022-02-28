@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 from pydantic import BaseModel
-from enum import IntEnum
 from typing import Optional, List
 
 
@@ -16,12 +15,10 @@ class SignUpForm(BaseModel):
 
 
 class PasswordResetRequestForm(BaseModel):
-    userId: str
     email: str
 
 
 class PasswordResetForm(BaseModel):
-    userId: str
     email: str
     password: str
     resetToken: str
