@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Starts the server
-# service mysql restart
+# service postgresql restart
 declare -A ENV_VARS
 File_Lines=()
 
-# read environment variables from file (info_secret)
+# read environment variables from file (.env.local)
 readarray -t File_Lines < <(cat .env.local)
 for ((i = 0; i < "${#File_Lines[@]}"; i++)) do
     line="${File_Lines[i]}"
