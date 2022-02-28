@@ -36,40 +36,40 @@ async def get_poem(id: str, token: str):
     user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
-        poem = db_session.query(
-            Poem).filter(
-                Poem.id == id).first()
+        poem = db_session.query(Poem).filter(
+            Poem.id == id
+        ).first()
         if poem:
-            user = db_session.query(
-                User).filter(User.id == poem.user_id).first()
+            user = db_session.query(User).filter(
+                User.id == poem.user_id
+            ).first()
             if not user:
                 return response
-            comments = db_session.query(
-                Comment).filter(
-                    Comment.poem_id == id).all()
+            comments = db_session.query(Comment).filter(
+                Comment.poem_id == id
+            ).all()
             comments_count = len(comments) if comments else 0
-            likes = db_session.query(
-                PoemLike).filter(
-                    PoemLike.poem_id == id).all()
+            likes = db_session.query(PoemLike).filter(
+                PoemLike.poem_id == id
+            ).all()
             likes_count = len(likes) if likes else 0
             is_liked_by_user = False
             if user_id:
-                poem_interaction = db_session.query(
-                    PoemLike).filter(and_(
-                        PoemLike.poem_id == id,
-                        PoemLike.user_id == user_id
-                    )).first()
+                poem_interaction = db_session.query(PoemLike).filter(and_(
+                    PoemLike.poem_id == id,
+                    PoemLike.user_id == user_id
+                )).first()
                 if poem_interaction:
                     is_liked_by_user = True
             response = {
                 'success': True,
                 'data': {
+                    'id': poem.id,
                     'user': {
                         'id': user.id,
                         'name': user.name,
                         'profilePhotoId': user.profile_photo_id
                     },
-                    'id': poem.id,
                     'title': poem.title,
                     'publishedOn': poem.created_on.isoformat(),
                     'verses': json.JSONDecoder().decode(poem.text),
@@ -95,7 +95,7 @@ async def add_poem(body: PoemAddForm):
         auth_token is not None and (auth_token.user_id != body.userId),
         len(body.title) > 256,
         len(body.verses) < 1,
-        not all(list(map(lambda x: len(x.strip()) > 5, body.verses)))
+        not all(list(map(lambda x: len(x.strip()) > 1, body.verses)))
     ]
     if any(wrong_conditions):
         return response
@@ -149,7 +149,7 @@ async def update_poem(body: PoemUpdateForm):
         auth_token is not None and (auth_token.user_id != body.userId),
         len(body.title) > 256,
         len(body.verses) < 1,
-        not all(list(map(lambda x: len(x.strip()) > 5, body.verses)))
+        not all(list(map(lambda x: len(x.strip()) > 1, body.verses)))
     ]
     if any(wrong_conditions):
         return response
@@ -184,8 +184,8 @@ async def update_poem(body: PoemUpdateForm):
     return response
 
 
-@router.delete('/poem-comments')
-async def remove_user(body: PoemDeleteForm):
+@router.delete('/poem')
+async def remove_poem(body: PoemDeleteForm):
     response = {
         'success': False,
         'message': 'Failed to remove poem.'
@@ -196,14 +196,14 @@ async def remove_user(body: PoemDeleteForm):
     db_session = get_session()
     try:
         db_session.query(Poem).filter(and_(
-                Poem.poem_id == body.poemId,
-                Poem.user_id == body.userId,
+            Poem.poem_id == body.poemId,
+            Poem.user_id == body.userId,
         )).delete(
             synchronize_session=False
         )
         db_session.query(Comment).filter(and_(
-                Comment.poem_id == body.poemId,
-                Comment.id == body.commentId,
+            Comment.poem_id == body.poemId,
+            Comment.id == body.commentId,
         )).delete(
             synchronize_session=False
         )
@@ -224,27 +224,18 @@ async def like_poem(body: PoemLikeForm):
         'message': 'Failed to like poem.'
     }
     auth_token = AuthToken.decode(body.authToken)
-    wrong_conditions = [
-        auth_token is None,
-        auth_token is not None and (auth_token.user_id != body.userId),
-        len(body.title) > 256,
-        len(body.verses) < 1,
-        not all(list(map(lambda x: len(x.strip()) > 5, body.verses)))
-    ]
-    if any(wrong_conditions):
+    if auth_token is None or (auth_token.user_id != body.userId):
         return response
     db_session = get_session()
     try:
-        cur_usr_fav = db_session.query(
-            PoemLike).filter(
-                and_(
-                    PoemLike.user_id == auth_token.user_id,
-                    PoemLike.poem_id == body.poemId,
-            )).first()
+        cur_usr_fav = db_session.query(PoemLike).filter(and_(
+            PoemLike.user_id == auth_token.user_id,
+            PoemLike.poem_id == body.poemId,
+        )).first()
         if cur_usr_fav:
             db_session.query(PoemLike).filter(and_(
-                    PoemLike.user_id == auth_token.user_id,
-                    PoemLike.poem_id == body.poemId,
+                PoemLike.user_id == auth_token.user_id,
+                PoemLike.poem_id == body.poemId,
             )).delete(
                 synchronize_session=False
             )
@@ -275,17 +266,82 @@ async def like_poem(body: PoemLikeForm):
     return response
 
 
-@router.get('/user-poems')
-async def get_user_poems(
-    userId='',
-    token='',
-    span=12,
-    after='',
-    before=''
-    ):
+@router.get('/poems-user-created')
+async def get_created_poems(userId, token='', span=12, after='', before=''):
     response = {
         'success': False,
-        'message': 'Failed to find poems of the user.'
+        'message': 'Failed to find poems created by the user.'
+    }
+    if not userId:
+        return response
+    if span < 0:
+        span = -span
+    auth_token = AuthToken.decode(token)
+    user_id = auth_token.user_id if auth_token is not None else None
+    db_session = get_session()
+    try:
+        result = db_session.query(Poem).filter(
+            Poem.user_id == userId
+        ).all()
+        user_poems = []
+        if result is not None:
+            user = db_session.query(User).filter(
+                User.id == userId
+            ).first()
+            if not user:
+                return response
+            for item in result:
+                comments = db_session.query(Comment).filter(
+                    Comment.poem_id == item.id
+                ).all()
+                comments_count = len(comments) if comments else 0
+                likes = db_session.query(PoemLike).filter(
+                    PoemLike.poem_id == item.id
+                ).all()
+                likes_count = len(likes) if likes else 0
+                is_liked_by_user = False
+                if user_id:
+                    poem_interaction = db_session.query(PoemLike).filter(and_(
+                        PoemLike.poem_id == item.id,
+                        PoemLike.user_id == user_id
+                    )).first()
+                    if poem_interaction:
+                        is_liked_by_user = True
+                obj = {
+                    'id': item.id,
+                    'title': item.title,
+                    'publishedOn': item.created_on.isoformat(),
+                    'verses': json.JSONDecoder().decode(item.text),
+                    'commentsCount': comments_count,
+                    'likesCount': likes_count,
+                    'isLiked': is_liked_by_user
+                }
+                user_poems.append(obj)
+        user_poems.sort(
+            key=lambda x: datetime.fromisoformat(x['publishedOn']),
+            reverse=True
+        )
+        response = {
+            'success': True,
+            'data': extract_page(
+                user_poems,
+                span,
+                after,
+                before,
+                True,
+                lambda x: x['id']
+            )
+        }
+    finally:
+        db_session.close()
+    return response
+
+
+@router.get('/poems-user-likes')
+async def get_liked_poems(userId, token='', span=12, after='', before=''):
+    response = {
+        'success': False,
+        'message': 'Failed to find poems liked by the user.'
     }
     if span < 0:
         span = -span
@@ -354,12 +410,7 @@ async def get_user_poems(
 
 
 @router.get('/poems-channel')
-async def get_channel_poems(
-    token='',
-    span=12,
-    after='',
-    before=''
-    ):
+async def get_channel_poems(token, span=12, after='', before=''):
     response = {
         'success': False,
         'message': 'Failed to find poems for the channel.'
@@ -374,8 +425,9 @@ async def get_channel_poems(
         return response
     db_session = get_session()
     try:
-        followings = db_session.query(
-            UserFollowing).filter(UserFollowing.follower_id == user_id).all()
+        followings = db_session.query(UserFollowing).filter(
+            UserFollowing.follower_id == user_id
+        ).all()
         max_size = 2**32 - 1
         m = len(followings) + 1 if followings else 1
         n = max_size // m
@@ -409,12 +461,12 @@ async def get_channel_poems(
                     if poem_interaction:
                         is_liked_by_user = True
                 obj = {
+                    'id': poem.id,
                     'user': {
                         'id': user.id,
                         'name': user.name,
                         'profilePhotoId': user.profile_photo_id
                     },
-                    'id': poem.id,
                     'title': poem.title,
                     'publishedOn': poem.created_on.isoformat(),
                     'verses': json.JSONDecoder().decode(poem.text),
@@ -424,7 +476,10 @@ async def get_channel_poems(
                 }
                 users_poems.append(obj)
         # stable sort based on creation time
-        users_poems.sort(key=lambda x: datetime.fromisoformat(x['publishedOn']))
+        users_poems.sort(
+            key=lambda x: datetime.fromisoformat(x['publishedOn']),
+            reverse=True
+        )
         response = {
             'success': True,
             'data': extract_page(
