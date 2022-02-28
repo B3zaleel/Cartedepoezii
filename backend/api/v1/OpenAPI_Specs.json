@@ -488,6 +488,56 @@
         }
       }
     },
+    "/profile-photo": {
+      "get": {
+        "summary": "Retrieve profile photo URL of a user.",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "imgId",
+            "in": "query",
+            "description": "The id of the user's profile photo.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details about a user's profile photo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "properties": {
+                        "url": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/followers": {
       "get": {
         "summary": "Retrieve a user's followers.",
