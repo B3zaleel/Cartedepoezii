@@ -77,6 +77,24 @@
       border-bottom-left-radius: inherit;
       border-bottom-right-radius: inherit;
 
+      > .pane-container {
+        > .pane {
+          display: flex;
+
+          &.hidden {
+            display: none;
+          }
+
+          .center {
+            justify-content: center;
+          }
+
+          .right {
+            justify-content: flex-end;
+          }
+        }
+      }
+
       &.hidden {
         display: none;
       }
