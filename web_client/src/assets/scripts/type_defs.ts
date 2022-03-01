@@ -40,3 +40,11 @@ export interface Comment {
   repliesTo: string,
   repliesCount: number,
 }
+
+export interface FileInputEvent {
+  target: HTMLInputElement
+}
+
+export interface ElementInputEvent {
+  target: HTMLElement
+}

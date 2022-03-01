@@ -1,3 +1,5 @@
+@use "@/assets/styles/globals";
+
 .modal-view {
   position: fixed;
   display: flex;
@@ -10,7 +12,8 @@
   justify-content: center;
   justify-items: center;
   z-index: 600;
-  background: hsla(0, 0%, 80%, 0.4);
+  background: globals.$modal-dialog-background;
+  backdrop-filter: blur(1px);
 
   > div {
     position: relative;
@@ -23,12 +26,12 @@
     margin: 10px;
     background: white;
     border-radius: 10px;
-    box-shadow: 0 0 2px 2px var(--shadow-color);
+    box-shadow: 0 0 2px 2px globals.$shadow-color;
 
     > .header {
       display: grid;
       grid-template-columns: calc(100% - 60px) 60px;
-      box-shadow: 0px 0px 1px 2px #dcdcdcc4;
+      box-shadow: 0px 0px 1px 2px globals.$shadow-color;
       border-top-left-radius: inherit;
       border-top-right-radius: inherit;
       cursor: context-menu;
@@ -70,9 +73,27 @@
       display: flex;
       justify-content: flex-end;
       padding: 10px 5px;
-      box-shadow: 0px 0px 1px 2px #dcdcdcc4;
+      box-shadow: 0px 0px 1px 2px globals.$shadow-color;
       border-bottom-left-radius: inherit;
       border-bottom-right-radius: inherit;
+
+      > .pane-container {
+        > .pane {
+          display: flex;
+
+          &.hidden {
+            display: none;
+          }
+
+          .center {
+            justify-content: center;
+          }
+
+          .right {
+            justify-content: flex-end;
+          }
+        }
+      }
 
       &.hidden {
         display: none;
