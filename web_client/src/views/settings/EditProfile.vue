@@ -70,6 +70,7 @@
     <div class="bio">
       <span>Bio</span>
       <textarea
+        class="cdp-txb"
         v-model="user.bio"
         rows="4"
       />
@@ -79,7 +80,11 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { User } from '@/assets/scripts/type_defs';
+import {
+  User,
+  FileInputEvent,
+  ElementInputEvent,
+} from '@/assets/scripts/type_defs';
 import AccountIcon from '@/assets/icons/Account.vue';
 import DeleteIcon from '@/assets/icons/Delete.vue';
 import SyncIcon from '@/assets/icons/Sync.vue';
@@ -158,13 +163,18 @@ export default class EditProfileView extends Vue {
     }
   }
 
-  changeImage(ev): void {
+  changeImage(ev: ElementInputEvent): void {
+    console.log('changeImage');
+    console.dir(ev);
     let button = ev.target;
+    console.dir(typeof button);
     if (button) {
-      if (button.nodeName === 'svg') {
+      if (button.nodeName === 'svg' && button.parentElement) {
         button = button.parentElement;
-      } else if (button.nodeName === 'path') {
-        button = button.parentElement.parentElement;
+      } else if (button.nodeName === 'path' && button.parentElement) {
+        if (button.parentElement.parentElement) {
+          button = button.parentElement.parentElement;
+        }
       }
       const inputElement = button.getElementsByTagName('input').item(0);
       if (inputElement) {
@@ -175,11 +185,11 @@ export default class EditProfileView extends Vue {
     this.imageSrc = '';
   }
 
-  imageInputChange(ev): void {
+  imageInputChange(ev: FileInputEvent): void {
     if (ev && ev.target) {
       const imageFiles = ev.target.files;
 
-      if (imageFiles.length > 0) {
+      if (imageFiles && imageFiles.length > 0) {
         const reader = new FileReader();
         reader.addEventListener('load', (e) => {
           if (e && e.target && e.target.result) {
