@@ -16,7 +16,7 @@
   },
   "servers": [
     {
-      "url": "localhost:5000/api/v1"
+      "url": "http://localhost:5000/api/v1"
     }
   ],
   "paths": {
@@ -1210,7 +1210,9 @@
                       "type": "boolean"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/PoemMin"
+                      "items": {
+                        "$ref": "#/components/schemas/PoemMin"
+                      }
                     }
                   }
                 }
