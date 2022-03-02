@@ -20,7 +20,7 @@ export default class Connection {
    * @param page - The page of results to retrieve.
    */
   getFollowers(userId: string, page: Page = { span: 12, after: '', before: '' }):
-    Promise<{success: boolean, data: Array<UserMin> | string} | Error> {
+    Promise<{success: boolean, data?: Array<UserMin>, message?: string}> {
     const path = [
       this.BASE_URL,
       '/followers?',
@@ -31,8 +31,8 @@ export default class Connection {
       page.before ? `&before=${page.before}` : '',
     ].join('');
     const result = new Promise<{
-      success: boolean, data: Array<UserMin>
-      } | Error>(
+      success: boolean, data?: Array<UserMin>, message?: string
+      }>(
         (resolve, reject) => {
           fetch(path, {
             method: 'GET',
@@ -54,7 +54,7 @@ export default class Connection {
    * @param page - The page of results to retrieve.
    */
   getFollowings(userId: string, page: Page = { span: 12, after: '', before: '' }):
-    Promise<{success: boolean, data: Array<UserMin> | string} | Error> {
+    Promise<{success: boolean, data?: Array<UserMin>, message?: string}> {
     const path = [
       this.BASE_URL,
       '/followings?',
@@ -65,8 +65,8 @@ export default class Connection {
       page.before ? `&before=${page.before}` : '',
     ].join('');
     const result = new Promise<{
-      success: boolean, data: Array<UserMin>
-      } | Error>((resolve, reject) => {
+      success: boolean, data?: Array<UserMin>, message?: string
+      }>((resolve, reject) => {
         fetch(path, {
           method: 'GET',
           mode: 'cors',
@@ -86,7 +86,7 @@ export default class Connection {
    * @param followId - The id of the other user.
    */
   follow(userId: string, followId: string):
-    Promise<{success: boolean, data: {status: boolean}} | Error> {
+    Promise<{success: boolean, data?: {status: boolean}, message?: string}> {
     const path = [
       this.BASE_URL,
       '/follow',
@@ -97,8 +97,8 @@ export default class Connection {
       followId,
     };
     const result = new Promise<{
-      success: boolean, data: {status: boolean}
-      } | Error>((resolve, reject) => {
+      success: boolean, data?: {status: boolean}, message?: string
+      }>((resolve, reject) => {
         fetch(path, {
           method: 'PUT',
           mode: 'cors',
