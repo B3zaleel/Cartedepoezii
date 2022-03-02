@@ -35,7 +35,7 @@ export default class Connection {
       } | Error>(
         (resolve, reject) => {
           fetch(path, {
-            method: 'PUT',
+            method: 'GET',
             mode: 'cors',
             headers: {
               'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export default class Connection {
       success: boolean, data: Array<UserMin>
       } | Error>((resolve, reject) => {
         fetch(path, {
-          method: 'PUT',
+          method: 'GET',
           mode: 'cors',
           headers: {
             'Content-Type': 'application/json',
