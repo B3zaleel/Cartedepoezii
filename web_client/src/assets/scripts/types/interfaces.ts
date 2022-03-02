@@ -2,6 +2,12 @@ export interface Item {
   id: string;
 }
 
+export interface Page {
+  span: number;
+  after: string;
+  before: string;
+}
+
 export interface FileInputEvent {
   target: HTMLInputElement
 }
