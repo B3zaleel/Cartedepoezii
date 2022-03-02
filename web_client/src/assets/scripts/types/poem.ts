@@ -8,7 +8,7 @@ export default class Poem implements Item {
 
   title!: string;
 
-  publishedOn!: Date;
+  publishedOn!: string;
 
   verses!: Array<string>;
 

@@ -9,7 +9,7 @@ export default class User implements Item {
 
   bio!: string;
 
-  joined!: Date;
+  joined!: string;
 
   profilePhotoId!: string;
 
@@ -30,7 +30,7 @@ export default class User implements Item {
     this.name = '';
     this.email = '';
     this.bio = '';
-    this.joined = new Date();
+    this.joined = new Date().toISOString();
     this.profilePhotoId = '';
     this.followersCount = 0;
     this.followingsCount = 0;
