@@ -1,4 +1,5 @@
 import UserMin from '../types/user_min';
+import { Page } from '../types/interfaces';
 
 /**
  * Represents a class for handling connection-related API calls.
@@ -16,17 +17,17 @@ export default class Connection {
   /**
    * Retrieve the followers of the given user.
    * @param userId - The id of the user.
-   * @param span - The maximum number of followers to retrieve.
+   * @param page - The page of results to retrieve.
    */
-  getFollowers(userId: string, span = 12, after = '', before = ''):
+  getFollowers(userId: string, page: Page = { span: 12, after: '', before: '' }):
     Promise<{success: boolean, data: Array<UserMin> | string} | Error> {
     const path = [
       this.BASE_URL,
       '/followers?',
       `id=${userId}`,
-      span ? `&span${span <= 0 ? 12 : span}` : '',
-      after ? `&after=${after}` : '',
-      before ? `&before=${before}` : '',
+      page.span ? `&span${page.span <= 0 ? 12 : page.span}` : '',
+      page.after ? `&after=${page.after}` : '',
+      page.before ? `&before=${page.before}` : '',
     ].join('');
     const result = new Promise<{
       success: boolean, data: Array<UserMin>
@@ -49,17 +50,17 @@ export default class Connection {
   /**
    * Retrieve the users followed by the given user.
    * @param userId - The id of the user.
-   * @param span - The maximum number of followers to retrieve.
+   * @param page - The page of results to retrieve.
    */
-  getFollowings(userId: string, span = 12, after = '', before = ''):
+  getFollowings(userId: string, page: Page = { span: 12, after: '', before: '' }):
     Promise<{success: boolean, data: Array<UserMin> | string} | Error> {
     const path = [
       this.BASE_URL,
       '/followings?',
       `id=${userId}`,
-      span ? `&span${span <= 0 ? 12 : span}` : '',
-      after ? `&after=${after}` : '',
-      before ? `&before=${before}` : '',
+      page.span ? `&span${page.span <= 0 ? 12 : page.span}` : '',
+      page.after ? `&after=${page.after}` : '',
+      page.before ? `&before=${page.before}` : '',
     ].join('');
     const result = new Promise<{
       success: boolean, data: Array<UserMin>
@@ -81,7 +82,6 @@ export default class Connection {
    * Toggle the connection between two users.
    * @param userId - The id of the user.
    * @param followId - The id of the other user.
-   * @param span - The maximum number of followers to retrieve.
    */
   follow(userId: string, followId: string):
     Promise<{success: boolean, data: {status: boolean}} | Error> {
