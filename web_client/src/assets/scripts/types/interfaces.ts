@@ -17,6 +17,7 @@ export interface ElementInputEvent {
 }
 
 export interface EditProfileForm {
+  userId: string;
   imageURL: string;
   imageUploaded: boolean;
   removePhoto: boolean;

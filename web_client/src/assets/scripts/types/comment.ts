@@ -4,15 +4,15 @@ import UserMin from './user_min';
 export default class Comment implements Item {
   id!: string;
 
-  user!: UserMin;
+  user?: UserMin;
 
   poemId!: string;
 
-  createdOn!: Date;
+  createdOn!: string;
 
   text!: string;
 
-  repliesTo!: string;
+  replyTo!: string;
 
   repliesCount!: number;
 }
