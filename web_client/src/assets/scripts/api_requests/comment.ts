@@ -3,7 +3,7 @@ import UserMin from '../types/user_min';
 import CommentT from '../types/comment';
 
 /**
- * Represents a class for handling user-related API requests.
+ * Represents a class for handling comment-related API requests.
  */
 export default class Comment {
   BASE_URL!: string;

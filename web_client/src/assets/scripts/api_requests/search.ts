@@ -69,7 +69,7 @@ export default class Search {
       success: boolean, data?: Array<Poem>, message?: string
       }>((resolve, reject) => {
         fetch(path, {
-          method: 'PUT',
+          method: 'GET',
           mode: 'cors',
           headers: {
             'Content-Type': 'application/json',
