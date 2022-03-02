@@ -51,7 +51,7 @@
       sect: true,
       hidden: endReached || loadingItems || loadingFailed
       }">
-      <button class="cdp-btn text">
+      <button class="cdp-btn text" @click="loadItems">
         <b>More</b>
       </button>
     </div>
@@ -112,13 +112,15 @@ export default class ItemsLoaderLayout extends Vue {
     const res = await this.itemsFetcher(nextPage);
     if (res.success) {
       if (res.data) {
-        this.itemGroups.push({
-          id: this.groupsLoaded,
-          group: res.data,
-        });
+        if (res.data.length > 0) {
+          this.itemGroups.push({
+            id: this.groupsLoaded,
+            group: res.data,
+          });
+          this.groupsLoaded += 1;
+        }
         this.lastItemId = res.data.length > 0 ? res.data[res.data.length - 1].id : '';
         this.endReached = res.data.length === 0;
-        this.groupsLoaded += 1;
         this.loadingItems = false;
         this.loadingFailed = false;
       }
