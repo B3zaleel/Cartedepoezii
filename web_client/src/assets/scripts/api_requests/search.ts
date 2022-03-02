@@ -21,7 +21,7 @@ export default class Search {
    * @param page - The page of results to retrieve.
    */
   findPeople(query: string, page: Page = { span: 12, after: '', before: '' }):
-    Promise<{success: boolean, data: Array<UserMin> | string} | Error> {
+    Promise<{success: boolean, data?: Array<UserMin>, message?: string}> {
     const path = [
       this.BASE_URL,
       '/search-people?',
@@ -32,8 +32,8 @@ export default class Search {
       page.before ? `&before=${page.before}` : '',
     ].join('');
     const result = new Promise<{
-      success: boolean, data: Array<UserMin>
-      } | Error>(
+      success: boolean, data?: Array<UserMin>, message?: string
+      }>(
         (resolve, reject) => {
           fetch(path, {
             method: 'GET',
@@ -55,7 +55,7 @@ export default class Search {
    * @param page - The page of results to retrieve.
    */
   findPoems(query: string, page: Page = { span: 12, after: '', before: '' }):
-    Promise<{success: boolean, data: Array<Poem> | string} | Error> {
+    Promise<{success: boolean, data?: Array<Poem>, message?: string}> {
     const path = [
       this.BASE_URL,
       '/search-poems?',
@@ -66,8 +66,8 @@ export default class Search {
       page.before ? `&before=${page.before}` : '',
     ].join('');
     const result = new Promise<{
-      success: boolean, data: Array<Poem>
-      } | Error>((resolve, reject) => {
+      success: boolean, data?: Array<Poem>, message?: string
+      }>((resolve, reject) => {
         fetch(path, {
           method: 'PUT',
           mode: 'cors',
