@@ -265,7 +265,7 @@ export default class Poem {
    * Retrieve poems for a user's timeline.
    */
   getPoemsForUser(page: Page = { span: 12, after: '', before: '' }):
-    Promise<{ success: boolean, data?: Array<Poem>, message?: string }> {
+    Promise<{ success: boolean, data?: Array<PoemT>, message?: string }> {
     const path = [
       this.BASE_URL,
       '/poems-channel?',
@@ -275,7 +275,7 @@ export default class Poem {
       page.before ? `&before=${page.before}` : '',
     ].join('');
     const result = new Promise<{
-      success: boolean, data?: Array<Poem>, message?: string
+      success: boolean, data?: Array<PoemT>, message?: string
     }>(
       (resolve, reject) => {
         fetch(path, {
