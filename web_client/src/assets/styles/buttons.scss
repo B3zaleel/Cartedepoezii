@@ -18,6 +18,7 @@
     border-radius: 15px;
     background: globals.$primary-color;
     color: white;
+    fill: white;
     font-weight: 700;
 
     &:hover {
@@ -33,6 +34,16 @@
 
     &:hover {
       background: gainsboro;
+    }
+  }
+
+  &.light {
+    border-color: globals.$primary-color;
+    background: white;
+    color: black;
+
+    &:hover {
+      background: globals.$primary-color-lightest;
     }
   }
 
