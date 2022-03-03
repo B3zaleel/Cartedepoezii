@@ -26,7 +26,7 @@ export default class Connection {
       '/followers?',
       `id=${userId}`,
       this.AUTH_TOKEN ? `&token=${this.AUTH_TOKEN}` : '',
-      page.span ? `&span${page.span <= 0 ? 12 : page.span}` : '',
+      page.span ? `&span=${page.span <= 0 ? 12 : page.span}` : '',
       page.after ? `&after=${page.after}` : '',
       page.before ? `&before=${page.before}` : '',
     ].join('');
@@ -60,7 +60,7 @@ export default class Connection {
       '/followings?',
       `id=${userId}`,
       this.AUTH_TOKEN ? `&token=${this.AUTH_TOKEN}` : '',
-      page.span ? `&span${page.span <= 0 ? 12 : page.span}` : '',
+      page.span ? `&span=${page.span <= 0 ? 12 : page.span}` : '',
       page.after ? `&after=${page.after}` : '',
       page.before ? `&before=${page.before}` : '',
     ].join('');

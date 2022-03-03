@@ -19,16 +19,16 @@ export default class User {
    * @param userId - The user's id.
    */
   getUser(userId: string):
-    Promise<{ success: boolean, data: Array<UserT> | string } | Error> {
+    Promise<{ success: boolean, data?: UserT, message?: string }> {
     const path = [
       this.BASE_URL,
-      '/search-people?',
+      '/user?',
       `id=${userId}`,
       this.AUTH_TOKEN ? `&token=${this.AUTH_TOKEN}` : '',
     ].join('');
     const result = new Promise<{
-      success: boolean, data: Array<UserT>
-    } | Error>(
+      success: boolean, data?: UserT, message?: string
+    }>(
       (resolve, reject) => {
         fetch(path, {
           method: 'GET',
