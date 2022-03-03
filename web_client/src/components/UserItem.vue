@@ -51,7 +51,7 @@ export default class UserItemComponent extends Vue {
 
   hideAction = false;
 
-  isFollowing = false;
+  isFollowing = this.user.isFollowing;
 
   connection!: ConnectionAPIReq;
 
