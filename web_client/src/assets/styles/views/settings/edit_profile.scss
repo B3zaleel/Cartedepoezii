@@ -41,14 +41,4 @@
     margin: 5px 0;
     font-size: 0.9em;
   }
-
-  textarea {
-    display: block;
-    resize: none;
-    width: calc(100% - 2 * 5px);
-    padding: 5px;
-    border-radius: 5px;
-    border: 2px solid var(--primary-color);
-    // padding: calc(0.7em + 8px) 10px 5px 10px;
-  }
 }
