@@ -1,15 +1,15 @@
 <template>
   <div class="user-item">
     <div>
-      <router-link :to="`/profile/${user.id}`">
+      <a :href="`/profile/${user.id}`">
         <img :src="imageSrc" v-show="imageSrc.length > 0"/>
         <AccountIcon v-show="imageSrc.length == 0"/>
-      </router-link>
+      </a>
     </div>
     <div>
-      <router-link :to="`/profile/${user.id}`">
+      <a :href="`/profile/${user.id}`">
         {{ user.name }}
-      </router-link>
+      </a>
     </div>
     <div>
       <button
@@ -17,7 +17,8 @@
           'cdp-btn': true,
           'text': true,
           danger: actionText === 'Unfollow',
-          light: actionText === 'Follow'
+          light: actionText === 'Follow',
+          hidden: hideAction
         }"
         @click="toggleConnection"
         @mouseenter="onMouseEnterAction"
