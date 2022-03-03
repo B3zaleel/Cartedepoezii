@@ -17,16 +17,22 @@
     </template>
 
     <template v-slot:main>
-      <div class="user-profile">
+      <div class="user-profile" v-show="userInfoLoaded">
         <div class="profile-info">
           <div>
             <div class="profile-photo-sect">
               <button class="image-view-btn">
                 <AccountIcon/>
-                <img :src="getProfilePhotoURL()" @error="imageLoadError"/>
+                <img :src="profilePhotoSrc"/>
               </button>
 
-              <button class="account-action-btn" @click="execAction">
+              <button
+                :class="{
+                  'cdp-btn': true,
+                  text: true,
+                  light: actionText === 'Follow' || actionText === 'Edit Profile',
+                  danger: actionText === 'Unfollow'
+                }" @click="execAction">
                 {{ actionText }}
               </button>
             </div>
@@ -66,13 +72,24 @@
           <template v-slot:modal-body>
             <div>
               <div class="followers" v-show="dialogState === DialogStates.Followers">
-                <UserItem :user="userTest"/>
+                <ItemsLoaderLayout
+                  :itemsName="'users'"
+                  :itemsFetcher="followersFetcher"
+                />
               </div>
               <div class="followings" v-show="dialogState === DialogStates.Followings">
-                <UserItem :user="userTest"/>
+                <ItemsLoaderLayout
+                  :itemsName="'users'"
+                  :itemsFetcher="followingsFetcher"
+                />
               </div>
               <div class="edit-profile" v-show="dialogState === DialogStates.EditProfile">
-                <EditProfileView :user="user"/>
+                <EditProfileView
+                  :userProfile="editableProfileInfo"
+                  :updateView="updateEditProfile"
+                  v-on:image-uploaded="imageUploaded"
+                  v-on:image-deleted="imageDeleted"
+                />
               </div>
               <!-- <div class="followings" v-show="dialogState === DialogStates.ProfilePhoto">
                 <UserItem :user="userTest"/>
@@ -83,8 +100,16 @@
           <template v-slot:modal-action-panel>
             <div v-show="dialogState === DialogStates.EditProfile">
               <div>
-                <button class="cdp-btn text">
-                  Save
+                <button
+                  :class="{
+                    'cdp-btn': true,
+                    'text': !isSavingProfile,
+                    'icon': isSavingProfile
+                    }"
+                    @click="saveProfile"
+                >
+                  <LoadingIcon v-show="isSavingProfile"/>
+                  <b v-show="!isSavingProfile">Save</b>
                 </button>
               </div>
             </div>
@@ -97,15 +122,22 @@
           v-on:select-tab="args => changeSelectedTab(args)"
         >
           <div v-show="selectedId == 1">
-            Poems go here
-            <Poem/>
+            <ItemsLoaderLayout
+              :itemsName="'poems'"
+              :itemsFetcher="poemsFetcher"
+            />
           </div>
           <div v-show="selectedId == 2">
-            Comments go here
-            <Comment/>
+            <ItemsLoaderLayout
+              :itemsName="'comments'"
+              :itemsFetcher="commentsFetcher"
+            />
           </div>
           <div v-show="selectedId == 3">
-            Likes go here
+            <ItemsLoaderLayout
+              :itemsName="'poems'"
+              :itemsFetcher="likesFetcher"
+            />
           </div>
         </TabsLayout>
       </div>
@@ -115,16 +147,28 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { User, UserMin } from '@/assets/scripts/type_defs';
+import {
+  EditProfileForm,
+  Page,
+  Item,
+} from '@/assets/scripts/types/interfaces';
+import User from '@/assets/scripts/types/user';
+import UserMin from '@/assets/scripts/types/user_min';
 import MathUtils from '@/assets/scripts/math_utils';
+import ConnectionAPIReq from '@/assets/scripts/api_requests/connection';
+import UserAPIReq from '@/assets/scripts/api_requests/user';
+import PoemAPIReq from '@/assets/scripts/api_requests/poem';
+import CommentAPIReq from '@/assets/scripts/api_requests/comment';
 import MainLayout from '@/views/layout/Main.vue';
 import TabsLayout from '@/views/layout/Tabs.vue';
 import ModalLayout from '@/views/layout/Modal.vue';
+import ItemsLoaderLayout from '@/views/layout/ItemsLoader.vue';
 import Poem from '@/components/Poem.vue';
 import Comment from '@/components/Comment.vue';
 import UserItem from '@/components/UserItem.vue';
 import ArrowLeftIcon from '@/assets/icons/ArrowLeft.vue';
 import AccountIcon from '@/assets/icons/Account.vue';
+import LoadingIcon from '@/assets/icons/Loading.vue';
 import CalendarMonthIcon from '@/assets/icons/CalendarMonth.vue';
 import EditProfileView from './settings/EditProfile.vue';
 
@@ -134,12 +178,14 @@ import EditProfileView from './settings/EditProfile.vue';
     MainLayout,
     TabsLayout,
     ModalLayout,
+    ItemsLoaderLayout,
     EditProfileView,
     Poem,
     Comment,
     UserItem,
     ArrowLeftIcon,
     AccountIcon,
+    LoadingIcon,
     CalendarMonthIcon,
   },
 })
@@ -154,7 +200,7 @@ export default class ProfileView extends Vue {
 
   openDialog = false;
 
-  dialogState!: number;
+  dialogState = 0;
 
   DialogStates = {
     None: 0,
@@ -181,29 +227,159 @@ export default class ProfileView extends Vue {
     },
   ];
 
-  selectedId = 1;
+  selectedId = 0;
 
-  user!: User;
+  user: User = new User();
+
+  editableProfileInfo: EditProfileForm = {
+    userId: '',
+    imageURL: '',
+    imageUploaded: false,
+    removePhoto: false,
+    email: '',
+    name: '',
+    bio: '',
+  };
+
+  updateEditProfile = false;
+
+  isSavingProfile = false;
+
+  profilePhotoSrc = '';
 
   userTest!: UserMin;
 
-  imageLoadFailed = false;
+  userInfoLoaded = false;
 
-  changeSelectedTab(tabId: number): void {
-    this.selectedId = tabId;
+  poemAPIReq = new PoemAPIReq(
+    this.$store.state.API_URL,
+    this.$store.state.user.authToken,
+  );
+
+  connectionAPIReq = new ConnectionAPIReq(
+    this.$store.state.API_URL,
+    this.$store.state.user.authToken,
+  );
+
+  userAPIReq = new UserAPIReq(
+    this.$store.state.API_URL,
+    this.$store.state.user.authToken,
+  );
+
+  commentAPIReq = new CommentAPIReq(
+    this.$store.state.API_URL,
+    this.$store.state.user.authToken,
+  );
+
+  loadUserInfo(): void {
+    this.userAPIReq.getUser(this.$route.params.id)
+      .then((res) => {
+        if (res.success) {
+          const user = res.data;
+          if (user) {
+            this.user = user;
+            this.loadProfilePhoto();
+            this.onMouseLeaveAction();
+            this.userInfoLoaded = true;
+          }
+        } else {
+          console.error(res.message);
+        }
+      });
   }
 
-  imageLoadError(): void {
-    this.imageLoadFailed = true;
+  loadProfilePhoto(): void {
+    this.userAPIReq.getProfilePhoto(this.user.profilePhotoId)
+      .then((res) => {
+        if (res.success) {
+          if (res.data) {
+            this.profilePhotoSrc = `${res.data.url}?tr=w-120,h-120`;
+          }
+        }
+      });
   }
 
-  getProfilePhotoURL(): string {
-    const BASE_URL = this.$store.state.API_URL;
-    return this.imageLoadFailed ? '' : `${BASE_URL}/profile-photo?id=${this.user.id}`;
+  saveProfile(): void {
+    this.userAPIReq.updateUser(this.editableProfileInfo)
+      .then((res) => {
+        if (res.success) {
+          if (res.data) {
+            this.userInfoLoaded = true;
+            this.$store.commit('signIn', {
+              id: this.user.id,
+              token: res.data.authToken,
+            });
+            this.user.profilePhotoId = res.data.profilePhotoId;
+            this.loadProfilePhoto();
+            this.isSavingProfile = false;
+            this.closeDialog();
+          }
+        } else {
+          this.userInfoLoaded = false;
+          console.error(res.message);
+          this.isSavingProfile = false;
+          this.closeDialog();
+        }
+      });
+  }
+
+  followersFetcher(page: Page): Promise<{
+      success: boolean,
+      data?: Array<Item>,
+      message?: string
+    }> {
+    return this.connectionAPIReq.getFollowers(this.$route.params.id, page);
+  }
+
+  followingsFetcher(page: Page): Promise<{
+      success: boolean,
+      data?: Array<Item>,
+      message?: string
+    }> {
+    return this.connectionAPIReq.getFollowings(this.$route.params.id, page);
+  }
+
+  poemsFetcher(page: Page): Promise<{
+      success: boolean,
+      data?: Array<Item>,
+      message?: string
+    }> {
+    return this.poemAPIReq.getPoemsUserCreated(this.$route.params.id, page);
+  }
+
+  async commentsFetcher(page: Page): Promise<{
+      success: boolean,
+      data?: Array<Item>,
+      message?: string
+    }> {
+    const res = await this.commentAPIReq.getCommentsByUser(this.$route.params.id, page);
+    const result = {
+      success: res.success,
+      data: res.data?.comments,
+      message: res.message,
+    };
+    const commentUser = res.data?.user;
+    for (let i = 0; res.data && i < res.data?.comments.length; i += 1) {
+      if (result.data) {
+        result.data[i].user = commentUser;
+      }
+    }
+    return result;
+  }
+
+  likesFetcher(page: Page): Promise<{
+      success: boolean,
+      data?: Array<Item>,
+      message?: string
+    }> {
+    return this.poemAPIReq.getPoemsUserLikes(this.$route.params.id, page);
   }
 
   getJoinDate(): string {
-    const joinDateStr = this.user.joinDate;
+    if (!this.user) {
+      return '';
+    }
+    const joinDate = new Date(this.user.joined);
     const months = [
       'January',
       'February',
@@ -218,7 +394,17 @@ export default class ProfileView extends Vue {
       'November',
       'December',
     ];
-    return `Joined ${months[joinDateStr.getMonth()]} ${joinDateStr.getFullYear()}`;
+    return `Joined ${months[joinDate.getMonth()]} ${joinDate.getFullYear()}`;
+  }
+
+  imageUploaded(imgSrc: string):void {
+    this.editableProfileInfo.imageUploaded = true;
+    this.editableProfileInfo.imageURL = imgSrc;
+  }
+
+  imageDeleted():void {
+    this.editableProfileInfo.removePhoto = true;
+    this.editableProfileInfo.imageURL = '';
   }
 
   onMouseEnterAction(): void {
@@ -232,6 +418,9 @@ export default class ProfileView extends Vue {
   }
 
   onMouseLeaveAction(): void {
+    if (!this.user) {
+      return;
+    }
     if (this.user.id === this.$store.state.user.id) {
       this.actionText = 'Edit Profile';
     } else if (this.user.isFollowing) {
@@ -242,6 +431,9 @@ export default class ProfileView extends Vue {
   }
 
   getSubTitle(): string {
+    if (!this.user) {
+      return '';
+    }
     switch (this.selectedId) {
       case 1: {
         const n = MathUtils.formatNumber(this.user.poemsCount, true);
@@ -300,6 +492,16 @@ export default class ProfileView extends Vue {
     this.dialogTitle = 'Edit Profile';
     this.hasHeader = true;
     this.hasFooter = true;
+    this.editableProfileInfo = {
+      userId: this.user.id,
+      imageURL: this.profilePhotoSrc,
+      imageUploaded: false,
+      removePhoto: false,
+      email: this.user.email || '',
+      name: this.user.name,
+      bio: this.user.bio,
+    };
+    this.updateEditProfile = true;
     this.dialogState = this.DialogStates.EditProfile;
   }
 
@@ -307,27 +509,11 @@ export default class ProfileView extends Vue {
     this.openDialog = false;
   }
 
+  changeSelectedTab(tabId: number): void {
+    this.selectedId = tabId;
+  }
+
   created(): void {
-    this.user = {
-      id: this.$route.params.id,
-      joinDate: new Date(),
-      name: 'Beza',
-      email: 'Beza',
-      bio: '',
-      profilePhotoId: '',
-      followersCount: 0,
-      followingsCount: 0,
-      isFollowing: false,
-      poemsCount: 0,
-      likesCount: 0,
-      commentsCount: 5,
-    };
-    this.userTest = {
-      id: 'fggiish-',
-      name: 'John',
-      profilePhotoId: '455',
-      isFollowing: false,
-    };
     if (this.user.id === this.$store.state.user.id) {
       this.actionText = 'Edit Profile';
     } else if (this.user.isFollowing) {
@@ -338,7 +524,9 @@ export default class ProfileView extends Vue {
     this.dialogState = this.DialogStates.None;
   }
 
-  // loadUserInfo() {}
+  mounted(): void {
+    this.loadUserInfo();
+  }
 }
 </script>
 
