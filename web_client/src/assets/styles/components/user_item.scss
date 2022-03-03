@@ -1,0 +1,55 @@
+@use "@/assets/styles/globals";
+
+.user-item {
+  display: grid;
+  padding: 5px;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  justify-content: center;
+  column-gap: 5px;
+  border-bottom: 2px solid gainsboro;
+  transition-property: background;
+  transition-duration: 300ms;
+
+  &:first-child{
+    border-top: none;
+  }
+
+  &:last-child{
+    border-bottom: none;
+  }
+
+  > div:nth-child(1) {
+    > a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      border: 2px solid globals.$primary-color-light;
+      border-radius: 50%;
+
+      > svg {
+        width: 30px;
+        height: 30px;
+      }
+    }
+  }
+
+  > div:nth-child(2) {
+    > a {
+      text-decoration: none;
+      white-space: nowrap;
+      overflow: auto;
+      text-overflow: ellipsis;
+      color: black;
+    }
+  }
+
+  > div:nth-child(3) {
+    position: relative;
+  }
+
+  &:hover {
+    background: globals.$shadow-color;
+  }
+}
