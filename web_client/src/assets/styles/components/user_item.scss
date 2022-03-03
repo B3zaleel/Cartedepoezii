@@ -21,13 +21,19 @@
 
   > div:nth-child(1) {
     > a {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 2px;
+      width: calc(30px + 2 * 2px);
+      height: calc(30px + 2 * 2px);
       border: 2px solid globals.$primary-color-light;
       border-radius: 50%;
 
+      > img {
+        border-radius: 50%;
+      }
       > svg {
         width: 30px;
         height: 30px;

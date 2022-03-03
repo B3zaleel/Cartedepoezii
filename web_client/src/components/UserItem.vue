@@ -3,7 +3,7 @@
     <div>
       <a :href="`/profile/${user.id}`">
         <img :src="imageSrc" v-show="imageSrc.length > 0"/>
-        <AccountIcon v-show="imageSrc.length == 0"/>
+        <AccountIcon v-show="imageSrc.length === 0"/>
       </a>
     </div>
     <div>
@@ -59,11 +59,11 @@ export default class UserItemComponent extends Vue {
   userAPIReq!: UserAPIReq;
 
   loadProfilePhoto(): void {
-    this.userAPIReq.getProfilePhoto(this.user.id)
+    this.userAPIReq.getProfilePhoto(this.user.profilePhotoId)
       .then((res) => {
         if (res.success) {
           if (res.data) {
-            this.imageSrc = res.data.url;
+            this.imageSrc = `${res.data.url}?tr=w-38,h-38`;
           }
         }
       });
@@ -108,6 +108,7 @@ export default class UserItemComponent extends Vue {
       this.$store.state.API_URL,
       this.$store.state.user.authToken,
     );
+    this.loadProfilePhoto();
   }
 }
 </script>
