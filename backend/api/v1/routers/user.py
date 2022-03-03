@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 import os
+import base64
 import email_validator
 from datetime import datetime
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter, UploadFile, Form, File
 from imagekitio import ImageKit
 from sqlalchemy import and_
 
-from ..form_types import UserDeleteForm
+from ..form_types import UserDeleteForm, UserUpdateForm
 from ..database import (
     get_session,
     User,
@@ -64,6 +65,7 @@ async def get_user(id: str, token=''):
                     'id': user.id,
                     'joined': user.created_on.isoformat(),
                     'name': user.name,
+                    'email': user.email if user.id == user_id else '',
                     'bio': user.bio,
                     'profilePhotoId': user.profile_photo_id,
                     'followersCount': followers_count,
@@ -80,24 +82,15 @@ async def get_user(id: str, token=''):
 
 
 @router.put('/user')
-async def update_user_info(
-    authToken: str,
-    userId: str,
-    name: str,
-    profilePhoto: UploadFile,
-    profilePhotoId: str,
-    removeProfilePhoto: bool,
-    bio: str,
-    email: str
-    ):
+async def update_user_info(body: UserUpdateForm):
     response = {
         'success': False,
         'message': 'Failed to update user info.'
     }
-    auth_token = AuthToken.decode(authToken)
+    auth_token = AuthToken.decode(body.authToken)
     wrong_conditions = [
         auth_token is None,
-        auth_token is not None and (auth_token.user_id != userId)
+        auth_token is not None and (auth_token.user_id != body.userId)
     ]
     if any(wrong_conditions):
         return response
@@ -108,16 +101,26 @@ async def update_user_info(
         url_endpoint=os.getenv('IMG_CDN_URL_EPT')
     )
     try:
-        email_validator.validate_email(email)
-        profile_picture_file_id = profilePhotoId
-        if removeProfilePhoto:
-            imagekit.delete_file(profilePhotoId)
-        elif profilePhoto is not None:
-            if profilePhotoId and profilePhotoId.strip():
-                imagekit.delete_file(profilePhotoId)
+        email_validator.validate_email(body.email)
+        profile_picture_file_id = body.profilePhotoId.strip()
+        if body.removeProfilePhoto:
+            if profile_picture_file_id:
+                imagekit.delete_file(profile_picture_file_id)
+                profile_picture_file_id = ''
+        if body.profilePhoto and not body.removeProfilePhoto:
+            if body.profilePhotoId.strip():
+                imagekit.delete_file(body.profilePhotoId)
+            user = db_session.query(User).filter(User.id == body.userId).first()
+            if user.profile_photo_id:
+                imagekit.delete_file(user.profile_photo_id)
+            # with open('foo.jpeg', 'wb') as file:
+            #     file.write(file_bytes)
             img_kit_res = imagekit.upload_file(
-                file=profilePhoto.file,
-                file_name=userId.replace('-', ''),
+                file=body.profilePhoto,
+                file_name='{}'.format(
+                    body.userId.replace('-', ''),
+                    # profilePhoto.content_type.split('/')[1]
+                ),
                 options={
                     'folder': 'cartedepoezii/profile_photos/',
                     'is_private_file': False
@@ -125,21 +128,23 @@ async def update_user_info(
             )
             if img_kit_res['response']:
                 profile_picture_file_id = img_kit_res['response']['fileId']
+                print(profile_picture_file_id)
             if img_kit_res['error']:
                 raise ValueError(img_kit_res['error']['message'])
-        db_session.query(User).filter(User.id == userId).update(
+        db_session.query(User).filter(User.id == body.userId).update(
             {
                 User.updated_on: datetime.utcnow(),
-                User.name: name,
-                User.email: email,
-                User.bio: bio
+                User.name: body.name,
+                User.profile_photo_id: profile_picture_file_id,
+                User.email: body.email,
+                User.bio: body.bio
             },
             synchronize_session=False
         )
         db_session.commit()
         new_auth_token = AuthToken(
-            user_id=userId,
-            email=email,
+            user_id=body.userId,
+            email=body.email,
             secure_text=auth_token.secure_text
         )
         response = {
