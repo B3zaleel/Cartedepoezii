@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import re
 import uuid
 from datetime import datetime
 from fastapi import APIRouter
@@ -14,15 +15,22 @@ router = APIRouter(prefix='/api/v1')
 
 
 @router.get('/comments')
-async def get_poem_comments(id='', span=12, after='', before=''):
+async def get_poem_comments(id='', span='', after='', before=''):
     response = {
         'success': False,
         'message': 'Failed to find comments.'
     }
-    if span < 0:
-        span = -span
     db_session = get_session()
     try:
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
+            db_session.close()
+            return response
+        span = int(span if span else '12')
         result = db_session.query(
             Comment).filter(and_(
                 Comment.poem_id == id,
@@ -72,7 +80,7 @@ async def get_poem_comments(id='', span=12, after='', before=''):
 
 
 @router.get('/comment-replies')
-async def get_comment_replies(id='', poemId='', span=12, after='', before=''):
+async def get_comment_replies(id='', poemId='', span='', after='', before=''):
     response = {
         'success': False,
         'message': 'Failed to find replies to comment.'
@@ -83,6 +91,15 @@ async def get_comment_replies(id='', poemId='', span=12, after='', before=''):
         return response
     db_session = get_session()
     try:
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
+            db_session.close()
+            return response
+        span = int(span if span else '12')
         result = db_session.query(Comment).filter(and_(
             Comment.poem_id == poemId,
             Comment.comment_id == id
@@ -125,7 +142,7 @@ async def get_comment_replies(id='', poemId='', span=12, after='', before=''):
 
 
 @router.get('/comments-by-user')
-async def get_comments_by_user(id='', token='', span=12, after='', before=''):
+async def get_comments_by_user(id='', token='', span='', after='', before=''):
     response = {
         'success': False,
         'message': 'User id is required.'
@@ -137,10 +154,16 @@ async def get_comments_by_user(id='', token='', span=12, after='', before=''):
         'message': 'Failed to find comments.'
     }
     auth_token = AuthToken.decode(token)
-    if span < 0:
-        span = -span
     db_session = get_session()
     try:
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
+            return response
+        span = int(span if span else '12')
         user = db_session.query(User).filter(User.id == id).first()
         if not user:
             return response

@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import json
+import re
 import uuid
 from datetime import datetime
 from fastapi import APIRouter
@@ -267,19 +268,26 @@ async def like_poem(body: PoemLikeForm):
 
 
 @router.get('/poems-user-created')
-async def get_created_poems(userId, token='', span=12, after='', before=''):
+async def get_created_poems(userId, token='', span='', after='', before=''):
     response = {
         'success': False,
         'message': 'Failed to find poems created by the user.'
     }
     if not userId:
         return response
-    if span < 0:
-        span = -span
     auth_token = AuthToken.decode(token)
     user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
+            db_session.close()
+            return response
+        span = int(span if span else '12')
         result = db_session.query(Poem).filter(
             Poem.user_id == userId
         ).all()
@@ -338,19 +346,26 @@ async def get_created_poems(userId, token='', span=12, after='', before=''):
 
 
 @router.get('/poems-user-likes')
-async def get_liked_poems(userId, token='', span=12, after='', before=''):
+async def get_liked_poems(userId, token='', span='', after='', before=''):
     response = {
         'success': False,
         'message': 'Failed to find poems liked by the user.'
     }
-    if span < 0:
-        span = -span
     if not userId:
         return response
     auth_token = AuthToken.decode(token)
     user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
+            db_session.close()
+            return response
+        span = int(span if span else '12')
         likes = db_session.query(PoemLike).filter(
             PoemLike.user_id == userId
         ).all()
@@ -416,13 +431,11 @@ async def get_liked_poems(userId, token='', span=12, after='', before=''):
 
 
 @router.get('/poems-channel')
-async def get_channel_poems(token, span=12, after='', before=''):
+async def get_channel_poems(token, span='', after='', before=''):
     response = {
         'success': False,
         'message': 'Failed to find poems for the channel.'
     }
-    if span < 0:
-        span = -span
     if not token:
         return response
     auth_token = AuthToken.decode(token)
@@ -431,6 +444,15 @@ async def get_channel_poems(token, span=12, after='', before=''):
         return response
     db_session = get_session()
     try:
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
+            db_session.close()
+            return response
+        span = int(span if span else '12')
         followings = db_session.query(UserFollowing).filter(
             UserFollowing.follower_id == user_id
         ).all()
