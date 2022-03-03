@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import re
 import uuid
 from datetime import datetime
 from fastapi import APIRouter
@@ -17,7 +18,7 @@ router = APIRouter(prefix='/api/v1')
 async def get_users_followers(
     id='',
     token='',
-    span=12,
+    span='12',
     after='',
     before=''
     ):
@@ -25,12 +26,19 @@ async def get_users_followers(
         'success': False,
         'message': 'Failed to find followers.'
     }
-    if span < 0:
-        span = -span
     auth_token = AuthToken.decode(token)
     user_id = auth_token.user_id if auth_token else None
     db_session = get_session()
     try:
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
+            db_session.close()
+            return response
+        span = int(span if span else '12')
         result = db_session.query(UserFollowing).filter(
             UserFollowing.following_id == id
         ).all()
@@ -73,7 +81,7 @@ async def get_users_followers(
 async def get_users_followings(
     id='',
     token='',
-    span=12,
+    span='12',
     after='',
     before=''
     ):
@@ -81,12 +89,19 @@ async def get_users_followings(
         'success': False,
         'message': 'Failed to find followings.'
     }
-    if span < 0:
-        span = -span
     auth_token = AuthToken.decode(token)
-    user_id = auth_token.user_id if auth_token is not None else None
+    user_id = auth_token.user_id if auth_token else None
     db_session = get_session()
     try:
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
+            db_session.close()
+            return response
+        span = int(span if span else '12')
         result = db_session.query(UserFollowing).filter(
             UserFollowing.follower_id == id
         ).all()
@@ -163,8 +178,7 @@ async def change_connection(body: ConnectionForm):
                 id=str(uuid.uuid4()),
                 created_on=datetime.utcnow(),
                 follower_id=body.userId,
-                following_id=body.followId,
-                name=body.name
+                following_id=body.followId
             )
             db_session.add(new_connection)
             db_session.commit()
