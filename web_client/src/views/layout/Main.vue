@@ -25,15 +25,15 @@
               <b>Explore</b>
             </span>
           </router-link>
-          <router-link
+          <a
             :class="{'nav-btn': true, selected: isSelectedBtn('profile')}"
-            :to="`/profile/${$store.state.user.id}`"
+            :href="`/profile/${$store.state.user.id}`"
           >
             <span>
               <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="mdi-account" width="24" height="24" viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>
               <b>Profile</b>
             </span>
-          </router-link>
+          </a>
           <button class="nav-btn">
             <span>
               <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="mdi-dots-horizontal-circle-outline" width="24" height="24" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5A1.5,1.5 0 0,1 10.5,12A1.5,1.5 0 0,1 12,10.5M7.5,10.5A1.5,1.5 0 0,1 9,12A1.5,1.5 0 0,1 7.5,13.5A1.5,1.5 0 0,1 6,12A1.5,1.5 0 0,1 7.5,10.5M16.5,10.5A1.5,1.5 0 0,1 18,12A1.5,1.5 0 0,1 16.5,13.5A1.5,1.5 0 0,1 15,12A1.5,1.5 0 0,1 16.5,10.5Z" /></svg>
@@ -87,8 +87,12 @@
     <div class="right-pane" id="right-pane_main-layout">
       <div>
         <div :class="{search: true, hidden: canHideSearchPanel()}">
-          <input placeholder="Search Cartedepoezii" v-model="searchQuery"/>
-          <button class="cdp-btn icon">
+          <input
+            placeholder="Search Cartedepoezii"
+            v-model="searchQuery"
+            @keydown.enter="searchSite"
+          />
+          <button class="cdp-btn icon" @click="searchSite">
             <MagnifyIcon/>
           </button>
         </div>
@@ -108,7 +112,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { Poem } from '@/assets/scripts/type_defs';
+import Poem from '@/assets/scripts/types/poem';
+import UserAPIReq from '@/assets/scripts/api_requests/user';
+import PoemAPIReq from '@/assets/scripts/api_requests/poem';
 import PoemEdit from '@/components/PoemEdit.vue';
 import CartedepoeziiLogo from '@/assets/icons/Logo.vue';
 import PenIcon from '@/assets/icons/Pen.vue';
@@ -117,23 +123,6 @@ import ModalLayout from './Modal.vue';
 
 @Component({
   name: 'MainLayout',
-  methods: {
-    isSelectedBtn(name) {
-      const userId = this.$store.state.user.id;
-      switch (name) {
-        case 'home':
-          return window.location.pathname === '/';
-        case 'explore':
-          return window.location.pathname.startsWith('/explore');
-        case 'profile':
-          return window.location.pathname === `/profile/${userId}`;
-        default:
-          break;
-      }
-      return false;
-    },
-  },
-  // watch: {},
   components: {
     ModalLayout,
     PoemEdit,
@@ -160,12 +149,22 @@ export default class MainLayout extends Vue {
       isFollowing: false,
       profilePhotoId: '',
     },
-    publishedDate: new Date(),
+    publishedOn: new Date().toISOString(),
     commentsCount: 0,
     likesCount: 0,
     isLiked: false,
     verses: [''],
   };
+
+  poemAPIReq = new PoemAPIReq(
+    this.$store.state.API_URL,
+    this.$store.state.user.authToken,
+  );
+
+  userAPIReq = new UserAPIReq(
+    this.$store.state.API_URL,
+    this.$store.state.user.authToken,
+  );
 
   adjustPanes = (): void => {
     const leftPane = document.getElementById('left-pane_main-layout');
@@ -196,11 +195,53 @@ export default class MainLayout extends Vue {
     }
   };
 
+  isSelectedBtn(name: string): boolean {
+    const userId = this.$store.state.user.id;
+    switch (name) {
+      case 'home':
+        return window.location.pathname === '/';
+      case 'explore':
+        return window.location.pathname.startsWith('/explore');
+      case 'profile':
+        return window.location.pathname === `/profile/${userId}`;
+      default:
+        break;
+    }
+    return false;
+  }
+
   canHideSearchPanel(): boolean {
     if (this.$route.path.startsWith('/search')) {
       return true;
     }
     return this.$route.path.startsWith('/explore');
+  }
+
+  openPoemDialog(): void {
+    this.newPoem = {
+      id: '',
+      title: '',
+      user: {
+        id: this.$store.state.user.id,
+        name: '',
+        isFollowing: false,
+        profilePhotoId: '',
+      },
+      publishedOn: new Date().toISOString(),
+      commentsCount: 0,
+      likesCount: 0,
+      isLiked: false,
+      verses: [''],
+    };
+    this.isWritingPoem = true;
+  }
+
+  closeDialog(): void {
+    this.isWritingPoem = false;
+  }
+
+  searchSite(): void {
+    this.$router.push(`/search/${this.searchQuery}`);
   }
 
   mounted(): void {
@@ -218,29 +259,6 @@ export default class MainLayout extends Vue {
         }
       }, false);
     }
-  }
-
-  openPoemDialog(): void {
-    this.newPoem = {
-      id: '',
-      title: '',
-      user: {
-        id: this.$store.state.user.id,
-        name: '',
-        isFollowing: false,
-        profilePhotoId: '',
-      },
-      publishedDate: new Date(),
-      commentsCount: 0,
-      likesCount: 0,
-      isLiked: false,
-      verses: [''],
-    };
-    this.isWritingPoem = true;
-  }
-
-  closeDialog(): void {
-    this.isWritingPoem = false;
   }
 }
 </script>
