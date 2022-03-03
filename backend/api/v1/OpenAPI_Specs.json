@@ -350,9 +350,8 @@
         "tags": ["User"],
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
-                "type": "object",
                 "properties": {
                   "authToken": {
                     "type": "string",
@@ -370,8 +369,8 @@
                   },
                   "profilePhoto": {
                     "type": "string",
-                    "format": "binary",
-                    "description": "The user's profile photo."
+                    "format": "base64",
+                    "description": "The user's base64 encoded profile photo."
                   },
                   "removeProfilePhoto": {
                     "type": "boolean",
