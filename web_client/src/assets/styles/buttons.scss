@@ -60,4 +60,8 @@
     fill: globals.$danger-color-light;
     transition-duration: 700ms;
   }
+
+  &.hidden {
+    display: none;
+  }
 }
