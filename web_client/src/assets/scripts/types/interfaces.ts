@@ -25,3 +25,9 @@ export interface EditProfileForm {
   name: string;
   bio: string;
 }
+
+export interface EditPoemForm {
+  poemId: string;
+  title: string;
+  verses: Array<string>;
+}
