@@ -85,22 +85,19 @@ export default class User {
       this.BASE_URL,
       '/user',
     ].join('');
-    const bodyData = new FormData();
-    bodyData.set('authToken', this.AUTH_TOKEN);
-    bodyData.set('userId', updateForm.userId);
-    bodyData.set('name', updateForm.name);
+    const bodyData = {
+      authToken: this.AUTH_TOKEN,
+      userId: updateForm.userId,
+      name: updateForm.name,
+      profilePhoto: '',
+      profilePhotoId: updateForm.imageURL,
+      removeProfilePhoto: updateForm.removePhoto,
+      email: updateForm.email,
+      bio: updateForm.bio,
+    };
     if (updateForm.imageUploaded && !updateForm.removePhoto) {
-      const mimeType = updateForm.imageURL.split(';')[0].split(':')[1];
-      console.log(mimeType);
-      bodyData.set('profilePhoto', new Blob(
-        [updateForm.imageURL],
-        { type: mimeType },
-      ));
+      bodyData.profilePhoto = updateForm.imageURL;
     }
-    bodyData.set('profilePhotoId', updateForm.imageURL);
-    bodyData.set('removeProfilePhoto', updateForm.removePhoto.toString());
-    bodyData.set('email', updateForm.email);
-    bodyData.set('bio', updateForm.bio);
     const result = new Promise<{
       success: boolean,
       data?: { authToken: string, profilePhotoId: string },
@@ -110,9 +107,9 @@ export default class User {
         method: 'PUT',
         mode: 'cors',
         headers: {
-          // 'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
-        body: bodyData,
+        body: JSON.stringify(bodyData),
       })
         .then((response) => resolve(response.json()))
         .catch((err) => reject(err));
