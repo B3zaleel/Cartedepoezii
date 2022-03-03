@@ -25,6 +25,13 @@
       opacity: 0.85;
       box-shadow: 0 0 2px 2px gainsboro;
     }
+
+    &.danger:hover {
+      background: globals.$danger-color;
+      color: white;
+      fill: globals.$danger-color-light;
+      transition-duration: 700ms;
+    }
   }
 
   &.icon {
