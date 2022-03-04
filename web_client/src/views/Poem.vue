@@ -22,7 +22,7 @@
             <LoadingIcon/>
           </div>
           <div v-show="poemLoaded">
-            <Poem :poem="poem"/>
+            <Poem :poem="poem" v-for="poem in poems" :key="poem.id"/>
           </div>
           <div v-show="poemLoaded">
             <ItemsLoaderLayout
@@ -59,7 +59,7 @@ import Poem from '@/components/Poem.vue';
   },
 })
 export default class PoemView extends Vue {
-  poem: PoemT = new PoemT();
+  poems: Array<PoemT> = [];
 
   poemLoaded = false;
 
@@ -91,8 +91,12 @@ export default class PoemView extends Vue {
       .then((res) => {
         if (res.success) {
           if (res.data) {
-            this.poem = res.data;
-            document.title = `${this.poem.user.name}: ${this.poem.title} - Cartedepoezii`;
+            const n = this.poems.length;
+            for (let i = 0; i < n; i += 1) {
+              this.poems.pop();
+            }
+            this.poems.push(res.data);
+            document.title = `${res.data.user.name}: ${res.data.title} - Cartedepoezii`;
             this.poemLoaded = true;
           }
         }
