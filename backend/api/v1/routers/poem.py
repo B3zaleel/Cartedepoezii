@@ -317,6 +317,11 @@ async def get_created_poems(userId, token='', span='', after='', before=''):
                         is_liked_by_user = True
                 obj = {
                     'id': item.id,
+                    'user': {
+                        'id': user.id,
+                        'name': user.name,
+                        'profilePhotoId': user.profile_photo_id,
+                    },
                     'title': item.title,
                     'publishedOn': item.created_on.isoformat(),
                     'verses': json.JSONDecoder().decode(item.text),
@@ -401,7 +406,7 @@ async def get_liked_poems(userId, token='', span='', after='', before=''):
                 'user': {
                     'id': user.id,
                     'name': user.name,
-                    'profilePhotoId': user.pro,
+                    'profilePhotoId': user.profile_photo_id,
                 },
                 'title': poem.title,
                 'publishedOn': poem.created_on.isoformat(),
