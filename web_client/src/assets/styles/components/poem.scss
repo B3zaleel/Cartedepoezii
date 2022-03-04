@@ -61,7 +61,7 @@
       }
 
       &.main {
-        margin: 0 40px;
+        padding: 0 40px;
         width: calc(100% - 2 * 40px);
         flex-flow: column;
 
@@ -76,6 +76,7 @@
           justify-content: center;
           height: max-content;
           min-height: 80px;
+          // width: calc(100% - 2 * 40px);
           margin: 0 0 5px 0;
           padding: 10px max(40px, 25%);
           background: ghostwhite;
