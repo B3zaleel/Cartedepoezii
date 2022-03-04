@@ -12,6 +12,7 @@
           <ItemsLoaderLayout
             :itemsName="'poems'"
             :itemsFetcher="poemsFetcher"
+            :reverse="true"
           />
         </div>
       </div>
