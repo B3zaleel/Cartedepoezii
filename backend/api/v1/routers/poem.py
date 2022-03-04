@@ -251,7 +251,6 @@ async def like_poem(body: PoemLikeForm):
                 created_on=datetime.utcnow(),
                 user_id=body.userId,
                 poem_id=body.poemId,
-                name=body.name
             )
             db_session.add(new_favourite)
             db_session.commit()
