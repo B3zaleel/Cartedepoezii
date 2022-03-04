@@ -6597,7 +6597,7 @@ original@^1.0.0:
   resolved "https://registry.npmmirror.com/original/-/original-1.0.2.tgz#e442a61cffe1c5fd20a65f3261c26663b303f25f"
   integrity sha512-hyBVl6iqqUOJ8FqRe+l/gS8H+kKYjrEndd5Pm1MfBtsEKA038HkkdbAl/72EAXGyonD/PFsvmVG+EvcIpliMBg==
   dependencies:
-    url-parse "^1.4.3"
+    url-parse "^1.5.9"
 
 os-browserify@^0.3.0:
   version "0.3.0"
@@ -8137,7 +8137,7 @@ sockjs-client@^1.5.0:
     faye-websocket "^0.11.3"
     inherits "^2.0.4"
     json3 "^3.3.3"
-    url-parse "^1.5.3"
+    url-parse "^1.5.9"
 
 sockjs@^0.3.21:
   version "0.3.24"
@@ -8968,9 +8968,9 @@ url-loader@^2.2.0:
     mime "^2.4.4"
     schema-utils "^2.5.0"
 
-url-parse@^1.4.3, url-parse@^1.5.3:
-  version "1.5.6"
-  resolved "https://registry.npmmirror.com/url-parse/-/url-parse-1.5.6.tgz#b2a41d5a233645f3c31204cc8be60e76a15230a2"
+url-parse@^1.5.9, url-parse@^1.5.9:
+  version "1.5.9"
+  resolved "https://registry.npmmirror.com/url-parse/-/url-parse-1.5.9.tgz#05ff26484a0b5e4040ac64dcee4177223d74675e"
   integrity sha512-xj3QdUJ1DttD1LeSfvJlU1eiF1RvBSBfUu8GplFGdUzSO28y5yUtEl7wb//PI4Af6qh0o/K8545vUmucRrfWsw==
   dependencies:
     querystringify "^2.1.1"
