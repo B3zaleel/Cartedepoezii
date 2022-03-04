@@ -105,8 +105,9 @@
             <template v-slot:modal-action-panel>
               <div>
                 <div>
-                  <button class="cdp-btn text" @click="createPoem">
-                    Done
+                  <button class="cdp-btn text" :disabled="isSavingPoem" @click="createPoem">
+                    <LoadingIcon v-show="isSavingPoem"/>
+                    <b v-show="!isSavingPoem">Done</b>
                   </button>
                 </div>
               </div>
@@ -154,6 +155,7 @@ import AccountIcon from '@/assets/icons/Account.vue';
 import DotsHorizontalCircleOutlineIcon from '@/assets/icons/DotsHorizontalCircleOutline.vue';
 import PenIcon from '@/assets/icons/Pen.vue';
 import MagnifyIcon from '@/assets/icons/Magnify.vue';
+import LoadingIcon from '@/assets/icons/Loading.vue';
 import ModalLayout from './Modal.vue';
 import ContextMenuLayout from './ContextMenu.vue';
 
@@ -170,6 +172,7 @@ import ContextMenuLayout from './ContextMenu.vue';
     DotsHorizontalCircleOutlineIcon,
     PenIcon,
     MagnifyIcon,
+    LoadingIcon,
   },
 })
 export default class MainLayout extends Vue {
@@ -182,6 +185,8 @@ export default class MainLayout extends Vue {
   };
 
   isWritingPoem = false;
+
+  isSavingPoem = false;
 
   hasHeader = true;
 
@@ -257,7 +262,6 @@ export default class MainLayout extends Vue {
   }
 
   openMoreMenu(ev: PointerClickEvent): void {
-    console.dir(ev.target);
     let button = null;
     const el = ev.target;
     let leftPos = ev.clientX;
@@ -338,11 +342,17 @@ export default class MainLayout extends Vue {
   createPoem(): void {
     const userId = this.$store.state.user.id;
     const { verses } = this.newPoem;
+    this.isSavingPoem = true;
     this.poemAPIReq.createPoem(userId, this.newPoem.title, verses)
       .then((res) => {
         if (res.success) {
           //
+          this.closeDialog();
         }
+        this.isSavingPoem = false;
+      })
+      .catch(() => {
+        this.isSavingPoem = false;
       });
   }
 
@@ -355,7 +365,11 @@ export default class MainLayout extends Vue {
     this.userAPIReq.deleteUser(this.$store.state.user.id)
       .then((res) => {
         if (res.success) {
-          this.$router.push('/');
+          if (this.$route.path !== '/') {
+            this.$router.push('/');
+          } else {
+            window.location.reload();
+          }
         }
       });
   }
