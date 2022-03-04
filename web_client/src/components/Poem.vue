@@ -1,6 +1,6 @@
 <template>
   <div class="poem" tabindex="0">
-    <div @click.self="openPoem">
+    <div>
       <div class="header">
         <div>
           <router-link :to="`/profile/${poem.user.id}`">
@@ -34,7 +34,7 @@
         </div>
       </div>
 
-      <div class="main" @click.self="openPoem">
+      <div class="main" @mousedown.self="openPoem">
         <h4>{{ poem.title }}</h4>
 
         <div :style="{'height': versesPHeight }">
@@ -391,9 +391,10 @@ export default class PoemComponent extends Vue {
       });
   }
 
-  openPoem(): void {
+  openPoem(ev: MouseEvent): void {
     const location = `/poem/${this.poem.id}`;
     if (!this.$route.path.startsWith(location)) {
+      console.dir(ev);
       this.$router.push(`/poem/${this.poem.id}`);
     }
   }

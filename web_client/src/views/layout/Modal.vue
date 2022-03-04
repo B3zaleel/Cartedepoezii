@@ -2,6 +2,7 @@
   <div
     :class="{'modal-view': true, hidden: !modalOpen}"
     @mousedown.self="closeDialog"
+    @mousedown="cancelBubble"
   >
     <div>
       <div class="header">
@@ -31,6 +32,13 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import CloseIcon from '@/assets/icons/Close.vue';
 
 @Component({
+  methods: {
+    cancelBubble(ev: MouseEvent): void {
+      ev.preventDefault();
+      ev.stopPropagation();
+      ev.stopImmediatePropagation();
+    },
+  },
   components: {
     CloseIcon,
   },
@@ -44,9 +52,9 @@ import CloseIcon from '@/assets/icons/Close.vue';
   @Prop() hasFooter!: boolean;
 
   closeDialog(ev: Event): void {
+    this.$emit('request-close');
     ev.preventDefault();
     ev.stopPropagation();
-    this.$emit('request-close');
   }
 }
 </script>
