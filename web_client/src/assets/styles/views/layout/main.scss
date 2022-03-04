@@ -1,4 +1,4 @@
-@use "../../globals";
+@use "@/assets/styles/globals";
 
 .main-layout {
   display: grid;
@@ -32,7 +32,7 @@
         align-items: center;
         justify-content: center;
         border-radius: 5px;
-        background: #d7dbdba1;
+        background: globals.$primary-color-lightest;
         cursor: pointer;
 
         > svg {
@@ -55,7 +55,7 @@
       left: 0;
       border-bottom: 2px solid gray;
       height: calc(45px + 2px);
-      z-index: 500;
+      z-index: 100;
 
       > :first-child {
         position: absolute;
@@ -77,6 +77,10 @@
         background: #ffffffb0;
         backdrop-filter: blur(2px);
       }
+    }
+
+    .info-sect {
+      display: none;
     }
 
     > :last-child {
@@ -278,6 +282,10 @@
 
     > .center-pane {
       border-right: none;
+
+      .info-sect {
+        display: block;
+      }
     }
 
     > .right-pane {
