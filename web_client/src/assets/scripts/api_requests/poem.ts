@@ -206,7 +206,7 @@ export default class Poem {
       '/poems-user-created?',
       `userId=${userId}`,
       this.AUTH_TOKEN ? `&token=${this.AUTH_TOKEN}` : '',
-      page.span ? `&span${page.span <= 0 ? 12 : page.span}` : '',
+      page.span ? `&span=${page.span <= 0 ? 12 : page.span}` : '',
       page.after ? `&after=${page.after}` : '',
       page.before ? `&before=${page.before}` : '',
     ].join('');
@@ -239,7 +239,7 @@ export default class Poem {
       '/poems-user-likes?',
       `userId=${userId}`,
       this.AUTH_TOKEN ? `&token=${this.AUTH_TOKEN}` : '',
-      page.span ? `&span${page.span <= 0 ? 12 : page.span}` : '',
+      page.span ? `&span=${page.span <= 0 ? 12 : page.span}` : '',
       page.after ? `&after=${page.after}` : '',
       page.before ? `&before=${page.before}` : '',
     ].join('');
@@ -270,7 +270,7 @@ export default class Poem {
       this.BASE_URL,
       '/poems-channel?',
       `&token=${this.AUTH_TOKEN}`,
-      page.span ? `&span${page.span <= 0 ? 12 : page.span}` : '',
+      page.span ? `&span=${page.span <= 0 ? 12 : page.span}` : '',
       page.after ? `&after=${page.after}` : '',
       page.before ? `&before=${page.before}` : '',
     ].join('');
