@@ -3,7 +3,7 @@ import os
 import base64
 import email_validator
 from datetime import datetime
-from fastapi import APIRouter, UploadFile, Form, File
+from fastapi import APIRouter
 from imagekitio import ImageKit
 from sqlalchemy import and_
 
@@ -13,7 +13,8 @@ from ..database import (
     User,
     UserFollowing,
     Poem,
-    PoemLike
+    PoemLike,
+    Comment,
 )
 from ..utils.token_handlers import AuthToken
 
@@ -47,8 +48,8 @@ async def get_user(id: str, token=''):
             likes = db_session.query(PoemLike).filter(
                 PoemLike.user_id == user.id
             ).all()
-            comments = db_session.query(PoemLike).filter(
-                PoemLike.user_id == user.id
+            comments = db_session.query(Comment).filter(
+                Comment.user_id == user.id
             ).all()
             cur_usr_ctn = db_session.query(UserFollowing).filter(and_(
                 UserFollowing.follower_id == user_id,
