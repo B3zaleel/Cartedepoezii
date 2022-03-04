@@ -1,3 +1,5 @@
+@use "@/assets/styles/globals";
+
 .poem {
   position: relative;
   display: flex;
@@ -9,31 +11,10 @@
   align-items: center;
   cursor: pointer;
 
-  > .sect {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    min-height: 100%;
-    height: 100%;
-  }
-
-  > .sect:nth-child(2) {
-    flex-flow: column;
-    padding: 10px;
-
-    h4 {
-      margin: 5px;
-    }
-
-    > button {
-      padding: 2px 5px;
-    }
-  }
-
-  > .sect:nth-child(3) {
+  > div {
     flex-flow: column;
     width: 100%;
-    padding: 5px;
+    padding: 5px 5px 0 5px;
 
     > div {
       display: flex;
@@ -53,7 +34,8 @@
             align-items: center;
             justify-content: center;
             padding: 2px;
-            border: 2px solid greenyellow;
+            color: black;
+            border: 2px solid globals.$primary-color-lighter;
             border-radius: 50%;
 
             > svg {
@@ -65,6 +47,7 @@
 
         > div:nth-child(2) {
           > a {
+            color: black;
             text-decoration: none;
             white-space: nowrap;
             overflow: auto;
@@ -74,25 +57,6 @@
 
         > div:nth-child(3) {
           position: relative;
-
-          > button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 5px;
-            background: none;
-            border-radius: 50%;
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition-property: background;
-            transition-duration: 300ms;
-            transition-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1);
-
-            &:hover {
-              border-color: gainsboro;
-              background: rgb(172, 172, 172);
-            }
-          }
         }
       }
 
@@ -113,14 +77,19 @@
           height: max-content;
           min-height: 80px;
           margin: 0 0 5px 0;
+          padding: 10px max(40px, 25%);
           background: ghostwhite;
           border-radius: 10px;
           border: 1px solid gainsboro;
 
           > p {
-            margin: 10px max(40px, 25%);
-            min-height: 100%;
-            white-space: pre-line;
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+
+            &.hidden {
+              display: none;
+            }
           }
 
           > .nav-btn {
@@ -161,7 +130,7 @@
             display: flex;
             right: 5px;
             bottom: 5px;
-            padding: 2px;
+            padding: 2px 5px;
             font-size: 0.8em;
             background: gainsboro;
             border-radius: 2px;
@@ -176,39 +145,76 @@
 
       &.interactions {
         display: flex;
-        padding: 5px 5px 0 5px;
+        width: calc(100% - 2 * 20px);
+        margin: 0 20px;
         align-items: center;
         justify-content: center;
         border-top: 1px solid gainsboro;
 
-        > button {
+        > div.action-box {
           display: grid;
           padding: 5px;
           margin: 0 5px;
+          column-gap: 5px;
           grid-template-columns: auto calc(4 * 0.8em);
           align-items: center;
           justify-content: center;
-          background: none;
-          border: 1px solid transparent;
-          border-radius: 5px;
-          cursor: pointer;
-          outline: none;
 
-          > span {
-            display: flex;
-            height: 100%;
-            align-items: center;
-            justify-content: center;
+          > button {
+            margin: 0;
+            border: none;
+            cursor: pointer;
+            outline: none;
+
+            > span {
+              display: flex;
+              height: 20px;
+              width: 20px;
+              padding: 5px;
+              align-items: center;
+              justify-content: center;
+              border-radius: 50%;
+              transition-property: background;
+              transition-duration: 200ms;
+
+              > svg {
+                width: 20px;
+                height: 20px;
+              }
+            }
           }
-          &:hover {
-            border: 1px solid gainsboro;
+          > .like-btn {
+            background: none;
+            &.liked {
+              > span > svg.liked-icon {
+                display: inline;
+                fill: globals.$primary-color;
+              }
+              > span > svg.not-liked-icon {
+                display: none;
+              }
+            }
+
+            &:not(.liked) {
+              > span > svg.liked-icon {
+                display: none;
+              }
+              > span > svg.not-liked-icon {
+                display: inline;
+              }
+            }
+
+            &:hover {
+              > span {
+                background: globals.$primary-color-lightest;
+                > svg.not-liked-icon {
+                  fill: globals.$primary-color;
+                }
+              }
+            }
           }
         }
       }
     }
-  }
-
-  > .sect.active {
-    display: flex;
   }
 }
