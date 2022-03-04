@@ -1,7 +1,7 @@
 <template>
   <div
     :class="{menu: true, visible: isMenuOpen,}"
-    :style="getPositionStyle()"
+    :style="positionStyle"
     @mousedown="mouseDownEvent"
   >
     <slot></slot>
@@ -14,6 +14,18 @@ import { Position } from '@/assets/scripts/types/interfaces';
 
 @Component({
   name: 'ContextMenuLayout',
+  computed: {
+    positionStyle() {
+      const style = {
+        position: this.$props.position.type,
+        left: this.$props.position.left || 'auto',
+        top: this.$props.position.top || 'auto',
+        right: this.$props.position.right || 'auto',
+        bottom: this.$props.position.bottom || 'auto',
+      };
+      return style;
+    },
+  },
   methods: {
     mouseDownEvent(ev) {
       ev.preventDefault();
@@ -23,22 +35,7 @@ import { Position } from '@/assets/scripts/types/interfaces';
 }) export default class ContextMenuLayout extends Vue {
   @Prop() isMenuOpen!: boolean;
 
-  @Prop() position: Position = {
-    type: 'absolute',
-    right: '0',
-    top: '0',
-  };
-
-  getPositionStyle(): Record<string, string> {
-    const style = {
-      position: this.position.type,
-      left: this.position.left || 'auto',
-      top: this.position.top || 'auto',
-      right: this.position.right || 'auto',
-      bottom: this.position.bottom || 'auto',
-    };
-    return style;
-  }
+  @Prop() position?: Position;
 
   created(): void {
     window.addEventListener('mousedown', () => {
