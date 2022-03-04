@@ -27,7 +27,7 @@ export default class Search {
       '/search-people?',
       `q=${query}`,
       this.AUTH_TOKEN ? `&token=${this.AUTH_TOKEN}` : '',
-      page.span ? `&span${page.span <= 0 ? 12 : page.span}` : '',
+      page.span ? `&span=${page.span <= 0 ? 12 : page.span}` : '',
       page.after ? `&after=${page.after}` : '',
       page.before ? `&before=${page.before}` : '',
     ].join('');
@@ -61,7 +61,7 @@ export default class Search {
       '/search-poems?',
       `q=${query}`,
       this.AUTH_TOKEN ? `&token=${this.AUTH_TOKEN}` : '',
-      page.span ? `&span${page.span <= 0 ? 12 : page.span}` : '',
+      page.span ? `&span=${page.span <= 0 ? 12 : page.span}` : '',
       page.after ? `&after=${page.after}` : '',
       page.before ? `&before=${page.before}` : '',
     ].join('');
