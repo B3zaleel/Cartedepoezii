@@ -6,6 +6,7 @@
           <input
             placeholder="Search Cartedepoezii"
             v-model="searchQuery"
+            @keydown.enter="search"
           />
           <button class="cdp-btn icon" @click="search">
             <MagnifyIcon/>
@@ -27,12 +28,14 @@
                 <ItemsLoaderLayout
                   :itemsName="'poems'"
                   :itemsFetcher="poemsFetcher"
+                  :reverse="true"
                 />
               </div>
               <div class="" v-show="selectedId === 2">
                 <ItemsLoaderLayout
                   :itemsName="'users'"
                   :itemsFetcher="peopleFetcher"
+                  :reverse="true"
                 />
               </div>
             </div>
@@ -105,6 +108,7 @@ export default class SearchView extends Vue {
   search(): void {
     if (this.$route.params.q !== this.searchQuery) {
       this.$router.push(`/search/${this.searchQuery}`);
+      window.location.reload();
     }
   }
 
@@ -113,7 +117,7 @@ export default class SearchView extends Vue {
       data?: Array<Item>,
       message?: string
     }> {
-    return this.searchQueryAPIReq.findPoems(this.searchQuery, page);
+    return this.searchQueryAPIReq.findPoems(this.$route.params.q, page);
   }
 
   peopleFetcher(page: Page): Promise<{
@@ -121,18 +125,11 @@ export default class SearchView extends Vue {
       data?: Array<Item>,
       message?: string
     }> {
-    return this.searchQueryAPIReq.findPeople(this.searchQuery, page);
-  }
-
-  created(): void {
-    this.searchQuery = this.$route.params.q;
+    return this.searchQueryAPIReq.findPeople(this.$route.params.q, page);
   }
 
   mounted(): void {
-    this.searchQueryAPIReq = new SearchAPIReq(
-      this.$store.state.API_URL,
-      this.$store.state.user.authToken,
-    );
+    this.searchQuery = this.$route.params.q;
   }
 }
 </script>
