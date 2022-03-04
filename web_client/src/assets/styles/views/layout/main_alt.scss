@@ -1,0 +1,71 @@
+@use "@/assets/styles/globals";
+
+.main-alt-layout {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100%;
+
+  > .header-pane {
+    display: flex;
+    position: sticky;
+    top: 0;
+    padding: 5px clamp(10px, 10%, 30px);
+    border-bottom: 1px solid gainsboro;
+    background: white;
+    box-shadow: 0 0 2px 2px globals.$shadow-color;
+    z-index: 50;
+
+    > .app-home-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      min-width: 40px;
+      border-radius: 5px;
+      background: globals.$primary-color-lightest;
+      text-decoration: none;
+
+      > svg {
+        width: calc(100% - 5px);
+        height: calc(100% - 5px);
+      }
+    }
+  }
+
+  > .main-pane {
+    min-height: 100%;
+    display: contents;
+
+    article {
+      margin: 0px clamp(20px, 10%, 200px);
+    }
+  }
+
+  > footer {
+    padding: 10px;
+
+    .legal {
+      a {
+        padding: 0 5px;
+        color: black;
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: globals.$primary-color-lighter;
+        text-decoration: 1px solid underline;
+      }
+
+      a:not(:last-child) {
+        border-right: 2px solid grey;
+      }
+    }
+
+    div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
