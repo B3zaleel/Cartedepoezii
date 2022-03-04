@@ -80,6 +80,8 @@ import UserItem from '@/components/UserItem.vue';
 export default class ItemsLoaderLayout extends Vue {
   @Prop() itemsName!: string;
 
+  @Prop({ default: false }) reverse!: boolean;
+
   @Prop() itemsFetcher!: (page: Page) => Promise<{
     success: boolean,
     data?: Array<Item>,
@@ -106,8 +108,8 @@ export default class ItemsLoaderLayout extends Vue {
     this.loadingFailed = false;
     const nextPage = {
       span: 12,
-      after: this.lastItemId,
-      before: '',
+      after: this.reverse ? '' : this.lastItemId,
+      before: this.reverse ? this.lastItemId : '',
     };
     const res = await this.itemsFetcher(nextPage);
     if (res.success) {

@@ -125,18 +125,21 @@
             <ItemsLoaderLayout
               :itemsName="'poems'"
               :itemsFetcher="poemsFetcher"
+              :reverse="true"
             />
           </div>
           <div v-show="selectedId == 2">
             <ItemsLoaderLayout
               :itemsName="'comments'"
               :itemsFetcher="commentsFetcher"
+              :reverse="true"
             />
           </div>
           <div v-show="selectedId == 3">
             <ItemsLoaderLayout
               :itemsName="'poems'"
               :itemsFetcher="likesFetcher"
+              :reverse="true"
             />
           </div>
         </TabsLayout>
