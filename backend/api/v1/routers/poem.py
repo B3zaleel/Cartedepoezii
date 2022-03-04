@@ -196,23 +196,32 @@ async def remove_poem(body: PoemDeleteForm):
         return response
     db_session = get_session()
     try:
-        db_session.query(Poem).filter(and_(
-            Poem.poem_id == body.poemId,
+        poem = db_session.query(Poem).filter(and_(
+            Poem.id == body.poemId,
             Poem.user_id == body.userId,
-        )).delete(
-            synchronize_session=False
-        )
-        db_session.query(Comment).filter(and_(
-            Comment.poem_id == body.poemId,
-            Comment.id == body.commentId,
-        )).delete(
-            synchronize_session=False
-        )
-        db_session.commit()
-        response = {
-            'success': True,
-            'data': {}
-        }
+        )).first()
+        if poem:
+            db_session.query(PoemLike).filter(
+                PoemLike.poem_id == body.poemId,
+            ).delete(
+                synchronize_session=False
+            )
+            db_session.query(Comment).filter(
+                Comment.poem_id == body.poemId,
+            ).delete(
+                synchronize_session=False
+            )
+            db_session.query(Poem).filter(and_(
+                Poem.id == body.poemId,
+                Poem.user_id == body.userId,
+            )).delete(
+                synchronize_session=False
+            )
+            db_session.commit()
+            response = {
+                'success': True,
+                'data': {}
+            }
     finally:
         db_session.close()
     return response
