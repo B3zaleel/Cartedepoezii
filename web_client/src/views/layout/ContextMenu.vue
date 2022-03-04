@@ -49,44 +49,5 @@ import { Position } from '@/assets/scripts/types/interfaces';
 </script>
 
 <style lang="scss">
-@use "@/assets/styles/globals";
-
-.menu.visible {
-  display: block;
-}
-
-.menu {
-  display: none;
-  padding: 5px 0;
-  border-radius: 4px;
-  border: 1px solid gray;
-  background: ghostwhite;
-  z-index: 700;
-  box-shadow: 0 0 2px 1.5px #a3a3a3dc;
-
-  > div {
-    display: flex;
-    flex-flow: column;
-
-    .menu-item {
-      display: flex;
-      padding: 5px;
-      color: black;
-      background: none;
-      border: none;
-      white-space: nowrap;
-      text-decoration: none;
-      cursor: pointer;
-
-      &:hover {
-        color: white;
-        background: globals.$primary-color-light;
-
-        &.danger {
-          background: globals.$danger-color-light;
-        }
-      }
-    }
-  }
-}
+@use "@/assets/styles/views/layout/context_menu";
 </style>
