@@ -6,13 +6,13 @@
           <CartedepoeziiLogo/>
         </div>
 
-        <div>
+        <div class="nav-pane">
           <router-link
             :class="{'nav-btn': true, selected: isSelectedBtn('home')}"
             to="/"
           >
             <span>
-              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="mdi-collage" width="24" height="24" viewBox="0 0 24 24"><path d="M5,3C3.89,3 3,3.89 3,5V19C3,20.11 3.89,21 5,21H11V3M13,3V11H21V5C21,3.89 20.11,3 19,3M13,13V21H19C20.11,21 21,20.11 21,19V13" /></svg>
+              <CollageIcon/>
               <b>Home</b>
             </span>
           </router-link>
@@ -21,7 +21,7 @@
             to="/explore"
           >
             <span>
-              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="mdi-compass" width="24" height="24" viewBox="0 0 24 24"><path d="M14.19,14.19L6,18L9.81,9.81L18,6M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,10.9A1.1,1.1 0 0,0 10.9,12A1.1,1.1 0 0,0 12,13.1A1.1,1.1 0 0,0 13.1,12A1.1,1.1 0 0,0 12,10.9Z" /></svg>
+              <CompassIcon/>
               <b>Explore</b>
             </span>
           </router-link>
@@ -30,16 +30,18 @@
             :href="`/profile/${$store.state.user.id}`"
           >
             <span>
-              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="mdi-account" width="24" height="24" viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>
+              <AccountIcon/>
               <b>Profile</b>
             </span>
           </a>
-          <button class="nav-btn">
-            <span>
-              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="mdi-dots-horizontal-circle-outline" width="24" height="24" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5A1.5,1.5 0 0,1 10.5,12A1.5,1.5 0 0,1 12,10.5M7.5,10.5A1.5,1.5 0 0,1 9,12A1.5,1.5 0 0,1 7.5,13.5A1.5,1.5 0 0,1 6,12A1.5,1.5 0 0,1 7.5,10.5M16.5,10.5A1.5,1.5 0 0,1 18,12A1.5,1.5 0 0,1 16.5,13.5A1.5,1.5 0 0,1 15,12A1.5,1.5 0 0,1 16.5,10.5Z" /></svg>
-              <b>More</b>
-            </span>
-          </button>
+          <div tabindex="1" @blur="closeMoreMenu">
+            <button class="nav-btn" @click.stop="openMoreMenu">
+              <span>
+                <DotsHorizontalCircleOutlineIcon/>
+                <b>More</b>
+              </span>
+            </button>
+          </div>
         </div>
 
         <div class="cta-sect">
@@ -58,6 +60,31 @@
       </div>
 
       <div>
+        <ContextMenuLayout
+          :position="moreMenuPos"
+          :isMenuOpen="isMoreMenuOpen"
+          v-on:request-close="closeMoreMenu"
+        >
+          <div>
+            <div class="info-sect">
+              <router-link class="menu-item" to="/terms-of-service">
+                Terms of Service
+              </router-link>
+              <router-link class="menu-item" to="/privacy-policy">
+                Privacy Policy
+              </router-link>
+              <router-link class="menu-item" to="/about">
+                About
+              </router-link>
+            </div>
+            <button class="menu-item" @click="signOut">
+              Sign Out
+            </button>
+            <button class="menu-item danger" @click="deleteAccount">
+              Delete Account
+            </button>
+          </div>
+        </ContextMenuLayout>
         <slot name="main"></slot>
           <ModalLayout
             :modalOpen="isWritingPoem"
@@ -67,14 +94,18 @@
           >
             <template v-slot:modal-body>
               <div>
-                <PoemEdit :poem="newPoem"/>
+                <PoemEdit
+                  :poem="newPoem"
+                  v-on:add-verse="args => addVerse(args)"
+                  v-on:remove-verse="args => removeVerse(args)"
+                />
               </div>
             </template>
 
             <template v-slot:modal-action-panel>
               <div>
                 <div>
-                  <button class="cdp-btn text">
+                  <button class="cdp-btn text" @click="createPoem">
                     Done
                   </button>
                 </div>
@@ -112,26 +143,44 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Poem from '@/assets/scripts/types/poem';
+import { EditPoemForm, Position, PointerClickEvent } from '@/assets/scripts/types/interfaces';
 import UserAPIReq from '@/assets/scripts/api_requests/user';
 import PoemAPIReq from '@/assets/scripts/api_requests/poem';
 import PoemEdit from '@/components/PoemEdit.vue';
 import CartedepoeziiLogo from '@/assets/icons/Logo.vue';
+import CollageIcon from '@/assets/icons/Collage.vue';
+import CompassIcon from '@/assets/icons/Compass.vue';
+import AccountIcon from '@/assets/icons/Account.vue';
+import DotsHorizontalCircleOutlineIcon from '@/assets/icons/DotsHorizontalCircleOutline.vue';
 import PenIcon from '@/assets/icons/Pen.vue';
 import MagnifyIcon from '@/assets/icons/Magnify.vue';
 import ModalLayout from './Modal.vue';
+import ContextMenuLayout from './ContextMenu.vue';
 
 @Component({
   name: 'MainLayout',
   components: {
     ModalLayout,
+    ContextMenuLayout,
     PoemEdit,
     CartedepoeziiLogo,
+    CollageIcon,
+    CompassIcon,
+    AccountIcon,
+    DotsHorizontalCircleOutlineIcon,
     PenIcon,
     MagnifyIcon,
   },
 })
 export default class MainLayout extends Vue {
+  isMoreMenuOpen = false;
+
+  moreMenuPos: Position = {
+    type: 'fixed',
+    left: '0',
+    bottom: '0',
+  };
+
   isWritingPoem = false;
 
   hasHeader = true;
@@ -140,19 +189,9 @@ export default class MainLayout extends Vue {
 
   searchQuery = '';
 
-  newPoem: Poem = {
-    id: '',
+  newPoem: EditPoemForm = {
+    poemId: '',
     title: '',
-    user: {
-      id: this.$store.state.user.id,
-      name: '',
-      isFollowing: false,
-      profilePhotoId: '',
-    },
-    publishedOn: new Date().toISOString(),
-    commentsCount: 0,
-    likesCount: 0,
-    isLiked: false,
     verses: [''],
   };
 
@@ -172,7 +211,7 @@ export default class MainLayout extends Vue {
     const dialogPane = document.getElementById('top-dialog');
 
     if (leftPane) {
-      const childHeight = leftPane.clientHeight;
+      // const childHeight = leftPane.clientHeight;
       const child = leftPane.getElementsByTagName('div').item(0);
 
       // console.log(leftPane.scrollHeight, leftPane.clientHeight);
@@ -182,7 +221,7 @@ export default class MainLayout extends Vue {
       }
     }
     if (rightPane) {
-      const childHeight = rightPane.clientHeight;
+      // const childHeight = rightPane.clientHeight;
       const child = rightPane.getElementsByTagName('div').item(0);
 
       rightPane.style.height = `${window.innerHeight}px`;
@@ -217,22 +256,50 @@ export default class MainLayout extends Vue {
     return this.$route.path.startsWith('/explore');
   }
 
+  openMoreMenu(ev: PointerClickEvent): void {
+    console.dir(ev.target);
+    let button = null;
+    const el = ev.target;
+    let leftPos = ev.clientX;
+    let bottomPos = ev.clientY;
+    if (el.nodeName === 'SPAN') {
+      button = el.parentElement;
+    } else if (el.nodeName === 'svg' || el.nodeName === 'B') {
+      button = el.parentElement?.parentElement;
+    } else if (el.nodeName === 'path') {
+      button = el.parentElement?.parentElement?.parentElement;
+    } else {
+      button = el;
+    }
+    if (button) {
+      leftPos = button.clientWidth;
+      bottomPos = window.innerHeight - button.offsetTop - 1.5 * button.clientHeight;
+    }
+    this.moreMenuPos.left = `${leftPos}px`;
+    this.moreMenuPos.bottom = `${bottomPos}px`;
+    this.isMoreMenuOpen = true;
+  }
+
+  closeMoreMenu(): void {
+    this.isMoreMenuOpen = false;
+  }
+
   openPoemDialog(): void {
-    this.newPoem = {
-      id: '',
-      title: '',
-      user: {
-        id: this.$store.state.user.id,
-        name: '',
-        isFollowing: false,
-        profilePhotoId: '',
-      },
-      publishedOn: new Date().toISOString(),
-      commentsCount: 0,
-      likesCount: 0,
-      isLiked: false,
-      verses: [''],
-    };
+    let isEditActive = false;
+
+    if (this.newPoem.title.length > 0) {
+      isEditActive = true;
+    }
+    if (this.newPoem.verses.some((obj) => obj.length > 0)) {
+      isEditActive = true;
+    }
+    if (!isEditActive) {
+      this.newPoem = {
+        poemId: '',
+        title: '',
+        verses: [''],
+      };
+    }
     this.isWritingPoem = true;
   }
 
@@ -242,6 +309,55 @@ export default class MainLayout extends Vue {
 
   searchSite(): void {
     this.$router.push(`/search/${this.searchQuery}`);
+  }
+
+  addVerse(versePos: number): void {
+    const newVerses = [];
+    for (let i = 0; i < this.newPoem.verses.length; i += 1) {
+      newVerses.push(this.newPoem.verses[i]);
+      if (i === versePos) {
+        newVerses.push('');
+      }
+    }
+    this.newPoem.verses = newVerses;
+  }
+
+  removeVerse(versePos: number): void {
+    const newVerses = [];
+    if (this.newPoem.verses.length === 1) {
+      return;
+    }
+    for (let i = 0; i < this.newPoem.verses.length; i += 1) {
+      if (i !== versePos) {
+        newVerses.push(this.newPoem.verses[i]);
+      }
+    }
+    this.newPoem.verses = newVerses;
+  }
+
+  createPoem(): void {
+    const userId = this.$store.state.user.id;
+    const { verses } = this.newPoem;
+    this.poemAPIReq.createPoem(userId, this.newPoem.title, verses)
+      .then((res) => {
+        if (res.success) {
+          //
+        }
+      });
+  }
+
+  signOut(): void {
+    this.$store.commit('signOut');
+    this.$router.push('/');
+  }
+
+  deleteAccount(): void {
+    this.userAPIReq.deleteUser(this.$store.state.user.id)
+      .then((res) => {
+        if (res.success) {
+          this.$router.push('/');
+        }
+      });
   }
 
   mounted(): void {
