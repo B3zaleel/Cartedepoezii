@@ -49,11 +49,11 @@
             <div class="connections-sect">
               <button @click="viewFollowers">
                 <b>{{ MathUtils.formatNumber(user.followersCount) }}</b>
-                <b>Followers</b>
+                <b>{{ user.followersCount === 1 ? 'Follower' : 'Followers'}}</b>
               </button>
               <button @click="viewFollowings">
                 <b>{{ MathUtils.formatNumber(user.followingsCount) }}</b>
-                <b>Followings</b>
+                <b>{{ user.followingsCount === 1 ? 'Following' : 'Followings'}}</b>
               </button>
             </div>
 
@@ -437,15 +437,15 @@ export default class ProfileView extends Vue {
     switch (this.selectedId) {
       case 1: {
         const n = MathUtils.formatNumber(this.user.poemsCount, true);
-        return `${n} Poems`;
+        return this.user.poemsCount === 1 ? `${n} Poem` : `${n} Poems`;
       }
       case 2: {
         const n = MathUtils.formatNumber(this.user.commentsCount, true);
-        return `${n} Comments`;
+        return this.user.commentsCount === 1 ? `${n} Comment` : `${n} Comments`;
       }
       case 3: {
         const n = MathUtils.formatNumber(this.user.likesCount, true);
-        return `${n} Likes`;
+        return this.user.likesCount === 1 ? `${n} Like` : `${n} Likes`;
       }
       default:
         return '';
