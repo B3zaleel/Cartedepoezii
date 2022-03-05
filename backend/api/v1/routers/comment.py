@@ -31,10 +31,9 @@ async def get_comment(id=''):
             ).first()
             if not user:
                 return response
-            replies = db_session.query(Comment).filter(and_(
-                Comment.poem_id == id,
+            replies = db_session.query(Comment).filter(
                 Comment.comment_id == comment.id,
-            )).all()
+            ).all()
             replies_count = len(replies) if replies else 0
             response = {
                 'success': True,
@@ -48,7 +47,8 @@ async def get_comment(id=''):
                     'createdOn': comment.created_on.isoformat(),
                     'text': comment.text,
                     'poemId': comment.poem_id,
-                    'repliesCount': replies_count
+                    'repliesCount': replies_count,
+                    'replyTo': comment.comment_id if comment.comment_id else ''
                 }
             }
     finally:
@@ -100,7 +100,8 @@ async def get_poem_comments(id='', span='', after='', before=''):
                     'createdOn': comment.created_on.isoformat(),
                     'text': comment.text,
                     'poemId': comment.poem_id,
-                    'repliesCount': replies_count
+                    'repliesCount': replies_count,
+                    'replyTo': comment.comment_id if comment.comment_id else ''
                 }
                 new_comments.append(obj)
         new_comments.sort(
@@ -128,8 +129,6 @@ async def get_comment_replies(id='', span='', after='', before=''):
         'success': False,
         'message': 'Failed to find replies to comment.'
     }
-    if span < 0:
-        span = -span
     if not id:
         return response
     db_session = get_session()
@@ -143,28 +142,34 @@ async def get_comment_replies(id='', span='', after='', before=''):
             db_session.close()
             return response
         span = int(span if span else '12')
-        replies = db_session.query(Comment).filter(
+        comments = db_session.query(Comment).filter(
             Comment.comment_id == id
         ).all()
         new_replies = []
-        if replies:
-            for reply in replies:
+        if comments:
+            for comment in comments:
                 user = db_session.query(User).filter(
-                    User.id == reply.user_id
+                    User.id == comment.user_id
                 ).first()
                 if not user:
                     continue
+                replies = db_session.query(Comment).filter(and_(
+                    Comment.poem_id == id,
+                    Comment.comment_id == comment.id,
+                )).all()
+                replies_count = len(replies) if replies else 0
                 obj = {
-                    'id': reply.id,
+                    'id': comment.id,
                     'user': {
                         'id': user.id,
                         'name': user.name,
                         'profilePhotoId': user.profile_photo_id
                     },
-                    'createdOn': reply.created_on.isoformat(),
-                    'text': reply.text,
-                    'poemId': reply.poem_id,
-                    'replyTo': id
+                    'createdOn': comment.created_on.isoformat(),
+                    'text': comment.text,
+                    'poemId': comment.poem_id,
+                    'repliesCount': replies_count,
+                    'replyTo': comment.comment_id if comment.comment_id else ''
                 }
                 new_replies.append(obj)
         new_replies.sort(
