@@ -1,8 +1,14 @@
+@use "@/assets/styles/globals";
 
 .loading-pane {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  background: gainsboro;
+}
+
+.poem-comment-sect-divider {
+  height: 10px;
   background: gainsboro;
 }
