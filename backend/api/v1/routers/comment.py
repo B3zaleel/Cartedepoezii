@@ -61,6 +61,9 @@ async def get_poem_comments(id='', span='', after='', before=''):
                     'repliesCount': replies_count
                 }
                 new_comments.append(obj)
+        new_comments.sort(
+            key=lambda x: datetime.fromisoformat(x['createdOn'])
+        )
         response = {
             'success': True,
             'data': extract_page(
@@ -98,13 +101,13 @@ async def get_comment_replies(id='', poemId='', span='', after='', before=''):
             db_session.close()
             return response
         span = int(span if span else '12')
-        result = db_session.query(Comment).filter(and_(
+        replies = db_session.query(Comment).filter(and_(
             Comment.poem_id == poemId,
             Comment.comment_id == id
         )).all()
-        new_result = []
-        if result:
-            for item in result:
+        new_replies = []
+        if replies:
+            for item in replies:
                 user = db_session.query(User).filter(
                     User.id == item.user_id
                 ).first()
@@ -122,11 +125,14 @@ async def get_comment_replies(id='', poemId='', span='', after='', before=''):
                     'poemId': poemId,
                     'replyTo': id
                 }
-                new_result.append(obj)
+                new_replies.append(obj)
+        new_replies.sort(
+            key=lambda x: datetime.fromisoformat(x['createdOn'])
+        )
         response = {
             'success': True,
             'data': extract_page(
-                new_result,
+                new_replies,
                 span,
                 after,
                 before,
@@ -184,6 +190,9 @@ async def get_comments_by_user(id='', token='', span='', after='', before=''):
                     'repliesCount': replies_count
                 }
                 new_comments.append(obj)
+        new_comments.sort(
+            key=lambda x: datetime.fromisoformat(x['createdOn'])
+        )
         response = {
             'success': True,
             'data': {
