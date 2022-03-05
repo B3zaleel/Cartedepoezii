@@ -183,6 +183,11 @@ async def get_comments_by_user(id='', token='', span='', after='', before=''):
                 replies_count = len(replies) if replies else 0
                 obj = {
                     'id': comment.id,
+                    'user': {
+                        'id': user.id,
+                        'name': user.name,
+                        'profilePhotoId': user.profile_photo_id
+                    },
                     'createdOn': comment.created_on.isoformat(),
                     'text': comment.text,
                     'poemId': comment.poem_id,

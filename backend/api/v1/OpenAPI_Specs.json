@@ -1811,7 +1811,7 @@
                         },
                         "comments": {
                           "items": {
-                            "$ref": "#/components/schemas/CommentMin"
+                            "$ref": "#/components/schemas/Comment"
                           }
                         }
                       }
@@ -2132,43 +2132,6 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
-          },
-          "repliesCount": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "CommentMin": {
-        "type": "object",
-        "description": "Represents a comment on a poem (minified).",
-        "required": [
-          "id",
-          "user",
-          "createdOn",
-          "text",
-          "poemId"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdOn": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "text": {
-            "type": "string",
-            "maxLength": 256
-          },
-          "poemId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "replyTo": {
-            "type": "string",
-            "format": "uuid"
           },
           "repliesCount": {
             "type": "integer",
