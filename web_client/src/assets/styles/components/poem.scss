@@ -144,17 +144,25 @@
         }
       }
 
+      &.creation-time {
+        width: calc(100% - 2 * 20px);
+        margin-bottom: 2.5px;
+        justify-content: flex-end;
+        font-size: x-small;
+        font-weight: 500;
+      }
+
       &.interactions {
         display: flex;
-        width: calc(100% - 2 * 20px);
-        margin: 0 20px;
+        width: calc(100% - 2 * 40px);
+        margin: 0 40px;
         align-items: center;
         justify-content: center;
         border-top: 1px solid gainsboro;
 
         > div.action-box {
           display: grid;
-          padding: 5px;
+          padding: 2px;
           margin: 0 5px;
           column-gap: 5px;
           grid-template-columns: auto calc(4 * 0.8em);
@@ -162,8 +170,14 @@
           justify-content: center;
 
           > button {
+            display: flex;
             margin: 0;
+            padding: 2px;
+            align-items: center;
+            justify-content: center;
+            background: none;
             border: none;
+            border-radius: 50%;
             cursor: pointer;
             outline: none;
 
@@ -171,7 +185,7 @@
               display: flex;
               height: 20px;
               width: 20px;
-              padding: 5px;
+              padding: 8px;
               align-items: center;
               justify-content: center;
               border-radius: 50%;
@@ -183,25 +197,40 @@
                 height: 20px;
               }
             }
+
+            &:hover {
+              > span {
+                background: gainsboro;
+                // > svg.not-liked-icon {
+                //   fill: globals.$primary-color;
+                // }
+              }
+            }
           }
           > .like-btn {
-            background: none;
+            background: transparent;
             &.liked {
-              > span > svg.liked-icon {
-                display: inline;
-                fill: globals.$primary-color;
-              }
-              > span > svg.not-liked-icon {
-                display: none;
+              > span {
+                > svg.liked-icon {
+                  display: inline;
+                  fill: globals.$primary-color;
+                }
+
+                > svg.not-liked-icon {
+                  display: none;
+                }
               }
             }
 
             &:not(.liked) {
-              > span > svg.liked-icon {
-                display: none;
-              }
-              > span > svg.not-liked-icon {
-                display: inline;
+              > span {
+                > svg.liked-icon {
+                  display: none;
+                }
+
+                > span > svg.not-liked-icon {
+                  display: inline;
+                }
               }
             }
 
@@ -214,6 +243,24 @@
               }
             }
           }
+        }
+      }
+
+      &.new-comment {
+        flex-direction: column;
+        width: calc(100% - 2 * 40px - 2 * 10px);
+        margin: 0 40px;
+        padding: 5px 10px;
+        align-items: center;
+        justify-content: center;
+
+        > div {
+          display: flex;
+          widtH: 100%;
+          padding-top: 2.5px;
+          flex-direction: row;
+          align-items: center;
+          justify-content: flex-end;
         }
       }
     }
