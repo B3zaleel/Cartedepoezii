@@ -3,7 +3,7 @@
     <div>
       <div class="heading">
         <button class="cdp-btn icon" @click="closeForm">
-          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="mdi-close" width="24" height="24" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg>
+          <CloseIcon/>
         </button>
 
         <div></div>
@@ -55,9 +55,20 @@
           <label class="label" for="form-word">Password</label>
         </div>
 
-        <div class="action">
-          <button class="cdp-btn text" v-bind:disabled="isSigningUp">
-            <b>Create Account</b>
+        <div>
+          <b>Aready have an account?</b>
+          <router-link
+            class="auth-link"
+            to="/sign-in"
+          >
+            Sign In
+          </router-link>
+        </div>
+
+        <div class="action right">
+          <button class="cdp-btn text" :disabled="isSigningUp">
+            <LoadingIcon v-show="isSigningUp"/>
+            <b v-show="!isSigningUp">Create Account</b>
           </button>
         </div>
       </form>
@@ -67,6 +78,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import AuthAPIReq from '@/assets/scripts/api_requests/authentication';
+import CloseIcon from '@/assets/icons/Close.vue';
+import LoadingIcon from '@/assets/icons/Loading.vue';
 
 @Component({
   name: 'SignUp',
@@ -91,6 +105,10 @@ import { Component, Vue } from 'vue-property-decorator';
       }
     },
   },
+  components: {
+    CloseIcon,
+    LoadingIcon,
+  },
 })
 export default class SignUp extends Vue {
   email = '';
@@ -107,18 +125,10 @@ export default class SignUp extends Vue {
 
   nameLimit = 60;
 
+  authAPIReq = new AuthAPIReq(this.$store.state.API_URL);
+
   updateNameCount(): void {
     this.nameCount = this.name.length;
-  }
-
-  validForm(): boolean {
-    // TODO: Validate form
-    let isValid = true;
-
-    if (this.password.length === 0) {
-      isValid = false;
-    }
-    return isValid;
   }
 
   closeForm(): void {
@@ -126,40 +136,24 @@ export default class SignUp extends Vue {
   }
 
   signUp(): void {
-    if (this.validForm()) {
-      const BASE_URL = this.$store.state.API_URL;
-      const signUpData = {
-        name: this.name,
-        email: this.email,
-        password: this.password,
-      };
-
-      this.isSigningUp = true;
-      fetch(`${BASE_URL}/sign-up`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(signUpData),
-      })
-        .then((response) => response.json())
-        .then((res) => {
-          if (res.success) {
+    this.isSigningUp = true;
+    this.authAPIReq.signUp(this.name, this.email, this.password)
+      .then((res) => {
+        if (res.success) {
+          if (res.data) {
             this.$store.commit('signIn', {
               token: res.data.authToken,
               id: res.data.userId,
             });
             this.$router.push('/');
-          } else {
-            // show error info
-            console.log(res.message);
-            this.isSigningUp = false;
           }
-        }).catch((err) => {
-          this.isSigningUp = false;
-        });
-    }
+        } else {
+          console.error(res.message);
+        }
+        this.isSigningUp = false;
+      }).catch(() => {
+        this.isSigningUp = false;
+      });
   }
 }
 </script>
