@@ -14,7 +14,49 @@ from ..utils.pagination import extract_page
 router = APIRouter(prefix='/api/v1')
 
 
-@router.get('/comments')
+@router.get('/comment')
+async def get_comment(id=''):
+    response = {
+        'success': False,
+        'message': 'Failed to find comment.'
+    }
+    db_session = get_session()
+    try:
+        comment = db_session.query(Comment).filter(
+            Comment.id == id
+        ).first()
+        if comment:
+            user = db_session.query(User).filter(
+                User.id == comment.user_id
+            ).first()
+            if not user:
+                return response
+            replies = db_session.query(Comment).filter(and_(
+                Comment.poem_id == id,
+                Comment.comment_id == comment.id,
+            )).all()
+            replies_count = len(replies) if replies else 0
+            response = {
+                'success': True,
+                'data': {
+                    'id': comment.id,
+                    'user': {
+                        'id': user.id,
+                        'name': user.name,
+                        'profilePhotoId': user.profile_photo_id
+                    },
+                    'createdOn': comment.created_on.isoformat(),
+                    'text': comment.text,
+                    'poemId': comment.poem_id,
+                    'repliesCount': replies_count
+                }
+            }
+    finally:
+        db_session.close()
+    return response
+
+
+@router.get('/comments-of-poem')
 async def get_poem_comments(id='', span='', after='', before=''):
     response = {
         'success': False,
@@ -81,14 +123,14 @@ async def get_poem_comments(id='', span='', after='', before=''):
 
 
 @router.get('/comment-replies')
-async def get_comment_replies(id='', poemId='', span='', after='', before=''):
+async def get_comment_replies(id='', span='', after='', before=''):
     response = {
         'success': False,
         'message': 'Failed to find replies to comment.'
     }
     if span < 0:
         span = -span
-    if not id or not poemId:
+    if not id:
         return response
     db_session = get_session()
     try:
@@ -101,28 +143,27 @@ async def get_comment_replies(id='', poemId='', span='', after='', before=''):
             db_session.close()
             return response
         span = int(span if span else '12')
-        replies = db_session.query(Comment).filter(and_(
-            Comment.poem_id == poemId,
+        replies = db_session.query(Comment).filter(
             Comment.comment_id == id
-        )).all()
+        ).all()
         new_replies = []
         if replies:
-            for item in replies:
+            for reply in replies:
                 user = db_session.query(User).filter(
-                    User.id == item.user_id
+                    User.id == reply.user_id
                 ).first()
                 if not user:
                     continue
                 obj = {
-                    'id': item.id,
+                    'id': reply.id,
                     'user': {
                         'id': user.id,
                         'name': user.name,
                         'profilePhotoId': user.profile_photo_id
                     },
-                    'createdOn': item.created_on.isoformat(),
-                    'text': item.text,
-                    'poemId': poemId,
+                    'createdOn': reply.created_on.isoformat(),
+                    'text': reply.text,
+                    'poemId': reply.poem_id,
                     'replyTo': id
                 }
                 new_replies.append(obj)
@@ -146,7 +187,7 @@ async def get_comment_replies(id='', poemId='', span='', after='', before=''):
 
 
 @router.get('/comments-by-user')
-async def get_comments_by_user(id='', token='', span='', after='', before=''):
+async def get_comments_by_user(id='', span='', after='', before=''):
     response = {
         'success': False,
         'message': 'User id is required.'
@@ -200,28 +241,21 @@ async def get_comments_by_user(id='', token='', span='', after='', before=''):
         )
         response = {
             'success': True,
-            'data': {
-                'user': {
-                    'id': user.id,
-                    'name': user.name,
-                    'profilePhotoId': user.profile_photo_id
-                },
-                'comments': extract_page(
-                    new_comments,
-                    span,
-                    after,
-                    before,
-                    True,
-                    lambda x: x['id']
-                )
-            }
+            'data': extract_page(
+                new_comments,
+                span,
+                after,
+                before,
+                True,
+                lambda x: x['id']
+            )
         }
     finally:
         db_session.close()
     return response
 
 
-@router.post('/comments')
+@router.post('/comment')
 async def add_comment(body: CommentAddForm):
     response = {
         'success': False,
@@ -277,7 +311,7 @@ async def add_comment(body: CommentAddForm):
     return response
 
 
-@router.delete('/comments')
+@router.delete('/comment')
 async def remove_comment(body: CommentDeleteForm):
     response = {
         'success': False,
@@ -288,16 +322,14 @@ async def remove_comment(body: CommentDeleteForm):
         return response
     db_session = get_session()
     try:
-        db_session.query(Comment).filter(and_(
-            Comment.poem_id == body.poemId,
+        db_session.query(Comment).filter(
             Comment.comment_id == body.commentId,
-        )).delete(
+        ).delete(
             synchronize_session=False
         )
-        db_session.query(Comment).filter(and_(
-            Comment.poem_id == body.poemId,
+        db_session.query(Comment).filter(
             Comment.id == body.commentId,
-        )).delete(
+        ).delete(
             synchronize_session=False
         )
         db_session.commit()
