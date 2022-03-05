@@ -74,6 +74,16 @@ const routes: Array<RouteConfig> = [
     component: () => import('../views/Poem.vue'),
   },
   {
+    path: '/comment/:id',
+    props: { id: String },
+    name: 'Comment',
+    meta: {
+      title: 'Comment',
+      requiresAuth: true,
+    },
+    component: () => import('../views/Comment.vue'),
+  },
+  {
     path: '/search/:q',
     props: { q: String },
     name: 'Search',
