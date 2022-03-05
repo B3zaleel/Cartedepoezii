@@ -85,4 +85,3 @@ class CommentDeleteForm(BaseModel):
     authToken: str
     userId: str
     commentId: str
-    poemId: str
