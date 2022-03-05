@@ -61,11 +61,15 @@
         </div>
       </div>
 
+      <div class="creation-time">
+        {{ creationTime }}
+      </div>
       <div class="interactions">
         <div class="action-box">
-          <button @click="openCommentDialog" class="cdp-btn icon">
+          <button @click="toggleComment">
             <span>
-              <CommentTextOutlineIcon/>
+              <CommentIcon v-show="isCommentingOnPoem"/>
+              <CommentTextIcon v-show="!isCommentingOnPoem"/>
             </span>
           </button>
           <b>{{ MathUtils.formatNumber(poem.commentsCount, true) }}</b>
@@ -87,9 +91,6 @@
         >
           <template v-slot:modal-body>
             <div>
-              <div v-show="dialogType === dialogTypes.Comment">
-                <textarea class="cdp-txb" rows="4" v-model="comment"/>
-              </div>
               <div v-show="dialogType === dialogTypes.Edit">
                 <PoemEdit
                   :poem="editPoemForm"
@@ -119,21 +120,19 @@
                   <b v-show="!isEditUploading">Done</b>
                 </button>
               </div>
-              <div
-                :class="{
-                  pane: true,
-                  right: true,
-                  hidden: dialogType !== dialogTypes.Comment}"
-              >
-                <DoughnutStatus/>
-                <button class="cdp-btn text" @click="commentOnPoem">
-                  <LoadingIcon v-show="isCommentUploading"/>
-                  <b v-show="!isCommentUploading">Reply</b>
-                </button>
-              </div>
             </div>
           </template>
         </ModalLayout>
+      </div>
+
+      <div class="new-comment" v-show="isCommentingOnPoem">
+        <textarea class="cdp-txb" v-model="comment"/>
+        <div>
+          <button class="cdp-btn text" @click="commentOnPoem">
+            <LoadingIcon v-show="isCommentUploading"/>
+            <b v-show="!isCommentUploading">Post</b>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -149,7 +148,8 @@ import PoemAPIReq from '@/assets/scripts/api_requests/poem';
 import AccountIcon from '@/assets/icons/Account.vue';
 import ChevronLeftIcon from '@/assets/icons/ChevronLeft.vue';
 import ChevronRightIcon from '@/assets/icons/ChevronRight.vue';
-import CommentTextOutlineIcon from '@/assets/icons/CommentTextOutline.vue';
+import CommentIcon from '@/assets/icons/Comment.vue';
+import CommentTextIcon from '@/assets/icons/CommentText.vue';
 import HeartOutlineIcon from '@/assets/icons/HeartOutline.vue';
 import HeartIcon from '@/assets/icons/Heart.vue';
 import DotsHorizontalIcon from '@/assets/icons/DotsHorizontal.vue';
@@ -161,11 +161,47 @@ import DoughnutStatus from '@/components/DoughnutStatus.vue';
 
 @Component({
   name: 'PoemComponent',
+  computed: {
+    creationTime() {
+      const months = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+      ];
+      const date = new Date(this.$props.poem.publishedOn);
+      const month = months[date.getUTCMonth()];
+      const monthDay = date.getUTCDate().toString();
+      const [a, b] = [
+        monthDay[monthDay.length - 1],
+        monthDay[monthDay.length - 2],
+      ];
+      let ordinal = 'th';
+
+      if ((a === '1') && (b !== '1')) {
+        ordinal = 'st';
+      } else if ((a === '2') && (b !== '1')) {
+        ordinal = 'nd';
+      } else if ((a === '3') && (b !== '1')) {
+        ordinal = 'rd';
+      }
+      return `Published on ${month} ${monthDay}${ordinal} ${date.getUTCFullYear()}`;
+    },
+  },
   components: {
     AccountIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
-    CommentTextOutlineIcon,
+    CommentIcon,
+    CommentTextIcon,
     HeartOutlineIcon,
     HeartIcon,
     DotsHorizontalIcon,
@@ -221,6 +257,8 @@ export default class PoemComponent extends Vue {
 
   loadingFailed = false;
 
+  isCommentingOnPoem = false;
+
   isCommentUploading = false;
 
   isEditUploading = false;
@@ -266,6 +304,10 @@ export default class PoemComponent extends Vue {
     }
   }
 
+  toggleComment(): void {
+    this.isCommentingOnPoem = !this.isCommentingOnPoem;
+  }
+
   openDeleteDialog(): void {
     this.closeMenu();
     if (!this.isDeletingPoem) {
@@ -285,16 +327,6 @@ export default class PoemComponent extends Vue {
         title: this.poem.title,
         verses: this.poem.verses,
       };
-      this.isDialogOpen = true;
-    }
-  }
-
-  openCommentDialog(): void {
-    this.closeMenu();
-    if (!this.isCommentUploading) {
-      this.dialogType = this.dialogTypes.Comment;
-      this.dialogTitle = 'Say your thoughts';
-      this.comment = '';
       this.isDialogOpen = true;
     }
   }
