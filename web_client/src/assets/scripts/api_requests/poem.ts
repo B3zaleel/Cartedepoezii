@@ -1,5 +1,4 @@
 import { Page } from '../types/interfaces';
-import PoemMin from '../types/poem_min';
 import PoemT from '../types/poem';
 
 /**
@@ -200,7 +199,7 @@ export default class Poem {
    * @param userId - The user's id.
    */
   getPoemsUserCreated(userId: string, page: Page = { span: 12, after: '', before: '' }):
-    Promise<{ success: boolean, data?: Array<PoemMin>, message?: string }> {
+    Promise<{ success: boolean, data?: Array<PoemT>, message?: string }> {
     const path = [
       this.BASE_URL,
       '/poems-user-created?',
@@ -211,7 +210,7 @@ export default class Poem {
       page.before ? `&before=${page.before}` : '',
     ].join('');
     const result = new Promise<{
-      success: boolean, data?: Array<PoemMin>, message?: string
+      success: boolean, data?: Array<PoemT>, message?: string
     }>(
       (resolve, reject) => {
         fetch(path, {
