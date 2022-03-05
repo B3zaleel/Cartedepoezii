@@ -1397,47 +1397,16 @@
         }
       }
     },
-    "/comments": {
+    "/comment": {
       "get": {
-        "summary": "Retrieve comments of a poem.",
+        "summary": "Retrieve a comment.",
         "tags": ["Comment"],
         "parameters": [
           {
             "name": "id",
             "in": "query",
-            "description": "The id of the poem.",
+            "description": "The id of the comment.",
             "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "span",
-            "in": "query",
-            "description": "The maximum number of comments to fetch.",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 12
-            }
-          },
-          {
-            "name": "after",
-            "in": "query",
-            "description": "The id of the comment from which the returned comments should be taken after.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "before",
-            "in": "query",
-            "description": "The id of the comment from which the returned comments should be taken before.",
-            "required": false,
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1455,9 +1424,7 @@
                       "type": "boolean"
                     },
                     "data": {
-                      "items": {
-                        "$ref": "#/components/schemas/Comment"
-                      }
+                      "$ref": "#/components/schemas/Comment"
                     }
                   }
                 }
@@ -1506,7 +1473,9 @@
                   },
                   "text": {
                     "type": "string",
-                    "maxLength": 256,
+                    "maxLength": 400,
+                    "minLength": 1,
+                    "nullable": false,
                     "description": "The comment's content."
                   },
                   "replyTo": {
@@ -1648,6 +1617,86 @@
         }
       }
     },
+    "/comments-of-poem": {
+      "get": {
+        "summary": "Retrieve comments of a poem.",
+        "tags": ["Comment"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The id of the poem.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of comments to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the comment from which the returned comments should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the comment from which the returned comments should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments of the given poem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/Comment"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/comment-replies": {
       "get": {
         "summary": "Retrieve replies to a comment on a poem.",
@@ -1657,16 +1706,6 @@
             "name": "id",
             "in": "query",
             "description": "The id of the comment.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "poemId",
-            "in": "query",
-            "description": "The id of the poem.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1754,15 +1793,6 @@
             }
           },
           {
-            "name": "token",
-            "in": "query",
-            "description": "The current user's authentication token.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "span",
             "in": "query",
             "description": "The maximum number of comments to fetch.",
@@ -1805,15 +1835,8 @@
                       "type": "boolean"
                     },
                     "data": {
-                      "properties": {
-                        "user": {
-                          "$ref": "#/components/schemas/UserMin"
-                        },
-                        "comments": {
-                          "items": {
-                            "$ref": "#/components/schemas/Comment"
-                          }
-                        }
+                      "items": {
+                        "$ref": "#/components/schemas/Comment"
                       }
                     }
                   }
@@ -2106,7 +2129,9 @@
           "user",
           "createdOn",
           "text",
-          "poemId"
+          "poemId",
+          "replyTo",
+          "repliesCount"
         ],
         "properties": {
           "id": {
