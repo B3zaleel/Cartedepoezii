@@ -34,3 +34,9 @@ The required environment variables can be stored in a file named `.env.local` an
 + Open an interactive shell with the `postgres` user by running `sudo -s -u postgres`.
 + Run `psql -f data/DBSetup_PostgreSQL.sql` in the interactive shell and exit.
 + Run the server using `./run.bash`.
+
+## Documentation
+
++ Install `redoc-cli` with `npm install -g redoc-cli`.
++ Build the docs with `redoc-cli bundle api/v1/OpenAPI_Specs.json -o index.html`.
++ Open `index.html`.
