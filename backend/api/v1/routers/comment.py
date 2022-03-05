@@ -227,10 +227,10 @@ async def add_comment(body: CommentAddForm):
     try:
         if body.replyTo:
             result = db_session.query(Comment).filter(and_(
-                Comment.poem_id == body.poemId,
+                Comment.id == body.replyTo,
                 Comment.comment_id == None
             )).first()
-            if not result:
+            if not result or result.poem_id != body.poemId:
                 db_session.close()
                 return response
         gen_id = str(uuid.uuid4())
