@@ -198,7 +198,6 @@ async def get_comments_by_user(id='', span='', after='', before=''):
         'success': False,
         'message': 'Failed to find comments.'
     }
-    auth_token = AuthToken.decode(token)
     db_session = get_session()
     try:
         span = span.strip()
@@ -213,7 +212,7 @@ async def get_comments_by_user(id='', span='', after='', before=''):
         if not user:
             return response
         comments = db_session.query(Comment).filter(
-            Comment.user_id == auth_token.user_id
+            Comment.user_id == id
         ).all()
         new_comments = []
         if comments:
