@@ -13,7 +13,7 @@
             {{ poem.user.name }}
           </router-link>
         </div>
-        <div tabindex="1" @blur="closeMenu">
+        <div tabindex="1" @blur="closeMenu" v-show="canModifyPoem">
           <button class="cdp-btn icon" @click.capture="openMenu">
             <DotsHorizontalIcon/>
           </button>
@@ -88,7 +88,7 @@
           <template v-slot:modal-body>
             <div>
               <div v-show="dialogType === dialogTypes.Comment">
-                <textarea class="cdp-txb" rows="4"/>
+                <textarea class="cdp-txb" rows="4" v-model="comment"/>
               </div>
               <div v-show="dialogType === dialogTypes.Edit">
                 <PoemEdit
@@ -202,6 +202,8 @@ export default class PoemComponent extends Vue {
     this.$store.state.API_URL,
     this.$store.state.user.authToken,
   );
+
+  canModifyPoem = this.poem.user.id === this.$store.state.user.id;
 
   isPoemLiked = this.poem.isLiked;
 
