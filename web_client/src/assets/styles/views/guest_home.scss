@@ -63,6 +63,16 @@
     h4 {
       font-size: 0.6em;
     }
+
+    a.alt-link {
+      color: globals.$primary-color-lighter;
+      text-decoration: none;
+
+      &:hover {
+        color: globals.$primary-color;
+        text-decoration: 1px solid underline globals.$primary-color-light;
+      }
+    }
   }
 }
 

@@ -21,8 +21,8 @@
             <div>
               <h4>
                 By signing up, you agree to our
-                <router-link to="/terms-of-service">Terms of service</router-link>
-                and <router-link to="privacy-policy">Privacy Policy</router-link>.
+                <router-link class="alt-link" to="/terms-of-service">Terms of service</router-link>
+                and <router-link class="alt-link" to="privacy-policy">Privacy Policy</router-link>.
               </h4>
             </div>
           </div>
