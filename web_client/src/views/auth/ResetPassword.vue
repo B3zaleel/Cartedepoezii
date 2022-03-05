@@ -3,7 +3,7 @@
     <div>
       <div class="heading">
         <button class="close-btn" @click="closeForm">
-          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="mdi-close" width="24" height="24" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg>
+          <CloseIcon/>
         </button>
 
         <div></div>
@@ -37,7 +37,8 @@
 
         <div class="action">
           <button class="btn-link" v-bind:disabled="isChangingPassword">
-            Change Password
+            <LoadingIcon v-show="isChangingPassword"/>
+            <b v-show="!isChangingPassword">Change Password</b>
           </button>
         </div>
       </form>
@@ -47,15 +48,16 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import queryString from 'query-string';
+import AuthAPIReq from '@/assets/scripts/api_requests/authentication';
+import CloseIcon from '@/assets/icons/Close.vue';
+import LoadingIcon from '@/assets/icons/Loading.vue';
 
 @Component({
-  name: 'ForgotPasswordView',
+  name: 'ResetPasswordView',
   data() {
     return {
       info: {
         email: '',
-        name: '',
         password: '',
       },
       isChangingPassword: false,
@@ -83,69 +85,44 @@ import queryString from 'query-string';
     },
   },
   components: {
+    CloseIcon,
+    LoadingIcon,
   },
 })
-export default class ForgotPasswordView extends Vue {
+export default class ResetPasswordView extends Vue {
   email!: string;
-
-  userId!: string;
-
-  resetToken!: string;
 
   password!: string;
 
   isChangingPassword = false;
 
-  validForm(): boolean {
-    // TODO: Validate form
-    let isValid = true;
-
-    if (this.password.length === 0) {
-      isValid = false;
-    }
-    return isValid;
-  }
+  authAPIReq = new AuthAPIReq(this.$store.state.API_URL);
 
   closeForm(): void {
     this.$router.push('/');
   }
 
   resetPassword(): void {
-    if (this.validForm()) {
-      const BASE_URL = this.$store.state.API_URL;
-      const pathQueries = queryString.parseUrl(this.$route.fullPath);
-      const passwordResetData = {
-        email: this.email,
-        userId: pathQueries.query.id || '',
-        resetToken: pathQueries.query.token || '',
-        password: this.password,
-      };
-
-      this.isChangingPassword = true;
-      fetch(`${BASE_URL}/reset-password`, {
-        method: 'PUT',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(passwordResetData),
-      })
-        .then((response) => response.json())
-        .then((res) => {
-          if (res.code === 200) {
+    this.isChangingPassword = true;
+    const userId = this.$route.query.id[0] || '';
+    const resetToken = this.$route.query.token[0] || '';
+    this.authAPIReq.resetPassword(userId, this.email, this.password, resetToken)
+      .then((res) => {
+        if (res.success) {
+          if (res.data) {
             this.$store.commit('signIn', {
               token: res.data.authToken,
+              id: res.data.userId,
             });
             this.$router.push('/');
-          } else {
-            // show error info
-            console.log(res.message);
           }
-          this.isChangingPassword = false;
-        }).catch((err) => {
-          this.isChangingPassword = false;
-        });
-    }
+        } else {
+          console.error(res.message);
+        }
+        this.isChangingPassword = false;
+      }).catch(() => {
+        this.isChangingPassword = false;
+      });
   }
 }
 </script>
