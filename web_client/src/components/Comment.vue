@@ -38,7 +38,7 @@
       <div class="creation-time">
         {{ creationTime }}
       </div>
-      <div :class="{footer: true, hidden: comment.coment_id }">
+      <div :class="{footer: true, hidden: !canReply }">
         <div>
           <button class="cdp-btn icon reply-tgl-btn" @click="toggleReplyToComment">
             <CommentIcon v-show="isReplyingToComment"/>
@@ -68,40 +68,40 @@
       </div>
 
       <ModalLayout
-          :modalOpen="isDialogOpen"
-          :modalTitle="dialogTitle"
-          :hasHeader="true"
-          v-on:request-close="closeDialog"
-        >
-          <template v-slot:modal-body>
-            <div>
-              <div v-show="dialogType === dialogTypes.Delete">
-                <p>Are you sure you want to delete this comment?</p>
-                <p v-show="comment.repliesCount > 0">
-                  This would delete {{ comment.repliesCount }} other comment(s) as well.
-                </p>
-              </div>
+        :modalOpen="isDialogOpen"
+        :modalTitle="dialogTitle"
+        :hasHeader="true"
+        v-on:request-close="closeDialog"
+      >
+        <template v-slot:modal-body>
+          <div>
+            <div v-show="dialogType === dialogTypes.Delete">
+              <p>Are you sure you want to delete this comment?</p>
+              <p v-show="comment.repliesCount > 0">
+                This would delete {{ comment.repliesCount }} other comment(s) as well.
+              </p>
             </div>
-          </template>
+          </div>
+        </template>
 
-          <template v-slot:modal-action-panel>
-            <div class="pane-container">
-              <div v-show="dialogType === dialogTypes.Delete">
-                <button class="cdp-btn text danger" @click="deleteComment">
-                  <LoadingIcon v-show="isDeletingComment"/>
-                  <b v-show="!isDeletingComment">Yes</b>
-                </button>
-              </div>
+        <template v-slot:modal-action-panel>
+          <div class="pane-container">
+            <div v-show="dialogType === dialogTypes.Delete">
+              <button class="cdp-btn text danger" @click="deleteComment">
+                <LoadingIcon v-show="isDeletingComment"/>
+                <b v-show="!isDeletingComment">Yes</b>
+              </button>
             </div>
-          </template>
-        </ModalLayout>
+          </div>
+        </template>
+      </ModalLayout>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { Page, Position, Item } from '@/assets/scripts/types/interfaces';
+import { Position } from '@/assets/scripts/types/interfaces';
 import Comment from '@/assets/scripts/types/comment';
 import CommentAPIReq from '@/assets/scripts/api_requests/comment';
 import AccountIcon from '@/assets/icons/Account.vue';
@@ -148,6 +148,10 @@ import DoughnutStatus from '@/components/DoughnutStatus.vue';
       } else if ((a === '3') && (b !== '1')) {
         ordinal = 'rd';
       }
+      const commentLocation = `/comment/${this.$props.comment.id}`;
+      if (this.$route.path.startsWith(commentLocation)) {
+        return `Created on ${month} ${monthDay}${ordinal} ${date.getUTCFullYear()}`;
+      }
       return `Replied on ${month} ${monthDay}${ordinal} ${date.getUTCFullYear()}`;
     },
     repliesText() {
@@ -158,6 +162,13 @@ import DoughnutStatus from '@/components/DoughnutStatus.vue';
         return `See ${this.$props.comment.repliesCount} Replies`;
       }
       return '';
+    },
+    canSeeReplies() {
+      const location = `/comment/${this.$props.comment.id}`;
+      return this.$props.comment.repliesCount > 0 && !this.$route.path.startsWith(location);
+    },
+    canReply() {
+      return this.$props.comment.replyTo.length === 0;
     },
   },
   components: {
@@ -182,8 +193,6 @@ export default class CommentComponent extends Vue {
   };
 
   canModifyComment = this.comment.user.id === this.$store.state.user.id;
-
-  canSeeReplies = this.comment.repliesCount > 0;
 
   isMenuOpen = false;
 
@@ -242,16 +251,6 @@ export default class CommentComponent extends Vue {
     this.isDialogOpen = false;
   }
 
-  repliesFetcher(page: Page): Promise<{
-      success: boolean,
-      data?: Array<Item>,
-      message?: string
-    }> {
-    const { poemId } = this.comment;
-    const commentId = this.comment.id;
-    return this.commentAPIReq.getCommentReplies(commentId, poemId, page);
-  }
-
   replyToComment(): void {
     const userId = this.$store.state.user.id;
     const { poemId } = this.comment;
@@ -270,10 +269,9 @@ export default class CommentComponent extends Vue {
 
   deleteComment(): void {
     const userId = this.$store.state.user.id;
-    const { poemId } = this.comment;
     const commentId = this.comment.id;
     this.isDeletingComment = true;
-    this.commentAPIReq.deleteComment(userId, poemId, commentId)
+    this.commentAPIReq.deleteComment(userId, commentId)
       .then((res) => {
         if (res.success) {
           window.location.reload();
