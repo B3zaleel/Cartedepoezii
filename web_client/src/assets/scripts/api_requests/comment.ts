@@ -16,6 +16,35 @@ export default class Comment {
   }
 
   /**
+   * Retrieve a comment.
+   * @param poemId - The poem's id.
+   */
+  getComment(commentId: string):
+    Promise<{ success: boolean, data?: CommentT, message?: string }> {
+    const path = [
+      this.BASE_URL,
+      '/comment?',
+      `id=${commentId}`,
+    ].join('');
+    const result = new Promise<{
+      success: boolean, data?: CommentT, message?: string
+    }>(
+      (resolve, reject) => {
+        fetch(path, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then((response) => resolve(response.json()))
+          .catch((err) => reject(err));
+      },
+    );
+    return result;
+  }
+
+  /**
    * Retrieve comments on a poem.
    * @param poemId - The poem's id.
    */
@@ -23,7 +52,7 @@ export default class Comment {
     Promise<{ success: boolean, data?: Array<CommentT>, message?: string }> {
     const path = [
       this.BASE_URL,
-      '/comments?',
+      '/comments-of-poem?',
       `id=${poemId}`,
       page.span ? `&span=${page.span <= 0 ? 12 : page.span}` : '',
       page.after ? `&after=${page.after}` : '',
@@ -50,19 +79,17 @@ export default class Comment {
 
   /**
    * Retrieve replies to a comment.
-   * @param poemId - The poem's id.
+   * @param commentId - The id of the comment.
    */
-  getCommentReplies(commentId: string, poemId: string, page: Page = { span: 12, after: '', before: '' }):
+  getCommentReplies(commentId: string, page: Page = { span: 12, after: '', before: '' }):
     Promise<{ success: boolean, data?: Array<CommentT>, message?: string }> {
     const path = [
       this.BASE_URL,
       '/comment-replies?',
       `id=${commentId}`,
-      `&poemId=${poemId}`,
       page.span ? `&span=${page.span <= 0 ? 12 : page.span}` : '',
       page.after ? `&after=${page.after}` : '',
       page.before ? `&before=${page.before}` : '',
-      this.AUTH_TOKEN ? `&token=${this.AUTH_TOKEN}` : '',
     ].join('');
     const result = new Promise<{
       success: boolean, data?: Array<CommentT>, message?: string
@@ -87,11 +114,7 @@ export default class Comment {
    * @param userId - The user's id.
    */
   getCommentsByUser(userId: string, page: Page = { span: 12, after: '', before: '' }):
-    Promise<{
-      success: boolean,
-      data?: {user: UserMin, comments: Array<CommentT>},
-      message?: string
-    }> {
+    Promise<{ success: boolean, data?: Array<CommentT>, message?: string }> {
     const path = [
       this.BASE_URL,
       '/comments-by-user?',
@@ -104,7 +127,7 @@ export default class Comment {
     ].join('');
     const result = new Promise<{
       success: boolean,
-      data?: {user: UserMin, comments: Array<CommentT>},
+      data?: Array<CommentT>,
       message?: string
     }>(
       (resolve, reject) => {
@@ -130,14 +153,10 @@ export default class Comment {
    * @param replyTo - The id of the comment being replied to.
    */
   createComment(poemId: string, userId: string, text: string, replyTo = ''):
-    Promise<{
-      success: boolean,
-      data?: CommentT,
-      message?: string
-    }> {
+    Promise<{ success: boolean, data?: CommentT, message?: string }> {
     const path = [
       this.BASE_URL,
-      '/comments',
+      '/comment',
     ].join('');
     const bodyData = {
       authToken: this.AUTH_TOKEN,
@@ -167,20 +186,18 @@ export default class Comment {
 
   /**
    * Remove a user's comment.
-   * @param userId - The id of the user.
-   * @param poemId - The id of the poem the comment was made under.
+   * @param userId - The id of the user deleting the comment.
    * @param commentId - The id of the comment to delete.
    */
-  deleteComment(userId: string, poemId: string, commentId: string):
+  deleteComment(userId: string, commentId: string):
     Promise<{ success: boolean, data?: Record<string, never>, message?: string }> {
     const path = [
       this.BASE_URL,
-      '/comments',
+      '/comment',
     ].join('');
     const bodyData = {
       authToken: this.AUTH_TOKEN,
       userId,
-      poemId,
       commentId,
     };
     const result = new Promise<{
