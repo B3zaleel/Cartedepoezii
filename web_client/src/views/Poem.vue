@@ -24,10 +24,15 @@
           <div v-show="poemLoaded">
             <Poem :poem="poem" v-for="poem in poems" :key="poem.id"/>
           </div>
+          <div
+            class="poem-comment-sect-divider"
+            v-show="poemLoaded"
+          ></div>
           <div v-show="poemLoaded">
             <ItemsLoaderLayout
               :itemsName="'comments'"
               :itemsFetcher="commentsFetcher"
+              :reverse="true"
             />
           </div>
         </div>
