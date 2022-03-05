@@ -31,7 +31,6 @@ class Comment(Base):
     )
     comment_id = Column(
         String(64),
-        ForeignKey('comments.id'),
         nullable=True
     )
     text = Column(
