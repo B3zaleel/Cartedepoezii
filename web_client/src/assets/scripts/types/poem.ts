@@ -16,5 +16,20 @@ export default class Poem implements Item {
 
   likesCount!: number;
 
-  isLiked!: boolean
+  isLiked!: boolean;
+
+  constructor() {
+    this.id = '';
+    this.user = {
+      id: '',
+      name: '',
+      profilePhotoId: '',
+    };
+    this.title = '';
+    this.publishedOn = new Date().toISOString();
+    this.verses = [''];
+    this.commentsCount = 0;
+    this.likesCount = 0;
+    this.isLiked = false;
+  }
 }
