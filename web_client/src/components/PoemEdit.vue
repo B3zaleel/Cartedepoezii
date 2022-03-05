@@ -4,16 +4,17 @@
       <div class="txb-label-over">
         <input
           name="title"
-          id="form-title"
           type="text"
+          :id="inputId"
           v-model="poem.title"
           :maxlength="titleLimit"
-          @input="updateTitleCount"
-          @focus="titleInputFocus"
+          @focus.stop="titleInputFocus"
           @blur="titleInputBlur"
         />
         <label
-          :class="{label: true, 'roll-up': canRollUpTitleLabel}" for="form-title">
+          :class="{label: true, 'roll-up': canRollUpTitleLabel}"
+          :for="inputId"
+        >
           <div>
             <span>Title</span>
             <span
@@ -82,6 +83,8 @@ import DeleteIcon from '@/assets/icons/Delete.vue';
 })
 export default class PoemEditComponent extends Vue {
   @Prop() poem!: EditPoemForm;
+
+  @Prop({ default: `${new Date().toISOString()}` }) inputId!: string;
 
   titleLimit = 256;
 
