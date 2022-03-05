@@ -46,9 +46,10 @@ async def get_poem(id: str, token: str):
             ).first()
             if not user:
                 return response
-            comments = db_session.query(Comment).filter(
-                Comment.poem_id == id
-            ).all()
+            comments = db_session.query(Comment).filter(and_(
+                Comment.poem_id == id,
+                Comment.comment_id == None
+            )).all()
             comments_count = len(comments) if comments else 0
             likes = db_session.query(PoemLike).filter(
                 PoemLike.poem_id == id
@@ -295,9 +296,10 @@ async def get_created_poems(userId, token='', span='', after='', before=''):
             if not user:
                 return response
             for item in result:
-                comments = db_session.query(Comment).filter(
-                    Comment.poem_id == item.id
-                ).all()
+                comments = db_session.query(Comment).filter(and_(
+                    Comment.poem_id == item.id,
+                    Comment.comment_id == None
+                )).all()
                 comments_count = len(comments) if comments else 0
                 likes = db_session.query(PoemLike).filter(
                     PoemLike.poem_id == item.id
