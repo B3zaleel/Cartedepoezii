@@ -145,6 +145,7 @@ import Poem from '@/assets/scripts/types/poem';
 import MathUtils from '@/assets/scripts/math_utils';
 import CommentAPIReq from '@/assets/scripts/api_requests/comment';
 import PoemAPIReq from '@/assets/scripts/api_requests/poem';
+import UserAPIReq from '@/assets/scripts/api_requests/user';
 import AccountIcon from '@/assets/icons/Account.vue';
 import ChevronLeftIcon from '@/assets/icons/ChevronLeft.vue';
 import ChevronRightIcon from '@/assets/icons/ChevronRight.vue';
@@ -235,6 +236,11 @@ export default class PoemComponent extends Vue {
   );
 
   poemAPIReq = new PoemAPIReq(
+    this.$store.state.API_URL,
+    this.$store.state.user.authToken,
+  );
+
+  userAPIReq = new UserAPIReq(
     this.$store.state.API_URL,
     this.$store.state.user.authToken,
   );
@@ -364,6 +370,17 @@ export default class PoemComponent extends Vue {
     this.editPoemForm.verses = newVerses;
   }
 
+  loadProfilePhoto(): void {
+    this.userAPIReq.getProfilePhoto(this.poem.user.profilePhotoId)
+      .then((res) => {
+        if (res.success) {
+          if (res.data) {
+            this.imageSrc = `${res.data.url}?tr=w-38,h-38`;
+          }
+        }
+      });
+  }
+
   commentOnPoem(): void {
     const poemId = this.poem.id;
     const userId = this.$store.state.user.id;
@@ -437,6 +454,7 @@ export default class PoemComponent extends Vue {
     this.isPoemLiked = this.poem.isLiked;
     this.poemLikesCount = this.poem.likesCount;
     this.poemCommentsCount = this.poem.commentsCount;
+    this.loadProfilePhoto();
 
   //   this.isPoemLiked = this.poem.isLiked;
   //   console.dir(this.$el);

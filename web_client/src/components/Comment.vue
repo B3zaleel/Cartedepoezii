@@ -104,6 +104,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Position } from '@/assets/scripts/types/interfaces';
 import Comment from '@/assets/scripts/types/comment';
 import CommentAPIReq from '@/assets/scripts/api_requests/comment';
+import UserAPIReq from '@/assets/scripts/api_requests/user';
 import AccountIcon from '@/assets/icons/Account.vue';
 import CommentIcon from '@/assets/icons/Comment.vue';
 import CommentTextIcon from '@/assets/icons/CommentText.vue';
@@ -226,6 +227,11 @@ export default class CommentComponent extends Vue {
     this.$store.state.user.authToken,
   );
 
+  userAPIReq = new UserAPIReq(
+    this.$store.state.API_URL,
+    this.$store.state.user.authToken,
+  );
+
   openMenu(): void {
     this.isMenuOpen = true;
   }
@@ -249,6 +255,17 @@ export default class CommentComponent extends Vue {
 
   closeDialog(): void {
     this.isDialogOpen = false;
+  }
+
+  loadProfilePhoto(): void {
+    this.userAPIReq.getProfilePhoto(this.comment.user.profilePhotoId)
+      .then((res) => {
+        if (res.success) {
+          if (res.data) {
+            this.imageSrc = `${res.data.url}?tr=w-38,h-38`;
+          }
+        }
+      });
   }
 
   replyToComment(): void {
@@ -282,6 +299,10 @@ export default class CommentComponent extends Vue {
       }).catch(() => {
         this.isDeletingComment = false;
       });
+  }
+
+  mounted(): void {
+    this.loadProfilePhoto();
   }
 }
 </script>
