@@ -20,7 +20,7 @@ export default class Comment {
    * @param poemId - The poem's id.
    */
   getPoemComments(poemId: string, page: Page = { span: 12, after: '', before: '' }):
-    Promise<{ success: boolean, data: Array<CommentT> }> {
+    Promise<{ success: boolean, data?: Array<CommentT>, message?: string }> {
     const path = [
       this.BASE_URL,
       '/comments?',
@@ -31,7 +31,7 @@ export default class Comment {
       this.AUTH_TOKEN ? `&token=${this.AUTH_TOKEN}` : '',
     ].join('');
     const result = new Promise<{
-      success: boolean, data: Array<CommentT>
+      success: boolean, data?: Array<CommentT>, message?: string
     }>(
       (resolve, reject) => {
         fetch(path, {
@@ -53,7 +53,7 @@ export default class Comment {
    * @param poemId - The poem's id.
    */
   getCommentReplies(commentId: string, poemId: string, page: Page = { span: 12, after: '', before: '' }):
-    Promise<{ success: boolean, data: Array<CommentT> }> {
+    Promise<{ success: boolean, data?: Array<CommentT>, message?: string }> {
     const path = [
       this.BASE_URL,
       '/comment-replies?',
@@ -65,7 +65,7 @@ export default class Comment {
       this.AUTH_TOKEN ? `&token=${this.AUTH_TOKEN}` : '',
     ].join('');
     const result = new Promise<{
-      success: boolean, data: Array<CommentT>
+      success: boolean, data?: Array<CommentT>, message?: string
     }>(
       (resolve, reject) => {
         fetch(path, {
