@@ -31,46 +31,44 @@ async def get_poem_comments(id='', span='', after='', before=''):
             db_session.close()
             return response
         span = int(span if span else '12')
-        result = db_session.query(
-            Comment).filter(and_(
-                Comment.poem_id == id,
-                Comment.comment_id == None
-            )).all()
-        new_result = []
-        if result is not None:
-            for item in result:
-                user = db_session.query(
-                    User).filter(User.id == item.user_id).first()
+        comments = db_session.query(Comment).filter(and_(
+            Comment.poem_id == id,
+            Comment.comment_id == None
+        )).all()
+        new_comments = []
+        if comments:
+            for comment in comments:
+                user = db_session.query(User).filter(
+                    User.id == comment.user_id
+                ).first()
                 if not user:
                     continue
-                replies = db_session.query(
-                    Comment).filter(
-                        and_(
-                            Comment.poem_id == id,
-                            Comment.comment_id == item.id,
-                    )).all()
+                replies = db_session.query(Comment).filter(and_(
+                    Comment.poem_id == id,
+                    Comment.comment_id == comment.id,
+                )).all()
                 replies_count = len(replies) if replies else 0
                 obj = {
-                    'id': item.id,
+                    'id': comment.id,
                     'user': {
                         'id': user.id,
                         'name': user.name,
                         'profilePhotoId': user.profile_photo_id
                     },
-                    'createdOn': item.created_on.isoformat(),
-                    'text': item.text,
-                    'poemId': item.poem_id,
+                    'createdOn': comment.created_on.isoformat(),
+                    'text': comment.text,
+                    'poemId': comment.poem_id,
                     'repliesCount': replies_count
                 }
-                new_result.append(obj)
+                new_comments.append(obj)
         response = {
             'success': True,
             'data': extract_page(
-                new_result,
+                new_comments,
                 span,
                 after,
                 before,
-                False,
+                True,
                 lambda x: x['id']
             )
         }
@@ -105,7 +103,7 @@ async def get_comment_replies(id='', poemId='', span='', after='', before=''):
             Comment.comment_id == id
         )).all()
         new_result = []
-        if result is not None:
+        if result:
             for item in result:
                 user = db_session.query(User).filter(
                     User.id == item.user_id
@@ -167,25 +165,25 @@ async def get_comments_by_user(id='', token='', span='', after='', before=''):
         user = db_session.query(User).filter(User.id == id).first()
         if not user:
             return response
-        result = db_session.query(Comment).filter(
+        comments = db_session.query(Comment).filter(
             Comment.user_id == auth_token.user_id
         ).all()
-        new_result = []
-        if result is not None:
-            for item in result:
+        new_comments = []
+        if comments:
+            for comment in comments:
                 replies = db_session.query(Comment).filter(
-                    Comment.comment_id == item.id
+                    Comment.comment_id == comment.id
                 ).all()
                 replies_count = len(replies) if replies else 0
                 obj = {
-                    'id': item.id,
-                    'createdOn': item.created_on.isoformat(),
-                    'text': item.text,
-                    'poemId': item.poem_id,
-                    'replyTo': item.comment_id if item.comment_id else '',
+                    'id': comment.id,
+                    'createdOn': comment.created_on.isoformat(),
+                    'text': comment.text,
+                    'poemId': comment.poem_id,
+                    'replyTo': comment.comment_id if comment.comment_id else '',
                     'repliesCount': replies_count
                 }
-                new_result.append(obj)
+                new_comments.append(obj)
         response = {
             'success': True,
             'data': {
@@ -195,7 +193,7 @@ async def get_comments_by_user(id='', token='', span='', after='', before=''):
                     'profilePhotoId': user.profile_photo_id
                 },
                 'comments': extract_page(
-                    new_result,
+                    new_comments,
                     span,
                     after,
                     before,
@@ -218,16 +216,18 @@ async def add_comment(body: CommentAddForm):
     auth_token = AuthToken.decode(body.authToken)
     wrong_conditions = [
         auth_token is None,
-        auth_token is not None and (auth_token.user_id != body.userId),
-        len(body.text) > 400
+        auth_token and (auth_token.user_id != body.userId),
+        len(body.text) > 400,
+        len(body.text.strip()) == 0
     ]
     if any(wrong_conditions):
         return response
     db_session = get_session()
     try:
-        if body.replyTo:
+        replyId = body.replyTo.strip() if body.replyTo else None
+        if replyId:
             result = db_session.query(Comment).filter(and_(
-                Comment.id == body.replyTo,
+                Comment.id == replyId,
                 Comment.comment_id == None
             )).first()
             if not result or result.poem_id != body.poemId:
@@ -240,7 +240,7 @@ async def add_comment(body: CommentAddForm):
             created_on=cur_time,
             poem_id=body.poemId,
             user_id=body.userId,
-            comment_id=body.replyTo,
+            comment_id=replyId,
             text=body.text,
         )
         db_session.add(comment)
