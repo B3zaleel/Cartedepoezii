@@ -1,28 +1,43 @@
 .poem-edit {
+  > .verses-header {
+    display: block;
+    margin: 5px 0;
+  }
+
   > .verses-pane {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-areas:
+    "cell-a cell-b"
+    "cell-c cell-d";
+    column-gap: 5px;
 
-    > div {
+    > div.input-pane {
+      grid-area: cell-a;
+    }
+
+    > .nav-pane {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      grid-area: cell-c;
+
+      > .page-status {
+        margin: 5px;
+        padding: 2px 5px;
+        border-radius: 2px;
+        background: gainsboro;
+        cursor: context-menu;
+      }
+    }
+
+    > div.mod-pane {
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
       padding: 5px;
-    }
-  }
-
-  > .verses-nav-pane {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    > .page-status {
-      margin: 5px;
-      padding: 2px 5px;
-      border-radius: 2px;
-      background: gainsboro;
-      cursor: context-menu;
+      // margin: 0 5px;
+      grid-area: cell-b;
     }
   }
 }

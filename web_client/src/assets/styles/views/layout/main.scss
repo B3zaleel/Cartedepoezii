@@ -7,8 +7,8 @@
   margin-left: clamp(2.5%, 25%, 80px);
   margin-right: clamp(2.5%, 25%, 80px);
   min-height: 100%;
-  border-left: 2px solid gray;
-  border-right: 2px solid gray;
+  border-left: 2px solid gainsboro;
+  border-right: 2px solid gainsboro;
   overscroll-behavior: contain;
   scroll-behavior: smooth;
   align-items: flex-start;
@@ -46,14 +46,14 @@
   > .center-pane {
     position: relative;
     min-height: 100%;
-    border-left: 2px solid gray;
-    border-right: 2px solid gray;
+    border-left: 2px solid gainsboro;
+    border-right: 2px solid gainsboro;
 
     > :first-child {
       position: sticky;
       top: 0;
       left: 0;
-      border-bottom: 2px solid gray;
+      border-bottom: 2px solid gainsboro;
       height: calc(45px + 2px);
       z-index: 100;
 
@@ -160,18 +160,18 @@
   > span {
     display: flex;
     width: fit-content;
-    padding: 2.5px 5px;
+    padding: 5px 10px;
     align-items: center;
     justify-content: center;
     color: black;
     fill: black;
     background: transparent;
     border-radius: 20px;
-    border: 1px solid gray;
+    border: 1px solid gainsboro;
     text-decoration: none;
     cursor: pointer;
     transition-property: background;
-    transition-duration: 600ms;
+    transition-duration: 300ms;
     transition-timing-function: ease-in-out;
 
     > svg {
@@ -190,7 +190,7 @@
 
   &:hover {
     > span {
-      background: globals.$primary-color-light;
+      background: globals.$primary-color-lighter;
       color: ghostwhite;
       fill: ghostwhite;
     }
@@ -215,7 +215,7 @@
     fill: whitesmoke;
     border-radius: 20px;
     border: none;
-    box-shadow: 0 0 1.5px 1px gray;
+    box-shadow: 0 0 1.5px 1px gainsboro;
     font-size: 1.3em;
     cursor: pointer;
     outline: none;
