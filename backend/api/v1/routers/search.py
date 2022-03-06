@@ -129,7 +129,7 @@ async def find_poems(q='', token='', span='', after='', before=''):
         query = query.replace('\'', '').strip()
         if not query:
             return response
-        query = "'{}'".format(query.strip())
+        query = re.sub('\s+', ' & ', query)
         text_search_results = db_session.query(Poem).filter(
             Poem.__ts_text_vector__.match(
                 query,
@@ -208,7 +208,7 @@ async def find_users(q='', token='', span='', after='', before=''):
         query = query.replace('\'', '').strip()
         if not query:
             return response
-        query = "'{}'".format(query.strip())
+        query = re.sub('\s+', ' & ', query)
         name_search_results = db_session.query(User).filter(
             User.__ts_name_vector__.match(
                 query,
