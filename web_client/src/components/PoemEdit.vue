@@ -8,7 +8,7 @@
           :id="inputId"
           v-model="poem.title"
           :maxlength="titleLimit"
-          @focus.stop="titleInputFocus"
+          @focus="titleInputFocus"
           @blur="titleInputBlur"
         />
         <label
@@ -28,11 +28,30 @@
       </div>
     </div>
 
-    <span>Verses</span>
+    <span class="verses-header">Verses</span>
 
     <div class="verses-pane">
-      <textarea class="cdp-txb" v-model="poem.verses[currentVerse - 1]"/>
-      <div>
+      <div class="input-pane">
+        <textarea
+          class="cdp-txb"
+          v-model="poem.verses[currentVerse - 1]"
+          rows="5"
+        />
+      </div>
+
+      <div class="nav-pane">
+        <button class="cdp-btn icon" @click="moveLeft">
+          <ArrowLeftIcon/>
+        </button>
+        <span class="page-status">
+          {{ currentVerse }} / {{ poem.verses.length }}
+        </span>
+        <button class="cdp-btn icon" @click="moveRight">
+          <ArrowRightIcon/>
+        </button>
+      </div>
+
+      <div class="mod-pane">
         <button class="cdp-btn icon danger" @click="removeVerse">
           <DeleteIcon/>
         </button>
@@ -41,18 +60,6 @@
         </button>
       </div>
     </div>
-
-    <div class="verses-nav-pane">
-      <button class="cdp-btn icon" @click="moveLeft">
-        <ArrowLeftIcon/>
-      </button>
-      <span class="page-status">
-        {{ currentVerse }} / {{ poem.verses.length }}
-      </span>
-      <button class="cdp-btn icon" @click="moveRight">
-        <ArrowRightIcon/>
-      </button>
-      </div>
   </div>
 </template>
 
@@ -106,6 +113,9 @@ export default class PoemEditComponent extends Vue {
 
   removeVerse(): void {
     this.$emit('remove-verse', this.currentVerse - 1);
+    if (this.currentVerse > this.poem.verses.length) {
+      this.currentVerse = this.poem.verses.length;
+    }
   }
 
   moveLeft(): void {
