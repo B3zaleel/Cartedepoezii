@@ -1397,6 +1397,85 @@
         }
       }
     },
+    "/poems-explore": {
+      "get": {
+        "summary": "Retrieve poems to explore for a user.",
+        "tags": ["Poem"],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "description": "The authentication token of the current user.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of poems to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the poem from which the returned poems should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the poem from which the returned poems should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Poems for a user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/Poem"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/comment": {
       "get": {
         "summary": "Retrieve a comment.",
