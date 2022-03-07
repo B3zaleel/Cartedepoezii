@@ -12,7 +12,7 @@
           {{ comment.user.name }}
         </router-link>
       </div>
-      <div tabindex="1" @blur="closeMenu" v-show="canModifyComment">
+      <div tabindex="1" @blur="closeMenu" v-show="canBackNav || canModifyComment">
         <button class="cdp-btn icon" @click.capture="openMenu">
           <DotsHorizontalIcon/>
         </button>
@@ -22,9 +22,16 @@
           :position="actionMenuPos"
         >
           <div>
-            <button class="menu-item danger" @click="openDeleteDialog">
-              Delete
-            </button>
+            <div v-show="canBackNav">
+              <router-link class="menu-item" :to="backNav">
+                Backtrack
+              </router-link>
+            </div>
+            <div v-show="canModifyComment">
+              <button class="menu-item danger" @click="openDeleteDialog">
+                Delete
+              </button>
+            </div>
           </div>
         </ContextMenuLayout>
       </div>
@@ -171,6 +178,20 @@ import DoughnutStatus from '@/components/DoughnutStatus.vue';
     canReply() {
       return this.$props.comment.replyTo.length === 0;
     },
+    canModifyComment() {
+      return this.$props.comment.user.id === this.$store.state.user.id;
+    },
+    canBackNav() {
+      const backNavLocation = this.$props.comment.replyTo
+        ? `/comment/${this.$props.comment.replyTo}`
+        : `/poem/${this.$props.comment.poemId}`;
+      return !this.$route.path.startsWith(backNavLocation);
+    },
+    backNav() {
+      return this.$props.comment.replyTo
+        ? `/comment/${this.$props.comment.replyTo}`
+        : `/poem/${this.$props.comment.poemId}`;
+    },
   },
   components: {
     AccountIcon,
@@ -192,8 +213,6 @@ export default class CommentComponent extends Vue {
     right: '0',
     top: '0',
   };
-
-  canModifyComment = this.comment.user.id === this.$store.state.user.id;
 
   isMenuOpen = false;
 
