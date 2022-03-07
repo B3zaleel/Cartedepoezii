@@ -442,10 +442,9 @@ export default class PoemComponent extends Vue {
       });
   }
 
-  openPoem(ev: MouseEvent): void {
+  openPoem(): void {
     const location = `/poem/${this.poem.id}`;
     if (!this.$route.path.startsWith(location)) {
-      console.dir(ev);
       this.$router.push(`/poem/${this.poem.id}`);
     }
   }
@@ -455,22 +454,19 @@ export default class PoemComponent extends Vue {
     this.poemLikesCount = this.poem.likesCount;
     this.poemCommentsCount = this.poem.commentsCount;
     this.loadProfilePhoto();
-
-  //   this.isPoemLiked = this.poem.isLiked;
-  //   console.dir(this.$el);
-  //   if (this.$el.getElementsByClassName) {
-  //     const versesParEl = this.$el.getElementsByClassName('verses-p');
-  //     console.log(versesParEl.length);
-  //     let maxHeight = 0;
-  //     for (let i = 0; i < versesParEl.length; i += 1) {
-  //       const height = versesParEl.item(i)?.clientHeight;
-  //       if (height && (height > maxHeight)) {
-  //         maxHeight = height;
-  //       }
-  //     }
-  //     this.versesPHeight = `${maxHeight}px`;
-  //     console.log(maxHeight);
-  //   }
+    const versesP = this.$el.firstElementChild?.children.item(1)?.children.item(1);
+    if (versesP) {
+      let maxHeight = 0;
+      for (let i = 0; i < versesP.childElementCount; i += 1) {
+        if (versesP.children.item(i)?.classList.contains('verses-p')) {
+          const height = versesP.children.item(i)?.clientHeight;
+          if (height && (height > maxHeight)) {
+            maxHeight = height;
+          }
+        }
+      }
+      this.versesPHeight = `${maxHeight + 2 * 10}px`;
+    }
   }
 }
 </script>
