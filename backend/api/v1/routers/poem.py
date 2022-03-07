@@ -525,3 +525,93 @@ async def get_channel_poems(token, span='', after='', before=''):
     finally:
         db_session.close()
     return response
+
+
+@router.get('/poems-explore')
+async def get_exploratory_poems(token, span='', after='', before=''):
+    response = {
+        'success': False,
+        'message': 'Failed to find poems for the user.'
+    }
+    if not token:
+        return response
+    auth_token = AuthToken.decode(token)
+    user_id = auth_token.user_id if auth_token is not None else None
+    if not user_id:
+        return response
+    db_session = get_session()
+    try:
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
+            db_session.close()
+            return response
+        span = int(span if span else '12')
+        followings = db_session.query(UserFollowing).filter(
+            UserFollowing.follower_id == user_id
+        ).all()
+        n = 48
+        poem_users_ids = [user_id]
+        if followings:
+            poem_users_ids.extend(list(map(lambda x: x.following_id, followings)))
+        explore_poems = []
+        poems = db_session.query(Poem).filter(
+            Poem.user_id.notin_(poem_users_ids)
+        ).limit(n).all()
+        for poem in poems:
+            user = db_session.query(User).filter(
+                User.id == poem.user_id
+            ).first()
+            comments = db_session.query(Comment).filter(and_(
+                Comment.poem_id == poem.id,
+                Comment.comment_id == None
+            )).all()
+            comments_count = len(comments) if comments else 0
+            likes = db_session.query(PoemLike).filter(
+                PoemLike.poem_id == poem.id
+            ).all()
+            likes_count = len(likes) if likes else 0
+            is_liked_by_user = False
+            if user_id:
+                poem_interaction = db_session.query(PoemLike).filter(and_(
+                    PoemLike.poem_id == poem.id,
+                    PoemLike.user_id == user_id
+                )).first()
+                if poem_interaction:
+                    is_liked_by_user = True
+            obj = {
+                'id': poem.id,
+                'user': {
+                    'id': user.id,
+                    'name': user.name,
+                    'profilePhotoId': user.profile_photo_id
+                },
+                'title': poem.title,
+                'publishedOn': poem.created_on.isoformat(),
+                'verses': json.JSONDecoder().decode(poem.text),
+                'commentsCount': comments_count,
+                'likesCount': likes_count,
+                'isLiked': is_liked_by_user
+            }
+            explore_poems.append(obj)
+        explore_poems.sort(
+            key=lambda x: x['likesCount'],
+            reverse=True
+        )
+        response = {
+            'success': True,
+            'data': extract_page(
+                explore_poems,
+                span,
+                after,
+                before,
+                True,
+                lambda x: x['id']
+            )
+        }
+    finally:
+        db_session.close()
+    return response
