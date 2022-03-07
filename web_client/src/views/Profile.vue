@@ -32,7 +32,11 @@
                   text: true,
                   light: actionText === 'Follow' || actionText === 'Edit Profile',
                   danger: actionText === 'Unfollow'
-                }" @click="execAction">
+                }"
+                @click="execAction"
+                @mouseenter="onMouseEnterAction"
+                @mouseleave="onMouseLeaveAction"
+              >
                 {{ actionText }}
               </button>
             </div>
@@ -251,6 +255,8 @@ export default class ProfileView extends Vue {
 
   isSavingProfile = false;
 
+  isFollowingUser = false;
+
   profilePhotoSrc = '';
 
   userInfoLoaded = false;
@@ -281,6 +287,7 @@ export default class ProfileView extends Vue {
         if (res.success) {
           if (res.data) {
             this.user = res.data;
+            this.isFollowingUser = this.user.isFollowing;
             this.loadProfilePhoto();
             this.onMouseLeaveAction();
           }
@@ -299,6 +306,23 @@ export default class ProfileView extends Vue {
             this.profilePhotoSrc = `${res.data.url}?tr=w-120,h-120`;
           }
         }
+      });
+  }
+
+  toggleConnection(): void {
+    const userId = this.$store.state.user.id;
+    const followId = this.$route.params.id;
+    this.connectionAPIReq.follow(userId, followId)
+      .then((res) => {
+        if (res.success) {
+          if (res.data) {
+            this.isFollowingUser = res.data.status;
+            this.onMouseLeaveAction();
+          }
+        } else {
+          console.error(res.message);
+        }
+        this.userInfoLoaded = true;
       });
   }
 
@@ -401,7 +425,7 @@ export default class ProfileView extends Vue {
   onMouseEnterAction(): void {
     if (this.user.id === this.$store.state.user.id) {
       this.actionText = 'Edit Profile';
-    } else if (this.user.isFollowing) {
+    } else if (this.isFollowingUser) {
       this.actionText = 'Unfollow';
     } else {
       this.actionText = 'Follow';
@@ -414,7 +438,7 @@ export default class ProfileView extends Vue {
     }
     if (this.user.id === this.$store.state.user.id) {
       this.actionText = 'Edit Profile';
-    } else if (this.user.isFollowing) {
+    } else if (this.isFollowingUser) {
       this.actionText = 'Following';
     } else {
       this.actionText = 'Follow';
@@ -447,7 +471,7 @@ export default class ProfileView extends Vue {
     let actionId = -1;
     if (this.user.id === this.$store.state.user.id) {
       actionId = 0;
-    } else if (this.user.isFollowing) {
+    } else if (this.isFollowingUser) {
       actionId = 1;
     } else {
       actionId = 2;
@@ -455,6 +479,11 @@ export default class ProfileView extends Vue {
     switch (actionId) {
       case 0: {
         this.viewEditProfile();
+        break;
+      }
+      case 1:
+      case 2: {
+        this.toggleConnection();
         break;
       }
       default:
@@ -507,7 +536,7 @@ export default class ProfileView extends Vue {
   created(): void {
     if (this.user.id === this.$store.state.user.id) {
       this.actionText = 'Edit Profile';
-    } else if (this.user.isFollowing) {
+    } else if (this.isFollowingUser) {
       this.actionText = 'Following';
     } else {
       this.actionText = 'Follow';
