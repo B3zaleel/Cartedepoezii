@@ -43,9 +43,12 @@
       sect: true,
       hidden: (itemGroups.length > 0) || loadingFailed || loadingItems
       }">
-      <h3>
+      <h3 v-show="!useCustom404">
         Nothing found
       </h3>
+      <div v-show="useCustom404">
+        <slot></slot>
+      </div>
     </div>
 
     <div :class="{
@@ -84,6 +87,8 @@ export default class ItemsLoaderLayout extends Vue {
   @Prop({ default: false }) reverse!: boolean;
 
   @Prop({ default: true }) updateItemView!: boolean;
+
+  @Prop({ default: false }) useCustom404!: boolean;
 
   @Prop() itemsFetcher!: (page: Page) => Promise<{
     success: boolean,
@@ -125,7 +130,7 @@ export default class ItemsLoaderLayout extends Vue {
           this.groupsLoaded += 1;
         }
         this.lastItemId = res.data.length > 0 ? res.data[res.data.length - 1].id : '';
-        this.endReached = res.data.length === 0;
+        this.endReached = res.data.length < nextPage.span;
         this.loadingItems = false;
         this.loadingFailed = false;
       }
