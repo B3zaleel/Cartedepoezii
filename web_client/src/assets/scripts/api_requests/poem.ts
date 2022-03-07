@@ -290,4 +290,35 @@ export default class Poem {
     );
     return result;
   }
+
+  /**
+   * Retrieve exploratory poems for a user.
+   */
+  getExploratoryPoems(page: Page = { span: 12, after: '', before: '' }):
+    Promise<{ success: boolean, data?: Array<PoemT>, message?: string }> {
+    const path = [
+      this.BASE_URL,
+      '/poems-explore?',
+      `&token=${this.AUTH_TOKEN}`,
+      page.span ? `&span=${page.span <= 0 ? 12 : page.span}` : '',
+      page.after ? `&after=${page.after}` : '',
+      page.before ? `&before=${page.before}` : '',
+    ].join('');
+    const result = new Promise<{
+      success: boolean, data?: Array<PoemT>, message?: string
+    }>(
+      (resolve, reject) => {
+        fetch(path, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then((response) => resolve(response.json()))
+          .catch((err) => reject(err));
+      },
+    );
+    return result;
+  }
 }
