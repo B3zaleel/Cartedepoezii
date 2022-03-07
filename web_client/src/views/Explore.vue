@@ -8,7 +8,7 @@
             v-model="searchQuery"
             @keydown.enter="search"
           />
-          <button class="cdp-btn icon" @click="search">
+          <button @click="search">
             <MagnifyIcon/>
           </button>
         </div>

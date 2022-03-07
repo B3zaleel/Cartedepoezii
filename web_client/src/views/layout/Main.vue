@@ -118,7 +118,7 @@
 
     <div class="right-pane" id="right-pane_main-layout">
       <div>
-        <div :class="{search: true, hidden: canHideSearchPanel()}">
+        <div :class="{'search-box': true, hidden: canHideSearchPanel()}">
           <input
             placeholder="Search Cartedepoezii"
             v-model="searchQuery"
