@@ -1,25 +1,106 @@
 @use "@/assets/styles/globals";
 
-.header-pane {
-  > .search-pane {
-    position: absolute;
-    display: grid;
-    align-items: center;
-    width: calc(100% - 2 * 5px);
-    left: 5px;
-    grid-template-columns: 1fr auto;
-    column-gap: 5px;
+.search-pane {
+  position: relative;
+  display: grid;
+  align-items: center;
+  width: calc(100% - 2 * 5px);
+  right: 5px;
+  left: 5px;
+  grid-template-columns: 1fr auto;
+  column-gap: 5px;
 
-    > input {
-      padding: 5px 10px;
-      border-radius: 15px;
-      border: 2px solid gainsboro;
-      outline: none;
-      min-width: 50px;
+  > input {
+    padding: 5px 35px 5px 15px;
+    min-width: 50px;
+    font-size: 15px;
+    border-radius: 15px;
+    border: 2px solid globals.$primary-color-lightest;
+    outline: none;
 
-      &:focus {
-        border: 2px solid globals.$primary-color-lighter;
+    &:focus {
+      border: 2px solid globals.$primary-color;
+
+      & + button {
+        fill: globals.$primary-color;
       }
+    }
+
+    &:not(:focus) {
+      & + button:hover {
+        fill: globals.$primary-color-light;
+      }
+    }
+  }
+
+  > button {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5px;
+    right: 7.5px;
+    fill: globals.$primary-color-lightest;
+    background: none;
+    border-radius: 50%;
+    border: none;
+    outline: none;
+    cursor: pointer;
+
+    &:hover {
+      background: ghostwhite;
+    }
+  }
+}
+
+.search-box {
+  position: relative;
+  display: grid;
+  align-items: center;
+  width: calc(100% );
+  top: 10px;
+  grid-template-columns: 1fr auto;
+  column-gap: 5px;
+
+  > input {
+    padding: 5px 35px 5px 15px;
+    min-width: 50px;
+    font-size: 15px;
+    border-radius: 15px;
+    border: 2px solid globals.$primary-color-lightest;
+    outline: none;
+
+    &:focus {
+      border: 2px solid globals.$primary-color;
+
+      & + button {
+        fill: globals.$primary-color;
+      }
+    }
+
+    &:not(:focus) {
+      & + button:hover {
+        fill: globals.$primary-color-light;
+      }
+    }
+  }
+
+  > button {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5px;
+    right: 5px;
+    fill: globals.$primary-color-lightest;
+    background: none;
+    border-radius: 50%;
+    border: none;
+    outline: none;
+    cursor: pointer;
+
+    &:hover {
+      background: ghostwhite;
     }
   }
 }
