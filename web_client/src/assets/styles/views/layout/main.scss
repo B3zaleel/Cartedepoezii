@@ -62,7 +62,6 @@
         display: grid;
         grid-auto-flow: row;
         align-items: center;
-        justify-content: flex-start;
         padding: 5px;
         width: calc(100% - 2 * 5px);
         height: calc(100% - 2 * 5px);
@@ -236,7 +235,7 @@
 }
 
 .header-pane {
-  > div {
+  > .page-nav-bar {
     display: grid;
     column-gap: 10px;
     grid-template-columns: auto 1fr;
