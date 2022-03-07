@@ -2,7 +2,7 @@
   <MainLayout>
     <template v-slot:header>
       <div class="header-pane">
-        <div>
+        <div class="page-nav-bar">
           <div>
             <button class="cdp-btn icon">
               <ArrowLeftIcon/>
