@@ -122,7 +122,7 @@
           v-bind:selectedId="selectedId"
           v-on:select-tab="args => changeSelectedTab(args)"
         >
-          <div v-show="selectedId == 1">
+          <div v-show="selectedId === 1">
             <ItemsLoaderLayout
               :itemsName="'poems'"
               :itemsFetcher="poemsFetcher"
@@ -130,18 +130,20 @@
               :updateItemView="selectedId === 1"
             />
           </div>
-          <div v-show="selectedId == 2">
+          <div v-show="selectedId === 2">
             <ItemsLoaderLayout
               :itemsName="'comments'"
               :itemsFetcher="commentsFetcher"
               :reverse="true"
+              :updateItemView="selectedId === 2"
             />
           </div>
-          <div v-show="selectedId == 3">
+          <div v-show="selectedId === 3">
             <ItemsLoaderLayout
               :itemsName="'poems'"
               :itemsFetcher="likesFetcher"
               :reverse="true"
+              :updateItemView="selectedId === 3"
             />
           </div>
         </TabsLayout>
