@@ -18,9 +18,14 @@
     <template v-slot:main>
       <div class="user-comment">
         <div>
-          <div v-show="!commentLoaded" class="loading-pane">
+          <div v-show="isLoadingComment" class="loading-pane">
             <LoadingIcon/>
           </div>
+
+          <div v-show="commentLoadingFailed">
+            <Error404View/>
+          </div>
+
           <div v-show="commentLoaded">
             <Comment :comment="comment" v-for="comment in comments" :key="comment.id"/>
           </div>
@@ -50,6 +55,7 @@ import ArrowLeftIcon from '@/assets/icons/ArrowLeft.vue';
 import LoadingIcon from '@/assets/icons/Loading.vue';
 import MainLayout from '@/views/layout/Main.vue';
 import ItemsLoaderLayout from '@/views/layout/ItemsLoader.vue';
+import Error404View from '@/views/error/_Error404.vue';
 import Comment from '@/components/Comment.vue';
 
 @Component({
@@ -59,13 +65,18 @@ import Comment from '@/components/Comment.vue';
     LoadingIcon,
     MainLayout,
     ItemsLoaderLayout,
+    Error404View,
     Comment,
   },
 })
 export default class CommentView extends Vue {
   comments: Array<CommentT> = [];
 
+  isLoadingComment = true;
+
   commentLoaded = false;
+
+  commentLoadingFailed = false;
 
   commentAPIReq = new CommentAPIReq(
     this.$store.state.API_URL,
@@ -90,7 +101,9 @@ export default class CommentView extends Vue {
   }
 
   loadComment(): void {
+    this.isLoadingComment = true;
     this.commentLoaded = false;
+    this.commentLoadingFailed = false;
     this.commentAPIReq.getComment(this.$route.params.id)
       .then((res) => {
         if (res.success) {
@@ -100,9 +113,14 @@ export default class CommentView extends Vue {
               this.comments.pop();
             }
             this.comments.push(res.data);
+            document.title = `Comment by ${res.data.user.name} - Cartedepoezii`;
+            this.commentLoaded = true;
           }
-          this.commentLoaded = true;
+        } else {
+          document.title = 'Comment Not Found - Cartedepoezii';
+          this.commentLoadingFailed = true;
         }
+        this.isLoadingComment = false;
       });
   }
 

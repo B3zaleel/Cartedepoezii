@@ -18,9 +18,14 @@
     <template v-slot:main>
       <div class="user-poem">
         <div>
-          <div v-show="!poemLoaded" class="loading-pane">
+          <div v-show="isLoadingPoem" class="loading-pane">
             <LoadingIcon/>
           </div>
+
+          <div v-show="poemLoadingFailed">
+            <Error404View/>
+          </div>
+
           <div v-show="poemLoaded">
             <Poem :poem="poem" v-for="poem in poems" :key="poem.id"/>
           </div>
@@ -51,6 +56,7 @@ import ArrowLeftIcon from '@/assets/icons/ArrowLeft.vue';
 import LoadingIcon from '@/assets/icons/Loading.vue';
 import MainLayout from '@/views/layout/Main.vue';
 import ItemsLoaderLayout from '@/views/layout/ItemsLoader.vue';
+import Error404View from '@/views/error/_Error404.vue';
 import Poem from '@/components/Poem.vue';
 
 @Component({
@@ -60,6 +66,7 @@ import Poem from '@/components/Poem.vue';
     LoadingIcon,
     MainLayout,
     ItemsLoaderLayout,
+    Error404View,
     Poem,
   },
 })
@@ -67,6 +74,10 @@ export default class PoemView extends Vue {
   poems: Array<PoemT> = [];
 
   poemLoaded = false;
+
+  isLoadingPoem = true;
+
+  poemLoadingFailed = false;
 
   commentsSrc = '';
 
@@ -92,6 +103,8 @@ export default class PoemView extends Vue {
 
   loadPoem(): void {
     this.poemLoaded = false;
+    this.isLoadingPoem = true;
+    this.poemLoadingFailed = false;
     this.poemAPIReq.getPoem(this.$route.params.id)
       .then((res) => {
         if (res.success) {
@@ -104,7 +117,11 @@ export default class PoemView extends Vue {
             document.title = `${res.data.user.name}: ${res.data.title} - Cartedepoezii`;
             this.poemLoaded = true;
           }
+        } else {
+          document.title = 'Poem Not Found - Cartedepoezii';
+          this.poemLoadingFailed = true;
         }
+        this.isLoadingPoem = false;
       });
   }
 

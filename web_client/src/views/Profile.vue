@@ -9,7 +9,7 @@
             </button>
           </div>
           <div>
-            <h2>{{ user.name }}</h2>
+            <h2>{{ user.name || 'Profile' }}</h2>
             <h5 class="">{{ getSubTitle() }}</h5>
           </div>
         </div>
@@ -17,8 +17,8 @@
     </template>
 
     <template v-slot:main>
-      <div class="user-profile" v-show="userInfoLoaded">
-        <div class="profile-info">
+      <div class="user-profile">
+        <div class="profile-info" v-show="userInfoLoaded">
           <div>
             <div class="profile-photo-sect">
               <button class="image-view-btn">
@@ -65,6 +65,14 @@
               {{ user.bio }}
             </div>
           </div>
+        </div>
+
+        <div v-show="isLoadingProfile" class="loading-pane">
+          <LoadingIcon/>
+        </div>
+
+        <div v-show="profileLoadingFailed">
+          <Error404View/>
         </div>
 
         <ModalLayout
@@ -122,6 +130,7 @@
         </ModalLayout>
 
         <TabsLayout
+          v-show="userInfoLoaded"
           :items="tabItems"
           v-bind:selectedId="selectedId"
           v-on:select-tab="args => changeSelectedTab(args)"
@@ -173,6 +182,8 @@ import MainLayout from '@/views/layout/Main.vue';
 import TabsLayout from '@/views/layout/Tabs.vue';
 import ModalLayout from '@/views/layout/Modal.vue';
 import ItemsLoaderLayout from '@/views/layout/ItemsLoader.vue';
+import EditProfileView from '@/views/settings/EditProfile.vue';
+import Error404View from '@/views/error/_Error404.vue';
 import Poem from '@/components/Poem.vue';
 import Comment from '@/components/Comment.vue';
 import UserItem from '@/components/UserItem.vue';
@@ -180,7 +191,6 @@ import ArrowLeftIcon from '@/assets/icons/ArrowLeft.vue';
 import AccountIcon from '@/assets/icons/Account.vue';
 import LoadingIcon from '@/assets/icons/Loading.vue';
 import CalendarMonthIcon from '@/assets/icons/CalendarMonth.vue';
-import EditProfileView from './settings/EditProfile.vue';
 
 @Component({
   name: 'ProfileView',
@@ -190,6 +200,7 @@ import EditProfileView from './settings/EditProfile.vue';
     ModalLayout,
     ItemsLoaderLayout,
     EditProfileView,
+    Error404View,
     Poem,
     Comment,
     UserItem,
@@ -253,6 +264,10 @@ export default class ProfileView extends Vue {
 
   updateEditProfile = false;
 
+  isLoadingProfile = true;
+
+  profileLoadingFailed = false;
+
   isSavingProfile = false;
 
   isFollowingUser = false;
@@ -290,11 +305,16 @@ export default class ProfileView extends Vue {
             this.isFollowingUser = this.user.isFollowing;
             this.loadProfilePhoto();
             this.onMouseLeaveAction();
+            document.title = `${res.data.name} - Cartedepoezii`;
+            this.userInfoLoaded = true;
+            this.profileLoadingFailed = false;
           }
         } else {
           console.error(res.message);
+          document.title = 'User Not Found - Cartedepoezii';
+          this.profileLoadingFailed = true;
         }
-        this.userInfoLoaded = true;
+        this.isLoadingProfile = false;
       });
   }
 
