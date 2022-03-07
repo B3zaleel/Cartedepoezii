@@ -106,6 +106,7 @@
                     'text': !isSavingProfile,
                     'icon': isSavingProfile
                     }"
+                    :disabled="isSavingProfile"
                     @click="saveProfile"
                 >
                   <LoadingIcon v-show="isSavingProfile"/>
@@ -126,6 +127,7 @@
               :itemsName="'poems'"
               :itemsFetcher="poemsFetcher"
               :reverse="true"
+              :updateItemView="selectedId === 1"
             />
           </div>
           <div v-show="selectedId == 2">
@@ -156,7 +158,6 @@ import {
   Item,
 } from '@/assets/scripts/types/interfaces';
 import User from '@/assets/scripts/types/user';
-import UserMin from '@/assets/scripts/types/user_min';
 import MathUtils from '@/assets/scripts/math_utils';
 import ConnectionAPIReq from '@/assets/scripts/api_requests/connection';
 import UserAPIReq from '@/assets/scripts/api_requests/user';
@@ -250,8 +251,6 @@ export default class ProfileView extends Vue {
 
   profilePhotoSrc = '';
 
-  userTest!: UserMin;
-
   userInfoLoaded = false;
 
   poemAPIReq = new PoemAPIReq(
@@ -278,16 +277,15 @@ export default class ProfileView extends Vue {
     this.userAPIReq.getUser(this.$route.params.id)
       .then((res) => {
         if (res.success) {
-          const user = res.data;
-          if (user) {
-            this.user = user;
+          if (res.data) {
+            this.user = res.data;
             this.loadProfilePhoto();
             this.onMouseLeaveAction();
-            this.userInfoLoaded = true;
           }
         } else {
           console.error(res.message);
         }
+        this.userInfoLoaded = true;
       });
   }
 
@@ -303,26 +301,26 @@ export default class ProfileView extends Vue {
   }
 
   saveProfile(): void {
+    this.isSavingProfile = true;
     this.userAPIReq.updateUser(this.editableProfileInfo)
       .then((res) => {
         if (res.success) {
           if (res.data) {
-            this.userInfoLoaded = true;
             this.$store.commit('signIn', {
               id: this.user.id,
               token: res.data.authToken,
             });
             this.user.profilePhotoId = res.data.profilePhotoId;
             this.loadProfilePhoto();
-            this.isSavingProfile = false;
-            this.closeDialog();
           }
         } else {
-          this.userInfoLoaded = false;
           console.error(res.message);
-          this.isSavingProfile = false;
-          this.closeDialog();
         }
+        this.isSavingProfile = false;
+        this.closeDialog();
+      }).catch(() => {
+        this.isSavingProfile = false;
+        this.closeDialog();
       });
   }
 
@@ -350,24 +348,12 @@ export default class ProfileView extends Vue {
     return this.poemAPIReq.getPoemsUserCreated(this.$route.params.id, page);
   }
 
-  async commentsFetcher(page: Page): Promise<{
+  commentsFetcher(page: Page): Promise<{
       success: boolean,
       data?: Array<Item>,
       message?: string
     }> {
-    const res = await this.commentAPIReq.getCommentsByUser(this.$route.params.id, page);
-    const result = {
-      success: res.success,
-      data: res.data?.comments,
-      message: res.message,
-    };
-    const commentUser = res.data?.user;
-    for (let i = 0; res.data && i < res.data?.comments.length; i += 1) {
-      if (result.data) {
-        result.data[i].user = commentUser;
-      }
-    }
-    return result;
+    return this.commentAPIReq.getCommentsByUser(this.$route.params.id, page);
   }
 
   likesFetcher(page: Page): Promise<{

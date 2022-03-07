@@ -14,6 +14,7 @@
             v-for="item in getPoems(group.id)"
             :key="item.id"
             :poem="item"
+            :updateDisplay="updateItemView"
           />
         </div>
         <div v-if="itemsName === 'comments'">
@@ -81,6 +82,8 @@ export default class ItemsLoaderLayout extends Vue {
   @Prop() itemsName!: string;
 
   @Prop({ default: false }) reverse!: boolean;
+
+  @Prop({ default: true }) updateItemView!: boolean;
 
   @Prop() itemsFetcher!: (page: Page) => Promise<{
     success: boolean,

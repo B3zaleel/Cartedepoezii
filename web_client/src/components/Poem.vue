@@ -48,7 +48,7 @@
             v-for="verse, idx in poem.verses"
             :key="idx"
             :class="{'verses-p': true, hidden: idx !== currentVerse - 1}"
-          >{{ verse }}</p>
+          >{{ verse.trim() }}</p>
           <button
             :class="{'nav-btn': true, right: true, hidden: currentVerse >= poem.verses.length}"
             @click="nextVerse">
@@ -139,7 +139,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import {
+  Component,
+  Prop,
+  Watch,
+  Vue,
+} from 'vue-property-decorator';
 import { Position, EditPoemForm } from '@/assets/scripts/types/interfaces';
 import Poem from '@/assets/scripts/types/poem';
 import MathUtils from '@/assets/scripts/math_utils';
@@ -216,6 +221,8 @@ import DoughnutStatus from '@/components/DoughnutStatus.vue';
 export default class PoemComponent extends Vue {
   @Prop() poem!: Poem;
 
+  @Prop() updateDisplay!: boolean;
+
   MathUtils = MathUtils;
 
   actionMenuPos: Position = {
@@ -273,7 +280,7 @@ export default class PoemComponent extends Vue {
 
   isMenuOpen = false;
 
-  versesPHeight = '';
+  versesPHeight = 'fit-content';
 
   isDialogOpen = false;
 
@@ -289,6 +296,30 @@ export default class PoemComponent extends Vue {
   hasHeader = true;
 
   dialogTitle = '';
+
+  @Watch('updateDisplay')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  updateElementSizing(_old: boolean, _newVal: boolean): void {
+    this.computeVersesPHeight();
+  }
+
+  computeVersesPHeight(): void {
+    let versesHeight = 'fit-content';
+    const versesP = this.$el?.firstElementChild?.children.item(1)?.children.item(1);
+    if (versesP) {
+      let maxHeight = 0;
+      for (let i = 0; i < versesP.childElementCount; i += 1) {
+        if (versesP.children.item(i)?.classList.contains('verses-p')) {
+          const height = versesP.children.item(i)?.clientHeight;
+          if (height && (height > maxHeight)) {
+            maxHeight = height;
+          }
+        }
+      }
+      versesHeight = `${maxHeight + 2 * 5}px`;
+    }
+    this.versesPHeight = versesHeight;
+  }
 
   openMenu(): void {
     this.isMenuOpen = true;
@@ -454,19 +485,7 @@ export default class PoemComponent extends Vue {
     this.poemLikesCount = this.poem.likesCount;
     this.poemCommentsCount = this.poem.commentsCount;
     this.loadProfilePhoto();
-    const versesP = this.$el.firstElementChild?.children.item(1)?.children.item(1);
-    if (versesP) {
-      let maxHeight = 0;
-      for (let i = 0; i < versesP.childElementCount; i += 1) {
-        if (versesP.children.item(i)?.classList.contains('verses-p')) {
-          const height = versesP.children.item(i)?.clientHeight;
-          if (height && (height > maxHeight)) {
-            maxHeight = height;
-          }
-        }
-      }
-      this.versesPHeight = `${maxHeight + 2 * 10}px`;
-    }
+    this.computeVersesPHeight();
   }
 }
 </script>
