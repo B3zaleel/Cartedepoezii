@@ -275,6 +275,18 @@
   }
 }
 
+.loading-pane {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 10px;
+  min-height: 100%;
+  max-height: 50px;
+  background: whitesmoke;
+}
+
 @media (max-width: 750px) {
   .main-layout {
     grid-template-areas: "left center";
