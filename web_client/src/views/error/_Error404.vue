@@ -18,3 +18,24 @@ import { Component, Vue } from 'vue-property-decorator';
 })
 export default class Error404Content extends Vue {}
 </script>
+
+<style lang="scss">
+@use "@/assets/styles/globals";
+
+.error-pane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 10px;
+
+  h1 {
+    color: globals.$primary-color-lighter;
+    font-size: 25px;
+  }
+
+  a {
+    display: inline-flex;
+  }
+}
+</style>
