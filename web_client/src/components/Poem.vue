@@ -486,6 +486,9 @@ export default class PoemComponent extends Vue {
     this.poemCommentsCount = this.poem.commentsCount;
     this.loadProfilePhoto();
     this.computeVersesPHeight();
+    window.addEventListener('resize', () => {
+      this.computeVersesPHeight();
+    });
   }
 }
 </script>
