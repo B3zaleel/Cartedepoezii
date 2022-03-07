@@ -129,7 +129,7 @@ const routes: Array<RouteConfig> = [
       title: 'Error 404',
       requiresAuth: false,
     },
-    component: () => import('../views/Error404.vue'),
+    component: () => import('../views/error/Error404.vue'),
   },
 ];
 
