@@ -9,11 +9,11 @@ This is the API layer for Cartedepoezii.
 
 ## Environment Variables
 
-The required environment variables can be stored in a file named `.env.local` and each line should have the format `Name: Value`. The table below lists the environment variables that will be used by this server:
+The required environment variables should be stored in a file named `.env.local` and each line should have the format `Name: Value`. The table below lists the environment variables that will be used by this server:
 
 | Name | Description |
 |:-|:-|
-| DB_DIALECT_DRIVER | |
+| DB_DIALECT_DRIVER | The driver for connecting to the database. |
 | DB_USER | The user with read and write access to the database. |
 | DB_PWORD | The password of the user with read and write access to the database. |
 | DB_HOST | The host of the database server. |
@@ -24,7 +24,9 @@ The required environment variables can be stored in a file named `.env.local` an
 | IMG_CDN_PUB_KEY | Imagekit.io public key. |
 | IMG_CDN_PRI_KEY | Imagekit.io private key. |
 | IMG_CDN_URL_EPT | Imagekit.io url endpoint. |
-| APP_SECRET_KEY | Secret key for this application. |
+| GOOGLE_MAIL_SENDER | The email address of the account responsible for sending emails to users. |
+| WEB_CLIENT_DOMAIN | The domain name of the web client. |
+| APP_SECRET_KEY | The secret key for this application. |
 
 ## How To Start
 
@@ -35,8 +37,8 @@ The required environment variables can be stored in a file named `.env.local` an
 + Run `psql -f data/DBSetup_PostgreSQL.sql` in the interactive shell and exit.
 + Run the server using `./run.bash`.
 
-## Documentation
+## Viewing The Documentation
 
 + Install `redoc-cli` with `npm install -g redoc-cli`.
 + Build the docs with `redoc-cli bundle api/v1/OpenAPI_Specs.json -o index.html`.
-+ Open `index.html`.
++ Open the `index.html` file from the current directory.
