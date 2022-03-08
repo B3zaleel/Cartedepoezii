@@ -87,13 +87,13 @@ export default class UserItemComponent extends Vue {
 
   onMouseEnterAction(): void {
     if (!this.hideAction) {
-      this.actionText = this.user.isFollowing && this.isFollowing ? 'Unfollow' : 'Follow';
+      this.actionText = this.isFollowing ? 'Unfollow' : 'Follow';
     }
   }
 
   onMouseLeaveAction(): void {
     if (!this.hideAction) {
-      this.actionText = this.user.isFollowing && this.isFollowing ? 'Following' : 'Follow';
+      this.actionText = this.isFollowing ? 'Following' : 'Follow';
     }
   }
 
