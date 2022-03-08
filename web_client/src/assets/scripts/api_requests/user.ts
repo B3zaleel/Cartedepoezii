@@ -123,11 +123,13 @@ export default class User {
    */
   deleteUser(userId: string):
     Promise<{ success: boolean, data?: Record<string, never>, message?: string }> {
+    const bodyData = {
+      userId,
+      authToken: this.AUTH_TOKEN,
+    };
     const path = [
       this.BASE_URL,
-      '/user?',
-      `authToken=${this.AUTH_TOKEN}`,
-      `&id=${userId}`,
+      '/user',
     ].join('');
     const result = new Promise<{
       success: boolean, data?: Record<string, never>, message?: string
@@ -138,6 +140,7 @@ export default class User {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(bodyData),
       })
         .then((response) => resolve(response.json()))
         .catch((err) => reject(err));
