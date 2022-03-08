@@ -366,6 +366,7 @@ export default class MainLayout extends Vue {
     this.userAPIReq.deleteUser(this.$store.state.user.id)
       .then((res) => {
         if (res.success) {
+          this.$store.state.commit('signOut');
           if (this.$route.path !== '/') {
             this.$router.push('/');
           } else {
