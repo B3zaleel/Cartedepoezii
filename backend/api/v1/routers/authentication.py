@@ -15,6 +15,8 @@ from ..form_types import (
 )
 from ..database import get_session, User
 from ..utils.token_handlers import AuthToken, ResetToken
+from ..utils.template_renderer import render_template
+from ..utils.mailing import deliver_message
 
 
 router = APIRouter(prefix='/api/v1')
@@ -74,9 +76,14 @@ async def sign_in(body: SignInForm):
                 )
                 db_session.commit()
                 if not is_active:
-                    pass
-                    # TODO: send an account locked message to the user \
-                    # with an option to reset password.
+                    deliver_message(
+                        body.email,
+                        'Your Account Has Been Locked',
+                        render_template(
+                            'account_locked',
+                            name=user.name
+                        )
+                    )
     except Exception as ex:
         print(ex.args[0])
         db_session.rollback()
@@ -120,6 +127,14 @@ async def sign_up(body: SignUpForm):
                     'authToken': AuthToken.encode(auth_token)
                 }
             }
+            deliver_message(
+                body.email,
+                'Welcome To Cartedepoezii',
+                render_template(
+                    'welcome',
+                    name=body.name
+                )
+            )
         except Exception as ex:
             print(ex.args[0])
             db_session.rollback()
@@ -153,12 +168,13 @@ async def request_reset_password(body: PasswordResetRequestForm):
         ).first()
         if result:
             reset_token = ResetToken(user_id=result.user_id, email=body.email, message='password_reset')
+            reset_token_str = ResetToken.encode(reset_token)
             db_session.query(User).filter(and_(
                 User.id == result.user_id,
                 User.email == body.email
             )).update(
                 {
-                    User.account_reset_token: ResetToken.encode(reset_token)
+                    User.account_reset_token: reset_token_str
                 },
                 synchronize_session=False
             )
@@ -167,7 +183,15 @@ async def request_reset_password(body: PasswordResetRequestForm):
                 'success': True,
                 'data': {}
             }
-            # TODO: Send a password reset request to the user's email
+            deliver_message(
+                body.email,
+                'Reset Your Password',
+                render_template(
+                    'password_reset',
+                    name=result.name,
+                    token=reset_token_str
+                )
+            )
     except Exception as ex:
         print(ex.args[0])
         db_session.rollback()
@@ -227,7 +251,14 @@ async def reset_password(body: PasswordResetForm):
                     'authToken': AuthToken.encode(auth_token)
                 }
             }
-            # TODO: Send a password changed confirmation message
+            deliver_message(
+                body.email,
+                'Your Password Has Changed',
+                render_template(
+                    'password_changed',
+                    name=user.name
+                )
+            )
     except Exception as ex:
         print(ex.args[0])
         db_session.rollback()
