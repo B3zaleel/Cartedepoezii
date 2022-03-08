@@ -1,11 +1,10 @@
 #!/usr/bin/python3
 import os
-import base64
 import email_validator
 from datetime import datetime
 from fastapi import APIRouter
 from imagekitio import ImageKit
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 
 from ..form_types import UserDeleteForm, UserUpdateForm
 from ..database import (
@@ -174,10 +173,36 @@ async def remove_user(body: UserDeleteForm):
         return response
     db_session = get_session()
     try:
-        db_session.query(UserFollowing).filter(and_(
-            UserFollowing.follower_id == auth_token.user_id,
-            UserFollowing.following_id == body.followId,
+        db_session.query(UserFollowing).filter(or_(
+            UserFollowing.follower_id == body.userId,
+            UserFollowing.following_id == body.userId,
         )).delete(
+            synchronize_session=False
+        )
+        db_session.query(PoemLike).filter(
+            PoemLike.user_id == body.userId,
+        ).delete(
+            synchronize_session=False
+        )
+        comments = db_session.query(Comment).filter(and_(
+            Comment.user_id == body.userId,
+            Comment.comment_id == None
+        )).all()
+        comment_ids = map(lambda x: x.id, comments)
+        db_session.query(Comment).filter(or_(
+            Comment.comment_id.in_(comment_ids),
+            Comment.user_id == body.userId
+        )).delete(
+            synchronize_session=False
+        )
+        db_session.query(Poem).filter(
+            Poem.user_id == body.userId,
+        ).delete(
+            synchronize_session=False
+        )
+        db_session.query(User).filter(
+            User.id == body.userId,
+        ).delete(
             synchronize_session=False
         )
         db_session.commit()
