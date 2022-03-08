@@ -25,19 +25,26 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2px;
-      width: calc(30px + 2 * 2px);
-      height: calc(30px + 2 * 2px);
+      box-sizing: content-box;
+      padding: 0.5px;
+      width: 38px;
+      height: 38px;
+      color: black;
       font-weight: 600;
-      border: 2px solid globals.$primary-color-light;
+      border: 1px solid globals.$primary-color-lighter;
       border-radius: 50%;
 
-      > img {
+      img {
+        position: absolute;
         border-radius: 50%;
+        z-index: 5;
       }
-      > svg {
-        width: 30px;
-        height: 30px;
+
+      svg {
+        position: absolute;
+        width: 80%;
+        height: 80%;
+        z-index: 1;
       }
     }
   }
@@ -50,6 +57,10 @@
       white-space: nowrap;
       overflow: auto;
       text-overflow: ellipsis;
+
+      &:hover {
+        color: globals.$primary-color-light;
+      }
     }
   }
 

@@ -6,18 +6,22 @@
     > div {
       padding: 15px;
       > .profile-photo-sect {
-        display: flex;
+        display: grid;
+        grid-auto-flow: column;
+        column-gap: 10px;
+        justify-content: flex-start;
         position: relative;
         align-items: center;
 
         > .image-view-btn{
           position: relative;
           display: flex;
+          box-sizing: content-box;
           align-items: center;
           justify-content: center;
-          width: calc(120px + 2 * 2px);
-          height: calc(120px + 2 * 2px);
-          margin-right: 10px;
+          padding: 1px;
+          width: 120px;
+          height: 120px;
           border: 2px solid globals.$primary-color;
           border-radius: 50%;
           outline: none;
