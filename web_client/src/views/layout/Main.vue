@@ -118,7 +118,7 @@
 
     <div class="right-pane" id="right-pane_main-layout">
       <div>
-        <div :class="{'search-box': true, hidden: canHideSearchPanel()}">
+        <div :class="{'search-box': true, hidden: canHideSearchPanel}">
           <input
             placeholder="Search Cartedepoezii"
             v-model="searchQuery"
@@ -161,6 +161,14 @@ import ContextMenuLayout from './ContextMenu.vue';
 
 @Component({
   name: 'MainLayout',
+  computed: {
+    canHideSearchPanel() {
+      return [
+        this.$route.path.startsWith('/explore'),
+        this.$route.path.startsWith('/search'),
+      ].some((cond) => cond);
+    },
+  },
   components: {
     ModalLayout,
     ContextMenuLayout,
@@ -252,13 +260,6 @@ export default class MainLayout extends Vue {
         break;
     }
     return false;
-  }
-
-  canHideSearchPanel(): boolean {
-    if (this.$route.path.startsWith('/search')) {
-      return true;
-    }
-    return this.$route.path.startsWith('/explore');
   }
 
   openMoreMenu(ev: PointerClickEvent): void {
