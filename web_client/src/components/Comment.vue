@@ -65,8 +65,12 @@
       </div>
 
       <div class="reply" v-show="isReplyingToComment">
-        <textarea class="cdp-txb" v-model="reply"/>
+        <textarea class="cdp-txb" v-model="reply" :maxlength="replyLimit"/>
         <div>
+          <DoughnutStatus
+            :value="reply.length / replyLimit"
+            :titleValue="doughnutTitle"
+          />
           <button class="cdp-btn text" @click="replyToComment">
             <LoadingIcon v-show="isReplyUploading"/>
             <b v-show="!isReplyUploading">Reply</b>
@@ -117,10 +121,10 @@ import CommentIcon from '@/assets/icons/Comment.vue';
 import CommentTextIcon from '@/assets/icons/CommentText.vue';
 import DotsHorizontalIcon from '@/assets/icons/DotsHorizontal.vue';
 import LoadingIcon from '@/assets/icons/Loading.vue';
+import DoughnutStatus from '@/assets/icons/animated/DoughnutStatus.vue';
 import ContextMenuLayout from '@/views/layout/ContextMenu.vue';
 import ItemsLoaderLayout from '@/views/layout/ItemsLoader.vue';
 import ModalLayout from '@/views/layout/Modal.vue';
-import DoughnutStatus from '@/components/DoughnutStatus.vue';
 
 @Component({
   name: 'CommentComponent',
@@ -192,6 +196,9 @@ import DoughnutStatus from '@/components/DoughnutStatus.vue';
         ? `/comment/${this.$props.comment.replyTo}`
         : `/poem/${this.$props.comment.poemId}`;
     },
+    doughnutTitle() {
+      return `${this.$data.reply.length} / ${this.$data.replyLimit}`;
+    },
   },
   components: {
     AccountIcon,
@@ -219,6 +226,8 @@ export default class CommentComponent extends Vue {
   poemRepliesCount = this.comment.repliesCount;
 
   reply = '';
+
+  replyLimit = 400;
 
   imageSrc = '';
 

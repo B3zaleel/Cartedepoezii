@@ -126,8 +126,12 @@
       </div>
 
       <div class="new-comment" v-show="isCommentingOnPoem">
-        <textarea class="cdp-txb" v-model="comment"/>
+        <textarea class="cdp-txb" v-model="comment" :maxlength="commentLimit"/>
         <div>
+          <DoughnutStatus
+            :value="comment.length / commentLimit"
+            :titleValue="doughnutTitle"
+          />
           <button class="cdp-btn text" @click="commentOnPoem">
             <LoadingIcon v-show="isCommentUploading"/>
             <b v-show="!isCommentUploading">Post</b>
@@ -163,7 +167,7 @@ import LoadingIcon from '@/assets/icons/Loading.vue';
 import ContextMenuLayout from '@/views/layout/ContextMenu.vue';
 import ModalLayout from '@/views/layout/Modal.vue';
 import PoemEdit from '@/components/PoemEdit.vue';
-import DoughnutStatus from '@/components/DoughnutStatus.vue';
+import DoughnutStatus from '@/assets/icons/animated/DoughnutStatus.vue';
 
 @Component({
   name: 'PoemComponent',
@@ -200,6 +204,9 @@ import DoughnutStatus from '@/components/DoughnutStatus.vue';
         ordinal = 'rd';
       }
       return `Published on ${month} ${monthDay}${ordinal} ${date.getUTCFullYear()}`;
+    },
+    doughnutTitle() {
+      return `${this.$data.comment.length} / ${this.$data.commentLimit}`;
     },
   },
   components: {
@@ -261,6 +268,8 @@ export default class PoemComponent extends Vue {
   poemCommentsCount = this.poem.commentsCount;
 
   comment = '';
+
+  commentLimit = 400;
 
   imageSrc = '';
 
