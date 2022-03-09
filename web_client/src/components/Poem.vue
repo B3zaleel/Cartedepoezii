@@ -269,7 +269,7 @@ export default class PoemComponent extends Vue {
 
   comment = '';
 
-  commentLimit = 400;
+  commentLimit = 384;
 
   imageSrc = '';
 

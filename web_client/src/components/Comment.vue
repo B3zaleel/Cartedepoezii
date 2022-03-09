@@ -227,7 +227,7 @@ export default class CommentComponent extends Vue {
 
   reply = '';
 
-  replyLimit = 400;
+  replyLimit = 384;
 
   imageSrc = '';
 
