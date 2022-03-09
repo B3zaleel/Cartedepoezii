@@ -95,9 +95,15 @@ async def sign_in(body: SignInForm):
 @router.post('/sign-up')
 async def sign_up(body: SignUpForm):
     '''Signs up a user.'''
-    response = None
+    response = {
+        'success': False,
+        'message': 'Failed to create account.'
+    }
     try:
         email_validator.validate_email(body.email)
+        if len(body.name) > 64:
+            response['message'] = 'Name is too long.'
+            return response
         db_session = get_session()
         ph = argon2.PasswordHasher()
         try:
@@ -143,13 +149,8 @@ async def sign_up(body: SignUpForm):
                 'message': 'Failed to create account.'
             }
         db_session.close()
-    except (email_validator.EmailNotValidError,
-            email_validator.EmailSyntaxError,
-            email_validator.EmailUndeliverableError):
-        response = {
-            'success': False,
-            'message': 'Invalid email.'
-        }
+    except email_validator.EmailNotValidError:
+        response['message'] = 'Invalid email.'
     return response
 
 
