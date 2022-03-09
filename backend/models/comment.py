@@ -34,6 +34,6 @@ class Comment(Base):
         nullable=True
     )
     text = Column(
-        String(400),
+        String(384),
         nullable=False
     )
