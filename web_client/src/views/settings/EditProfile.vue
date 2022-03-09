@@ -110,7 +110,7 @@ export default class EditProfileView extends Vue {
 
   nameCount = 0;
 
-  nameLimit = 60;
+  nameLimit = 64;
 
   imageLoadFailed = false;
 
