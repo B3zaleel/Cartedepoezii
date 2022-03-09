@@ -266,13 +266,11 @@ async def add_comment(body: CommentAddForm):
         'message': 'Failed to add comment.'
     }
     auth_token = AuthToken.decode(body.authToken)
-    wrong_conditions = [
-        auth_token is None,
-        auth_token and (auth_token.user_id != body.userId),
-        len(body.text) > 400,
-        len(body.text.strip()) == 0
-    ]
-    if any(wrong_conditions):
+    if auth_token is None or auth_token.user_id != body.userId:
+        response['message'] = 'Invalid authentication token.'
+        return response
+    if len(body.text) > 384:
+        response['message'] = 'Name is too long.'
         return response
     db_session = get_session()
     try:
@@ -323,6 +321,7 @@ async def remove_comment(body: CommentDeleteForm):
     }
     auth_token = AuthToken.decode(body.authToken)
     if auth_token is None or auth_token.user_id != body.userId:
+        response['message'] = 'Invalid authentication token.'
         return response
     db_session = get_session()
     try:
