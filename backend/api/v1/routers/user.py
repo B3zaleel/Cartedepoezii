@@ -88,12 +88,14 @@ async def update_user_info(body: UserUpdateForm):
         'message': 'Failed to update user info.'
     }
     auth_token = AuthToken.decode(body.authToken)
-    wrong_conditions = [
-        auth_token is None,
-        auth_token is not None and (auth_token.user_id != body.userId)
-    ]
-    if any(wrong_conditions):
+    if auth_token is None or (auth_token.user_id != body.userId):
+        response['message'] = 'Invalid authentication token.'
         return response
+    if len(body.name) > 64:
+        response['message'] = 'Name is too long.'
+        return response
+    elif len(body.bio) > 384:
+        response['message'] = 'Bio is too long.'
     db_session = get_session()
     imagekit = ImageKit(
         private_key=os.getenv('IMG_CDN_PRI_KEY'),
@@ -113,13 +115,10 @@ async def update_user_info(body: UserUpdateForm):
             user = db_session.query(User).filter(User.id == body.userId).first()
             if user.profile_photo_id:
                 imagekit.delete_file(user.profile_photo_id)
-            # with open('foo.jpeg', 'wb') as file:
-            #     file.write(file_bytes)
             img_kit_res = imagekit.upload_file(
                 file=body.profilePhoto,
                 file_name='{}'.format(
                     body.userId.replace('-', ''),
-                    # profilePhoto.content_type.split('/')[1]
                 ),
                 options={
                     'folder': 'cartedepoezii/profile_photos/',
@@ -154,10 +153,12 @@ async def update_user_info(body: UserUpdateForm):
                 'profilePhotoId': profile_picture_file_id
             }
         }
+    except email_validator.EmailNotValidError as ex:
+        response['message'] = 'Invalid email.'
     except Exception as ex:
         print(ex.args[0])
-        db_session.rollback()
     finally:
+        db_session.rollback()
         db_session.close()
     return response
 
@@ -170,6 +171,7 @@ async def remove_user(body: UserDeleteForm):
     }
     auth_token = AuthToken.decode(body.authToken)
     if auth_token is None or auth_token.user_id != body.userId:
+        response['message'] = 'Invalid authentication token.'
         return response
     db_session = get_session()
     try:
