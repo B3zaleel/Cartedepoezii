@@ -42,6 +42,11 @@ export interface Position {
   bottom?: string;
 }
 
+export interface Point2D {
+  x: number;
+  y: number;
+}
+
 export interface EditProfileForm {
   userId: string;
   imageURL: string;
