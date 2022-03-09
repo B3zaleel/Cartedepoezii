@@ -92,14 +92,17 @@ async def add_poem(body: PoemAddForm):
         'message': 'Failed to add poem.'
     }
     auth_token = AuthToken.decode(body.authToken)
-    wrong_conditions = [
-        auth_token is None,
-        auth_token is not None and (auth_token.user_id != body.userId),
-        len(body.title) > 256,
-        len(body.verses) < 1,
-        not all(list(map(lambda x: len(x.strip()) > 1, body.verses)))
-    ]
-    if any(wrong_conditions):
+    if auth_token is None or auth_token.user_id != body.userId:
+        response['message'] = 'Invalid authentication token.'
+        return response
+    if len(body.title) > 256:
+        response['message'] = 'Title is too long.'
+        return response
+    if len(body.verses) < 1:
+        response['message'] = 'Verses is too short.'
+        return response
+    if not all(list(map(lambda x: len(x.strip()) > 1, body.verses))):
+        response['message'] = 'Verses is too short.'
         return response
     db_session = get_session()
     try:
@@ -140,14 +143,17 @@ async def update_poem(body: PoemUpdateForm):
         'message': 'Failed to update poem.'
     }
     auth_token = AuthToken.decode(body.authToken)
-    wrong_conditions = [
-        auth_token is None,
-        auth_token is not None and (auth_token.user_id != body.userId),
-        len(body.title) > 256,
-        len(body.verses) < 1,
-        not all(list(map(lambda x: len(x.strip()) > 1, body.verses)))
-    ]
-    if any(wrong_conditions):
+    if auth_token is None or auth_token.user_id != body.userId:
+        response['message'] = 'Invalid authentication token.'
+        return response
+    if len(body.title) > 256:
+        response['message'] = 'Title is too long.'
+        return response
+    if len(body.verses) < 1:
+        response['message'] = 'Verses is too short.'
+        return response
+    if not all(list(map(lambda x: len(x.strip()) > 1, body.verses))):
+        response['message'] = 'Verses is too short.'
         return response
     db_session = get_session()
     try:
@@ -182,6 +188,7 @@ async def remove_poem(body: PoemDeleteForm):
     }
     auth_token = AuthToken.decode(body.authToken)
     if auth_token is None or auth_token.user_id != body.userId:
+        response['message'] = 'Invalid authentication token.'
         return response
     db_session = get_session()
     try:
@@ -223,7 +230,8 @@ async def like_poem(body: PoemLikeForm):
         'message': 'Failed to like poem.'
     }
     auth_token = AuthToken.decode(body.authToken)
-    if auth_token is None or (auth_token.user_id != body.userId):
+    if auth_token is None or auth_token.user_id != body.userId:
+        response['message'] = 'Invalid authentication token.'
         return response
     db_session = get_session()
     try:
@@ -439,12 +447,11 @@ async def get_channel_poems(token, span='', after='', before=''):
         'success': False,
         'message': 'Failed to find poems for the channel.'
     }
-    if not token:
-        return response
     auth_token = AuthToken.decode(token)
-    user_id = auth_token.user_id if auth_token is not None else None
-    if not user_id:
+    if auth_token is None:
+        response['message'] = 'Invalid authentication token.'
         return response
+    user_id = auth_token.user_id
     db_session = get_session()
     try:
         span = span.strip()
@@ -533,12 +540,11 @@ async def get_exploratory_poems(token, span='', after='', before=''):
         'success': False,
         'message': 'Failed to find poems for the user.'
     }
-    if not token:
-        return response
     auth_token = AuthToken.decode(token)
-    user_id = auth_token.user_id if auth_token is not None else None
-    if not user_id:
+    if auth_token is None:
+        response['message'] = 'Invalid authentication token.'
         return response
+    user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
         span = span.strip()
