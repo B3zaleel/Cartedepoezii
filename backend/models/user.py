@@ -23,8 +23,8 @@ class User(BaseModel, Base):
         unique=True,
         index=True
     )
-    name = Column(String(60))
-    bio = Column(String(256), default='')
+    name = Column(String(64))
+    bio = Column(String(384), default='')
     profile_photo_id = Column(
         TEXT,
         nullable=False,
