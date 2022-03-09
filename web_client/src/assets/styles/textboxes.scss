@@ -53,4 +53,17 @@
     font-size: 0.7em;
   }
 }
-/* #endregion */
+
+.cdp-txb {
+  width: calc(100% - 2 * 5px);
+  padding: 5px;
+  border-radius: 10px;
+  border: 2px solid gainsboro;
+  outline: none;
+  resize: none;
+
+  &:focus {
+    color: black;
+    border: 2px solid globals.$primary-color-lighter;
+  }
+}

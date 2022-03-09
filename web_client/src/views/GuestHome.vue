@@ -6,7 +6,7 @@
           <img
             class="bg"
             loading="lazy"
-            src="../assets/images/flat-lay-out-dark-green-leafs.jpg"
+            src="../assets/images/home_background.jpg"
           />
           <div class="bg">
             <Logo/>
