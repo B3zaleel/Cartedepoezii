@@ -21,8 +21,8 @@
             <div>
               <h4>
                 By signing up, you agree to our
-                <router-link to="/terms-of-service">Terms of service</router-link>
-                and <router-link to="privacy-policy">Privacy Policy</router-link>.
+                <router-link class="alt-link" to="/terms-of-service">Terms of service</router-link>
+                and <router-link class="alt-link" to="privacy-policy">Privacy Policy</router-link>.
               </h4>
             </div>
           </div>
@@ -53,93 +53,5 @@ export default class GuestHomeView extends Vue {}
 </script>
 
 <style lang="scss">
-.guest-home {
-  display: grid;
-  grid-template-rows: 1fr auto;
-  min-height: 100%;
-
-  .main {
-    display: grid;
-    grid-template-columns: 50% 50%;
-
-    div {
-      position: relative;
-
-      img {
-        width: 100%;
-        object-fit: cover;
-      }
-      .bg{
-        position: absolute;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        left: 0;
-        bottom: 0;
-      }
-      .bg:last-child{
-        z-index: 5;
-        background: #b4f0dec4;
-        backdrop-filter: blur(1.5px);
-
-        > svg {
-          width: clamp(30px, 80%, 720px);
-          height: clamp(30px, 80%, 720px);
-        }
-      }
-    }
-
-    > div:nth-child(2) {
-      padding: 20px;
-
-      > div {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-
-    h1 {
-      font-size: 2.5em;
-    }
-
-    h2 {
-      font-size: clamp(18px, 2.0em, 25px);
-    }
-
-    h3 {
-      font-size: clamp(12px, 1.2em, 18px);
-    }
-
-    h4 {
-      font-size: 0.6em;
-    }
-  }
-}
-
-@media (max-width: 600px) {
-  .guest-home {
-    .main {
-      display: flex;
-      flex-flow: column-reverse;
-      grid-template-columns: none;
-      align-items: stretch;
-      justify-content: stretch;
-
-      > div:first-child {
-        min-height: 150px;
-        height: 40%;
-      }
-
-      > div:last-child {
-        height: inherit;
-        align-items: center;
-        height: 60%;
-        min-height: 250px;
-      }
-    }
-  }
-}
+@use "@/assets/styles/views/guest_home";
 </style>

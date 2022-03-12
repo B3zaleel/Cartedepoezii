@@ -44,9 +44,9 @@ import CloseIcon from '@/assets/icons/Close.vue';
   @Prop() hasFooter!: boolean;
 
   closeDialog(ev: Event): void {
+    this.$emit('request-close');
     ev.preventDefault();
     ev.stopPropagation();
-    this.$emit('request-close');
   }
 }
 </script>

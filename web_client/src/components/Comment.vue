@@ -2,28 +2,36 @@
   <div class="comment">
     <div class="heading">
       <div>
-        <router-link to="/f">
-          <img/>
+        <router-link :to="`/profile/${comment.user.id}`">
+          <img :src="imageSrc"/>
           <AccountIcon/>
         </router-link>
       </div>
       <div>
-        <router-link to="/f">
+        <router-link :to="`/profile/${comment.user.id}`">
           {{ comment.user.name }}
         </router-link>
       </div>
-      <div tabindex="1" @blur="closeMenu">
-        <button @click.capture="openMenu">
+      <div tabindex="1" @blur="closeMenu" v-show="canBackNav || canModifyComment">
+        <button class="cdp-btn icon" @click.capture="openMenu">
           <DotsHorizontalIcon/>
         </button>
         <ContextMenuLayout
           :isMenuOpen="isMenuOpen"
           v-on:request-close="closeMenu"
+          :position="actionMenuPos"
         >
           <div>
-            <button class="menu-item">
-              Delete
-            </button>
+            <div v-show="canBackNav">
+              <router-link class="menu-item" :to="backNav">
+                Backtrack
+              </router-link>
+            </div>
+            <div v-show="canModifyComment">
+              <button class="menu-item danger" @click="openDeleteDialog">
+                Delete
+              </button>
+            </div>
           </div>
         </ContextMenuLayout>
       </div>
@@ -34,208 +42,299 @@
         {{ comment.text }}
       </p>
 
-      <div :class="{footer: true, visible: comment.repliesTo && showReplies}">
+      <div class="creation-time">
+        {{ creationTime }}
+      </div>
+      <div :class="{footer: true, hidden: !canReply }">
         <div>
-          <button>
-            <CommentIcon/>
+          <button class="cdp-btn icon reply-tgl-btn" @click="toggleReplyToComment">
+            <CommentIcon v-show="isReplyingToComment"/>
+            <CommentTextIcon v-show="!isReplyingToComment"/>
           </button>
         </div>
 
         <div>
-          <span>
-            {{ comment.repliesCount > 1 ? `${comment.repliesCount} Replies` : '1 Reply' }}
-          </span>
-          <span>
-            &nbsp;-&nbsp;{{ comment.createdDate.getFullYear() }}
-          </span>
+          <router-link
+            :to="`/comment/${comment.id}`"
+            class="see-replies"
+            v-show="canSeeReplies"
+          >
+            {{ repliesText }}
+          </router-link>
         </div>
       </div>
+
+      <div class="reply" v-show="isReplyingToComment">
+        <textarea class="cdp-txb" v-model="reply" :maxlength="replyLimit"/>
+        <div>
+          <DoughnutStatus
+            :value="reply.length / replyLimit"
+            :titleValue="doughnutTitle"
+          />
+          <button class="cdp-btn text" @click="replyToComment">
+            <LoadingIcon v-show="isReplyUploading"/>
+            <b v-show="!isReplyUploading">Reply</b>
+          </button>
+        </div>
+      </div>
+
+      <ModalLayout
+        :modalOpen="isDialogOpen"
+        :modalTitle="dialogTitle"
+        :hasHeader="true"
+        v-on:request-close="closeDialog"
+      >
+        <template v-slot:modal-body>
+          <div>
+            <div v-show="dialogType === dialogTypes.Delete">
+              <p>Are you sure you want to delete this comment?</p>
+              <p v-show="comment.repliesCount > 0">
+                This would delete {{ comment.repliesCount }} other comment(s) as well.
+              </p>
+            </div>
+          </div>
+        </template>
+
+        <template v-slot:modal-action-panel>
+          <div class="pane-container">
+            <div v-show="dialogType === dialogTypes.Delete">
+              <button class="cdp-btn text danger" @click="deleteComment">
+                <LoadingIcon v-show="isDeletingComment"/>
+                <b v-show="!isDeletingComment">Yes</b>
+              </button>
+            </div>
+          </div>
+        </template>
+      </ModalLayout>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { UserMin, Comment } from '@/assets/scripts/type_defs';
+import { Position } from '@/assets/scripts/types/interfaces';
+import Comment from '@/assets/scripts/types/comment';
+import CommentAPIReq from '@/assets/scripts/api_requests/comment';
+import UserAPIReq from '@/assets/scripts/api_requests/user';
 import AccountIcon from '@/assets/icons/Account.vue';
 import CommentIcon from '@/assets/icons/Comment.vue';
+import CommentTextIcon from '@/assets/icons/CommentText.vue';
 import DotsHorizontalIcon from '@/assets/icons/DotsHorizontal.vue';
+import LoadingIcon from '@/assets/icons/Loading.vue';
+import DoughnutStatus from '@/assets/icons/animated/DoughnutStatus.vue';
 import ContextMenuLayout from '@/views/layout/ContextMenu.vue';
+import ItemsLoaderLayout from '@/views/layout/ItemsLoader.vue';
+import ModalLayout from '@/views/layout/Modal.vue';
 
 @Component({
   name: 'CommentComponent',
+  computed: {
+    creationTime() {
+      const months = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+      ];
+      const date = new Date(this.$props.comment.createdOn);
+      const month = months[date.getUTCMonth()];
+      const monthDay = date.getUTCDate().toString();
+      const [a, b] = [
+        monthDay[monthDay.length - 1],
+        monthDay[monthDay.length - 2],
+      ];
+      let ordinal = 'th';
+
+      if ((a === '1') && (b !== '1')) {
+        ordinal = 'st';
+      } else if ((a === '2') && (b !== '1')) {
+        ordinal = 'nd';
+      } else if ((a === '3') && (b !== '1')) {
+        ordinal = 'rd';
+      }
+      const commentLocation = `/comment/${this.$props.comment.id}`;
+      if (this.$route.path.startsWith(commentLocation)) {
+        return `Created on ${month} ${monthDay}${ordinal} ${date.getUTCFullYear()}`;
+      }
+      return `Replied on ${month} ${monthDay}${ordinal} ${date.getUTCFullYear()}`;
+    },
+    repliesText() {
+      if (this.$props.comment.repliesCount === 1) {
+        return 'See 1 Reply';
+      }
+      if (this.$props.comment.repliesCount > 1) {
+        return `See ${this.$props.comment.repliesCount} Replies`;
+      }
+      return '';
+    },
+    canSeeReplies() {
+      const location = `/comment/${this.$props.comment.id}`;
+      return this.$props.comment.repliesCount > 0 && !this.$route.path.startsWith(location);
+    },
+    canReply() {
+      return this.$props.comment.replyTo.length === 0;
+    },
+    canModifyComment() {
+      return this.$props.comment.user.id === this.$store.state.user.id;
+    },
+    canBackNav() {
+      const backNavLocation = this.$props.comment.replyTo
+        ? `/comment/${this.$props.comment.replyTo}`
+        : `/poem/${this.$props.comment.poemId}`;
+      return !this.$route.path.startsWith(backNavLocation);
+    },
+    backNav() {
+      return this.$props.comment.replyTo
+        ? `/comment/${this.$props.comment.replyTo}`
+        : `/poem/${this.$props.comment.poemId}`;
+    },
+    doughnutTitle() {
+      return `${this.$data.reply.length} / ${this.$data.replyLimit}`;
+    },
+  },
   components: {
     AccountIcon,
     CommentIcon,
+    CommentTextIcon,
     DotsHorizontalIcon,
+    LoadingIcon,
     ContextMenuLayout,
+    ItemsLoaderLayout,
+    ModalLayout,
+    DoughnutStatus,
   },
 })
 export default class CommentComponent extends Vue {
-  @Prop() commentId!: string;
+  @Prop() comment!: Comment;
 
-  @Prop() showReplies!: boolean;
-
-  comment!: Comment;
+  actionMenuPos: Position = {
+    type: 'absolute',
+    right: '0',
+    top: '0',
+  };
 
   isMenuOpen = false;
 
+  poemRepliesCount = this.comment.repliesCount;
+
+  reply = '';
+
+  replyLimit = 384;
+
+  imageSrc = '';
+
+  isReplyingToComment = false;
+
+  isReplyUploading = false;
+
+  isDeletingComment = false;
+
+  isDialogOpen = false;
+
+  dialogType = 0;
+
+  dialogTypes = {
+    None: 0,
+    Delete: 2,
+  };
+
+  hasHeader = true;
+
+  dialogTitle = '';
+
+  commentAPIReq = new CommentAPIReq(
+    this.$store.state.API_URL,
+    this.$store.state.user.authToken,
+  );
+
+  userAPIReq = new UserAPIReq(
+    this.$store.state.API_URL,
+    this.$store.state.user.authToken,
+  );
+
   openMenu(): void {
     this.isMenuOpen = true;
+  }
+
+  openDeleteDialog(): void {
+    this.closeMenu();
+    if (!this.isDeletingComment) {
+      this.dialogType = this.dialogTypes.Delete;
+      this.dialogTitle = 'Delete Comment';
+      this.isDialogOpen = true;
+    }
+  }
+
+  toggleReplyToComment(): void {
+    this.isReplyingToComment = !this.isReplyingToComment;
   }
 
   closeMenu(): void {
     this.isMenuOpen = false;
   }
 
-  created(): void {
-    const author : UserMin = {
-      id: '4566-332',
-      name: 'Marianna',
-      profilePhotoId: '',
-      isFollowing: false,
-    };
-    this.comment = {
-      id: 'e45',
-      user: author,
-      poemId: '',
-      text: 'This poem was awesome',
-      createdDate: new Date(),
-      repliesTo: '',
-      repliesCount: 2,
-    };
+  closeDialog(): void {
+    this.isDialogOpen = false;
+  }
+
+  loadProfilePhoto(): void {
+    this.userAPIReq.getProfilePhoto(this.comment.user.profilePhotoId)
+      .then((res) => {
+        if (res.success) {
+          if (res.data) {
+            this.imageSrc = `${res.data.url}?tr=w-38,h-38`;
+          }
+        }
+      });
+  }
+
+  replyToComment(): void {
+    const userId = this.$store.state.user.id;
+    const { poemId } = this.comment;
+    const commentId = this.comment.id;
+    this.isReplyUploading = true;
+    this.commentAPIReq.createComment(poemId, userId, this.reply, commentId)
+      .then((res) => {
+        if (res.success) {
+          this.reply = '';
+        }
+        this.isReplyUploading = false;
+      }).catch(() => {
+        this.isReplyUploading = false;
+      });
+  }
+
+  deleteComment(): void {
+    const userId = this.$store.state.user.id;
+    const commentId = this.comment.id;
+    this.isDeletingComment = true;
+    this.commentAPIReq.deleteComment(userId, commentId)
+      .then((res) => {
+        if (res.success) {
+          window.location.reload();
+        } else {
+          console.error(res.message);
+        }
+        this.isDeletingComment = false;
+      }).catch(() => {
+        this.isDeletingComment = false;
+      });
+  }
+
+  mounted(): void {
+    this.loadProfilePhoto();
   }
 }
 </script>
 
 <style lang="scss">
-.comment {
-  padding: 5px;
-  border-top: 1px solid gainsboro;
-  border-bottom: 1px solid gainsboro;
-
-  > .heading {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    justify-content: center;
-    column-gap: 5px;
-
-    > div:nth-child(1) {
-      > a {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        // width: 25px;
-        padding: 2px;
-        border: 2px solid greenyellow;
-        border-radius: 50%;
-
-        > svg {
-          width: 30px;
-          height: 30px;
-        }
-      }
-    }
-
-    > div:nth-child(2) {
-      > a {
-        text-decoration: none;
-        white-space: nowrap;
-        overflow: auto;
-        text-overflow: ellipsis;
-      }
-    }
-
-    > div:nth-child(3) {
-      position: relative;
-
-      > button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 5px;
-        background: none;
-        border-radius: 50%;
-        border: 1px solid transparent;
-        cursor: pointer;
-        transition-property: background;
-        transition-duration: 300ms;
-        transition-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1);
-
-        &:hover {
-          border-color: gainsboro;
-          background: rgb(172, 172, 172);
-        }
-      }
-    }
-  }
-
-  > .body {
-    margin: 0 40px;
-
-    > .main {
-      margin: 10px 0;
-    }
-
-    > .footer {
-      display: none;
-    }
-
-    > .footer.visible {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      padding: 5px 5px 0 5px;
-      justify-content: flex-start;
-      align-items: center;
-      border-top: 1px solid black;
-
-      // > div:nth-child(1) {
-      //   > button {
-      //     display: none;
-      //   }
-      // }
-
-      > div:nth-child(1) {
-        > button {
-          display: flex;
-          padding: 5px;
-          align-items: center;
-          justify-content: center;
-          background: none;
-          border: 1px solid transparent;
-          border-radius: 50%;
-          cursor: pointer;
-          outline: none;
-
-          &:hover {
-            border: 1px solid gainsboro;
-          }
-        }
-      }
-
-      > div:nth-child(2) {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        align-content: center;
-
-        > span {
-          padding: 0;
-          margin: 0;
-          background: none;
-          border: none;
-        }
-
-        > span:nth-child(1) {
-          cursor: pointer;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-      }
-    }
-  }
-}
+@use "@/assets/styles/components/comment";
 </style>

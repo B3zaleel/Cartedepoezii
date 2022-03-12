@@ -6,6 +6,7 @@
   justify-content: center;
   margin: 2px;
   border: 1px solid transparent;
+  background: none;
   text-decoration: none;
   cursor: pointer;
   outline: none;
@@ -18,11 +19,19 @@
     border-radius: 15px;
     background: globals.$primary-color;
     color: white;
+    fill: white;
     font-weight: 700;
 
     &:hover {
       opacity: 0.85;
       box-shadow: 0 0 2px 2px gainsboro;
+    }
+
+    &.danger:hover {
+      background: globals.$danger-color;
+      color: white;
+      fill: globals.$danger-color-light;
+      transition-duration: 700ms;
     }
   }
 
@@ -36,10 +45,24 @@
     }
   }
 
+  &.light {
+    border-color: globals.$primary-color;
+    background: white;
+    color: black;
+
+    &:hover {
+      background: globals.$primary-color-lightest;
+    }
+  }
+
   &.danger:hover {
     // background: globals.$danger-color;
     color: white;
     fill: globals.$danger-color-light;
     transition-duration: 700ms;
+  }
+
+  &.hidden {
+    display: none;
   }
 }

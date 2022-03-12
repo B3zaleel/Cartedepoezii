@@ -1,3 +1,4 @@
+@use "@/assets/styles/globals";
 
 .user-profile {
   > .profile-info {
@@ -5,26 +6,30 @@
     > div {
       padding: 15px;
       > .profile-photo-sect {
-        display: flex;
+        display: grid;
+        grid-auto-flow: column;
+        column-gap: 10px;
+        justify-content: flex-start;
         position: relative;
         align-items: center;
 
         > .image-view-btn{
           position: relative;
           display: flex;
+          box-sizing: content-box;
           align-items: center;
           justify-content: center;
-          width: calc(100px + 10px);
-          height: calc(100px + 10px);
-          margin-right: 10px;
-          border: 3px solid #00ff73;
+          padding: 1px;
+          width: 120px;
+          height: 120px;
+          border: 2px solid globals.$primary-color;
           border-radius: 50%;
           outline: none;
           cursor: pointer;
 
           img {
             position: absolute;
-            width: calc(100% - 2 * 10px);
+            border-radius: 50%;
             z-index: 5;
           }
 
@@ -33,24 +38,6 @@
             width: 80%;
             height: 80%;
             z-index: 1;
-          }
-        }
-
-        > .account-action-btn {
-          border: 2px solid gainsboro;
-          border-radius: 10px;
-          cursor: pointer;
-
-          &.edit {
-            background: ghostwhite;
-          }
-
-          &.follow {
-            background: #46d398;
-          }
-
-          &.unfollow {
-            background: #e03f0d;
           }
         }
       }
@@ -93,7 +80,7 @@
       }
 
       > .bio-sect{
-        padding: 10px;
+        padding: 5px 10px 0 10px;
       }
     }
   }

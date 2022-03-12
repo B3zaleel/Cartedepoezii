@@ -16,7 +16,7 @@
   },
   "servers": [
     {
-      "url": "localhost:5000/api/v1"
+      "url": "http://localhost:5000/api/v1"
     }
   ],
   "paths": {
@@ -350,9 +350,8 @@
         "tags": ["User"],
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
-                "type": "object",
                 "properties": {
                   "authToken": {
                     "type": "string",
@@ -370,8 +369,8 @@
                   },
                   "profilePhoto": {
                     "type": "string",
-                    "format": "binary",
-                    "description": "The user's profile photo."
+                    "format": "base64",
+                    "description": "The user's base64 encoded profile photo."
                   },
                   "removeProfilePhoto": {
                     "type": "boolean",
@@ -1210,7 +1209,9 @@
                       "type": "boolean"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/PoemMin"
+                      "items": {
+                        "$ref": "#/components/schemas/Poem"
+                      }
                     }
                   }
                 }
@@ -1396,25 +1397,24 @@
         }
       }
     },
-    "/comments": {
+    "/poems-explore": {
       "get": {
-        "summary": "Retrieve comments of a poem.",
-        "tags": ["Comment"],
+        "summary": "Retrieve poems to explore for a user.",
+        "tags": ["Poem"],
         "parameters": [
           {
-            "name": "id",
+            "name": "token",
             "in": "query",
-            "description": "The id of the poem.",
+            "description": "The authentication token of the current user.",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           },
           {
             "name": "span",
             "in": "query",
-            "description": "The maximum number of comments to fetch.",
+            "description": "The maximum number of poems to fetch.",
             "required": false,
             "schema": {
               "type": "integer",
@@ -1425,7 +1425,7 @@
           {
             "name": "after",
             "in": "query",
-            "description": "The id of the comment from which the returned comments should be taken after.",
+            "description": "The id of the poem from which the returned poems should be taken after.",
             "required": false,
             "schema": {
               "type": "string",
@@ -1435,8 +1435,57 @@
           {
             "name": "before",
             "in": "query",
-            "description": "The id of the comment from which the returned comments should be taken before.",
+            "description": "The id of the poem from which the returned poems should be taken before.",
             "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Poems for a user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/Poem"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comment": {
+      "get": {
+        "summary": "Retrieve a comment.",
+        "tags": ["Comment"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The id of the comment.",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1454,9 +1503,7 @@
                       "type": "boolean"
                     },
                     "data": {
-                      "items": {
-                        "$ref": "#/components/schemas/Comment"
-                      }
+                      "$ref": "#/components/schemas/Comment"
                     }
                   }
                 }
@@ -1505,7 +1552,9 @@
                   },
                   "text": {
                     "type": "string",
-                    "maxLength": 256,
+                    "maxLength": 400,
+                    "minLength": 1,
+                    "nullable": false,
                     "description": "The comment's content."
                   },
                   "replyTo": {
@@ -1647,6 +1696,86 @@
         }
       }
     },
+    "/comments-of-poem": {
+      "get": {
+        "summary": "Retrieve comments of a poem.",
+        "tags": ["Comment"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The id of the poem.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "span",
+            "in": "query",
+            "description": "The maximum number of comments to fetch.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "The id of the comment from which the returned comments should be taken after.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "The id of the comment from which the returned comments should be taken before.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments of the given poem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/Comment"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/comment-replies": {
       "get": {
         "summary": "Retrieve replies to a comment on a poem.",
@@ -1656,16 +1785,6 @@
             "name": "id",
             "in": "query",
             "description": "The id of the comment.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "poemId",
-            "in": "query",
-            "description": "The id of the poem.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1753,15 +1872,6 @@
             }
           },
           {
-            "name": "token",
-            "in": "query",
-            "description": "The current user's authentication token.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "span",
             "in": "query",
             "description": "The maximum number of comments to fetch.",
@@ -1804,15 +1914,8 @@
                       "type": "boolean"
                     },
                     "data": {
-                      "properties": {
-                        "user": {
-                          "$ref": "#/components/schemas/UserMin"
-                        },
-                        "comments": {
-                          "items": {
-                            "$ref": "#/components/schemas/CommentMin"
-                          }
-                        }
+                      "items": {
+                        "$ref": "#/components/schemas/Comment"
                       }
                     }
                   }
@@ -2105,7 +2208,9 @@
           "user",
           "createdOn",
           "text",
-          "poemId"
+          "poemId",
+          "replyTo",
+          "repliesCount"
         ],
         "properties": {
           "id": {
@@ -2138,43 +2243,6 @@
           }
         }
       },
-      "CommentMin": {
-        "type": "object",
-        "description": "Represents a comment on a poem (minified).",
-        "required": [
-          "id",
-          "user",
-          "createdOn",
-          "text",
-          "poemId"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdOn": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "text": {
-            "type": "string",
-            "maxLength": 256
-          },
-          "poemId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "replyTo": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "repliesCount": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
       "Poem": {
         "type": "object",
         "properties": {
@@ -2198,42 +2266,6 @@
             "items": {
               "type": "string",
               "maxLength": 1
-            },
-            "minItems": 1
-          },
-          "commentsCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "likesCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "isLiked": {
-            "type": "boolean"
-          }
-        }
-      },
-      "PoemMin": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "title": {
-            "type": "string",
-            "maxLength": 256
-          },
-          "publishedOn": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "verses": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "minLength": 1
             },
             "minItems": 1
           },

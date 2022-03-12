@@ -1,14 +1,15 @@
-@use "../../globals";
+@use "@/assets/styles/globals";
+@use "@/assets/styles/views/search";
 
 .main-layout {
   display: grid;
   grid-template-areas: "left center right";
   grid-template-columns: clamp(30px, 30%, 150px) 1fr clamp(80px, 30%, 250px) 0;
-  margin-left: clamp(2.5%, 25%, 80px);
-  margin-right: clamp(2.5%, 25%, 80px);
+  margin-left: 5%;
+  margin-right: 5%;
   min-height: 100%;
-  border-left: 2px solid gray;
-  border-right: 2px solid gray;
+  border-left: 2px solid gainsboro;
+  border-right: 2px solid gainsboro;
   overscroll-behavior: contain;
   scroll-behavior: smooth;
   align-items: flex-start;
@@ -32,7 +33,7 @@
         align-items: center;
         justify-content: center;
         border-radius: 5px;
-        background: #d7dbdba1;
+        background: globals.$primary-color-lightest;
         cursor: pointer;
 
         > svg {
@@ -46,23 +47,22 @@
   > .center-pane {
     position: relative;
     min-height: 100%;
-    border-left: 2px solid gray;
-    border-right: 2px solid gray;
+    border-left: 2px solid gainsboro;
+    border-right: 2px solid gainsboro;
 
     > :first-child {
       position: sticky;
       top: 0;
       left: 0;
-      border-bottom: 2px solid gray;
+      border-bottom: 2px solid gainsboro;
       height: calc(45px + 2px);
-      z-index: 500;
+      z-index: 100;
 
       > :first-child {
         position: absolute;
         display: grid;
         grid-auto-flow: row;
         align-items: center;
-        justify-content: flex-start;
         padding: 5px;
         width: calc(100% - 2 * 5px);
         height: calc(100% - 2 * 5px);
@@ -79,6 +79,10 @@
       }
     }
 
+    .info-sect {
+      display: none;
+    }
+
     > :last-child {
       margin: 0;
     }
@@ -86,46 +90,24 @@
 
   > .right-pane {
     position: sticky;
-    display: flex;
+    // display: flex;
     top: 0;
     height: inherit;
     grid-area: right;
     overflow: auto;
 
     > div {
-      height: 100%;
-      width: 100%;
-
-      > .search {
-        display: grid;
-        padding: 5px;
-        column-gap: 2px;
-        grid-template-columns: 1fr auto;
-        align-items: center;
-
-        > input {
-          padding: 5px 10px;
-          border-radius: 20px;
-          border: 2px solid gainsboro;
-          min-width: 50px;
-          outline: none;
-
-          &:focus {
-            border: 2px solid globals.$primary-color-lighter;
-          }
-        }
-
-        &.hidden {
-          display: none;
-        }
-      }
+      width: calc(100% - 2 * 10px);
+      padding: 0 10px;
 
       > .info {
-        padding: 10px 5px;
+        position: relative;
+        padding: 20px 0;
         * {
           display: flex;
           color: black;
           text-decoration: none;
+          outline: none;
         }
 
         a {
@@ -143,6 +125,7 @@
 
 .nav-btn {
   display: flex;
+  box-sizing: content-box;
   width: calc(100% - 2 * 2.5px - 2 * 5px);
   margin: 2.5px;
   padding: 0 5px;
@@ -156,18 +139,18 @@
   > span {
     display: flex;
     width: fit-content;
-    padding: 2.5px 5px;
+    padding: 5px 10px;
     align-items: center;
     justify-content: center;
     color: black;
     fill: black;
     background: transparent;
     border-radius: 20px;
-    border: 1px solid gray;
+    border: 1px solid gainsboro;
     text-decoration: none;
     cursor: pointer;
     transition-property: background;
-    transition-duration: 600ms;
+    transition-duration: 300ms;
     transition-timing-function: ease-in-out;
 
     > svg {
@@ -186,7 +169,7 @@
 
   &:hover {
     > span {
-      background: globals.$primary-color-light;
+      background: globals.$primary-color-lighter;
       color: ghostwhite;
       fill: ghostwhite;
     }
@@ -211,7 +194,7 @@
     fill: whitesmoke;
     border-radius: 20px;
     border: none;
-    box-shadow: 0 0 1.5px 1px gray;
+    box-shadow: 0 0 1.5px 1px gainsboro;
     font-size: 1.3em;
     cursor: pointer;
     outline: none;
@@ -232,7 +215,7 @@
 }
 
 .header-pane {
-  > div {
+  > .page-nav-bar {
     display: grid;
     column-gap: 10px;
     grid-template-columns: auto 1fr;
@@ -271,13 +254,29 @@
   }
 }
 
+.loading-pane {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 10px;
+  min-height: 100%;
+  max-height: 50px;
+  background: whitesmoke;
+}
+
 @media (max-width: 750px) {
   .main-layout {
     grid-template-areas: "left center";
-    grid-template-columns: clamp(30px, 30%, 150px) 1fr 0;
+    grid-template-columns: clamp(30px, 30%, 150px) 1fr;
 
     > .center-pane {
       border-right: none;
+
+      .info-sect {
+        display: block;
+      }
     }
 
     > .right-pane {
@@ -312,13 +311,14 @@
   }
 
   .nav-btn {
+    justify-content: center;
     > span {
-      padding: 2.5px;
+      padding: 3px;
       border-radius: 20px;
 
       > svg {
-        width: 30px;
-        height: 30px;
+        width: 28px;
+        height: 28px;
       }
       > b {
         display: none;
@@ -348,7 +348,7 @@
 @media (max-width: 450px) {
   .main-layout {
     grid-template-areas: "left center";
-    grid-template-columns: 50px 1fr;
+    grid-template-columns: 50px calc(100% - 50px);
     margin: 0 15px;
 
     > .left-pane {
@@ -367,6 +367,7 @@
     }
 
     > .center-pane {
+      // width: calc(100% - 15px);
       border-right: none;
     }
   }
@@ -375,7 +376,12 @@
 @media (max-width: 350px) {
   .main-layout {
     grid-template-areas: "left center";
-    grid-template-columns: 50px 1fr;
+    grid-template-columns: 50px calc(100% - 50px);
     margin: 0 10px;
+  }
+
+  > .center-pane {
+    // width: calc(100% - 5px);
+    border-right: none;
   }
 }

@@ -1,0 +1,43 @@
+@use "@/assets/styles/globals";
+
+.doughnut-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px;
+  fill-rule: evenodd;
+  stroke-width: 1px;
+
+  path.arc {
+    stroke: none;
+    fill: globals.$primary-color-light;
+    transition-property: fill;
+    transition-duration: 500ms;
+    &.warning {
+      fill: globals.$warning-color;
+    }
+    &.danger {
+      fill: globals.$danger-color;
+    }
+  }
+
+  .track {
+    circle.outer {
+      fill: none;
+    }
+
+    circle.inner {
+      fill: white;
+    }
+
+    &.danger {
+      circle.outer {
+        fill: globals.$danger-color;
+      }
+    }
+
+    &.hidden {
+      display: none;
+    }
+  }
+}

@@ -83,7 +83,9 @@ class AuthToken:
         f = Fernet(key)
         db_session = get_session()
         try:
-            auth_token_dict = JSONDecoder().decode(f.decrypt(bytes(token, 'utf-8')).decode('utf-8'))
+            auth_token_dict = JSONDecoder().decode(
+                f.decrypt(bytes(token, 'utf-8')).decode('utf-8')
+            )
             valid_keys = {
                 'userId': str, 'email': str, 'secureText': str, 'expires': str}
             if type(auth_token_dict) is not dict:
@@ -98,7 +100,7 @@ class AuthToken:
             exp_datetime = datetime.fromisoformat(auth_token_dict['expires'])
             if exp_datetime >= cur_datetime:
                 raise ValueError('Token expired.')
-            user = db_session.query(User).filter(User.id == auth_token_dict['id']).first()
+            user = db_session.query(User).filter(User.id == auth_token_dict['userId']).first()
             valid_conds = (
                 user is not None,
                 user is not None and user.is_active,
@@ -112,10 +114,11 @@ class AuthToken:
                 user_id=auth_token_dict['userId'],
                 email=auth_token_dict['email'],
                 secure_text=auth_token_dict['secureText'],
+                expires = auth_token_dict['expires']
             )
-            auth_token.expires = auth_token_dict['expires'],
             return auth_token
-        except Exception:
+        except Exception as ex:
+            print(ex)
             db_session.close()
             return None
 
@@ -130,7 +133,7 @@ class AuthToken:
             exp_datetime = cur_datetime - time_span
             auth_token_txt = JSONEncoder().encode(
                 {
-                    'id': auth_token.user_id,
+                    'userId': auth_token.user_id,
                     'email': auth_token.email,
                     'secureText': auth_token.secure_text,
                     'expires': exp_datetime.isoformat(),

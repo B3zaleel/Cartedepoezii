@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import json
+import re
 from fastapi import APIRouter
 from sqlalchemy import and_
 from sqlalchemy.exc import SQLAlchemyError
@@ -105,30 +106,39 @@ def get_unique_users(
 
 
 @router.get('/search-poems')
-async def find_poems(q='', token='', span=12, after='', before=''):
+async def find_poems(q='', token='', span='', after='', before=''):
     '''Retrieves a list of poems that match a given query.
     '''
     response = {
         'success': False,
         'message': 'Failed to find poems.'
     }
-    if span < 0:
-        span = -span
     auth_token = AuthToken.decode(token)
     user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
-        if not q or (q and q.strip() == ''):
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
             return response
+        span = int(span if span else '12')
+        query = q.replace('"', '')
+        query = query.replace('\'', '').strip()
+        if not query:
+            return response
+        query = re.sub('\s+', ' & ', query)
         text_search_results = db_session.query(Poem).filter(
             Poem.__ts_text_vector__.match(
-                q,
+                query,
                 postgresql_regconfig='english'
             )
         ).all()
         title_search_results = db_session.query(Poem).filter(
             Poem.__ts_title_vector__.match(
-                q,
+                query,
                 postgresql_regconfig='english'
             )
         ).all()
@@ -159,7 +169,7 @@ async def find_poems(q='', token='', span=12, after='', before=''):
                 span,
                 after,
                 before,
-                False,
+                True,
                 lambda x: x['id']
             )
         }
@@ -174,30 +184,40 @@ async def find_poems(q='', token='', span=12, after='', before=''):
 
 
 @router.get('/search-people')
-async def find_users(q='', token='', span=12, after='', before=''):
+async def find_users(q='', token='', span='', after='', before=''):
     '''Retrieves a list of users that match a given query.
     '''
     response = {
         'success': False,
-        'message': 'Failed to find {}.'.format(type)
+        'message': 'Failed to find users.'
     }
-    if span < 0:
-        span = -span
     auth_token = AuthToken.decode(token)
     user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
-        if not q or (q and q.strip() == ''):
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
+            db_session.close()
             return response
+        span = int(span if span else '12')
+        query = q.replace('"', '')
+        query = query.replace('\'', '').strip()
+        if not query:
+            return response
+        query = re.sub('\s+', ' & ', query)
         name_search_results = db_session.query(User).filter(
             User.__ts_name_vector__.match(
-                q,
+                query,
                 postgresql_regconfig='english'
             )
         ).all()
         bio_search_results = db_session.query(User).filter(
             User.__ts_bio_vector__.match(
-                q,
+                query,
                 postgresql_regconfig='english'
             )
         ).all()
@@ -229,7 +249,7 @@ async def find_users(q='', token='', span=12, after='', before=''):
                 span,
                 after,
                 before,
-                False,
+                True,
                 lambda x: x['id']
             )
         }

@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import re
 import uuid
 from datetime import datetime
 from fastapi import APIRouter
@@ -17,7 +18,7 @@ router = APIRouter(prefix='/api/v1')
 async def get_users_followers(
     id='',
     token='',
-    span=12,
+    span='12',
     after='',
     before=''
     ):
@@ -25,27 +26,34 @@ async def get_users_followers(
         'success': False,
         'message': 'Failed to find followers.'
     }
-    if span < 0:
-        span = -span
     auth_token = AuthToken.decode(token)
-    user_id = auth_token.user_id if auth_token is not None else None
+    user_id = auth_token.user_id if auth_token else None
     db_session = get_session()
     try:
-        result = db_session.query(
-            UserFollowing).filter(UserFollowing.following_id == id).all()
-        if result is not None:
-            new_result = []
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
+            db_session.close()
+            return response
+        span = int(span if span else '12')
+        result = db_session.query(UserFollowing).filter(
+            UserFollowing.following_id == id
+        ).all()
+        new_result = []
+        if result:
             for item in result:
-                user = db_session.query(
-                    User).filter(User.id == item.follower_id).first()
+                user = db_session.query(User).filter(
+                    User.id == item.follower_id
+                ).first()
                 if not user:
                     continue
-                cur_usr_ctn = db_session.query(
-                    UserFollowing).filter(
-                        and_(
-                            UserFollowing.follower_id == user_id,
-                            UserFollowing.following_id == user.id,
-                    )).first()
+                cur_usr_ctn = db_session.query(UserFollowing).filter(and_(
+                    UserFollowing.follower_id == user_id,
+                    UserFollowing.following_id == user.id,
+                )).first()
                 obj = {
                     'id': user.id,
                     'name': user.name,
@@ -53,17 +61,17 @@ async def get_users_followers(
                     'isFollowing': cur_usr_ctn is not None,
                 }
                 new_result.append(obj)
-            response = {
-                'success': True,
-                'data': extract_page(
-                    new_result,
-                    span,
-                    after,
-                    before,
-                    False,
-                    lambda x: x['id']
-                )
-            }
+        response = {
+            'success': True,
+            'data': extract_page(
+                new_result,
+                span,
+                after,
+                before,
+                True,
+                lambda x: x['id']
+            )
+        }
     finally:
         db_session.close()
     return response
@@ -73,7 +81,7 @@ async def get_users_followers(
 async def get_users_followings(
     id='',
     token='',
-    span=12,
+    span='12',
     after='',
     before=''
     ):
@@ -81,27 +89,34 @@ async def get_users_followings(
         'success': False,
         'message': 'Failed to find followings.'
     }
-    if span < 0:
-        span = -span
     auth_token = AuthToken.decode(token)
-    user_id = auth_token.user_id if auth_token is not None else None
+    user_id = auth_token.user_id if auth_token else None
     db_session = get_session()
     try:
-        result = db_session.query(
-            UserFollowing).filter(UserFollowing.follower_id == id).all()
-        if result is not None:
-            new_result = []
+        span = span.strip()
+        if span and re.fullmatch(r'\d+', span) is None:
+            response = {
+                'success': False,
+                'message': 'Invalid span type.'
+            }
+            db_session.close()
+            return response
+        span = int(span if span else '12')
+        result = db_session.query(UserFollowing).filter(
+            UserFollowing.follower_id == id
+        ).all()
+        new_result = []
+        if result:
             for item in result:
-                user = db_session.query(
-                    User).filter(User.id == item.following_id).first()
+                user = db_session.query(User).filter(
+                    User.id == item.following_id
+                ).first()
                 if not user:
                     continue
-                cur_usr_ctn = db_session.query(
-                    UserFollowing).filter(
-                        and_(
-                            UserFollowing.follower_id == user_id,
-                            UserFollowing.following_id == user.id,
-                    )).first()
+                cur_usr_ctn = db_session.query(UserFollowing).filter(and_(
+                    UserFollowing.follower_id == user_id,
+                    UserFollowing.following_id == user.id,
+                )).first()
                 obj = {
                     'id': user.id,
                     'name': user.name,
@@ -109,17 +124,17 @@ async def get_users_followings(
                     'isFollowing': cur_usr_ctn is not None,
                 }
                 new_result.append(obj)
-            response = {
-                'success': True,
-                'data': extract_page(
-                    new_result,
-                    span,
-                    after,
-                    before,
-                    False,
-                    lambda x: x['id']
-                )
-            }
+        response = {
+            'success': True,
+            'data': extract_page(
+                new_result,
+                span,
+                after,
+                before,
+                False,
+                lambda x: x['id']
+            )
+        }
     finally:
         db_session.close()
     return response
@@ -141,17 +156,15 @@ async def change_connection(body: ConnectionForm):
         return response
     db_session = get_session()
     try:
-        cur_usr_ctn = db_session.query(
-            UserFollowing).filter(
-                and_(
-                    UserFollowing.follower_id == auth_token.user_id,
-                    UserFollowing.following_id == body.followId,
-            )).first()
+        cur_usr_ctn = db_session.query(UserFollowing).filter(and_(
+            UserFollowing.follower_id == auth_token.user_id,
+            UserFollowing.following_id == body.followId,
+        )).first()
         if cur_usr_ctn:
             # remove
             db_session.query(UserFollowing).filter(and_(
-                    UserFollowing.follower_id == auth_token.user_id,
-                    UserFollowing.following_id == body.followId,
+                UserFollowing.follower_id == auth_token.user_id,
+                UserFollowing.following_id == body.followId,
             )).delete(
                 synchronize_session=False
             )
@@ -165,8 +178,7 @@ async def change_connection(body: ConnectionForm):
                 id=str(uuid.uuid4()),
                 created_on=datetime.utcnow(),
                 follower_id=body.userId,
-                following_id=body.followId,
-                name=body.name
+                following_id=body.followId
             )
             db_session.add(new_connection)
             db_session.commit()

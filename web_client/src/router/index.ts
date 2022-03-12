@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import VueRouter, { RouteConfig } from 'vue-router';
+import VueRouter, { Route, RouteConfig } from 'vue-router';
 
 Vue.use(VueRouter);
 
@@ -10,7 +10,6 @@ const routes: Array<RouteConfig> = [
     meta: {
       title: 'Home',
       requiresAuth: false,
-      authLevel: 'any',
     },
     component: () => import('../views/Home.vue'),
   },
@@ -21,7 +20,6 @@ const routes: Array<RouteConfig> = [
       title: 'Sign In',
       requiresAuth: false,
       disableOnSignedIn: true,
-      authLevel: 'any',
     },
     component: () => import('../views/auth/SignIn.vue'),
   },
@@ -41,6 +39,7 @@ const routes: Array<RouteConfig> = [
     meta: {
       title: 'Reset Password',
       requiresAuth: false,
+      disableOnSignedIn: true,
     },
     component: () => import('../views/auth/ResetPassword.vue'),
   },
@@ -72,6 +71,16 @@ const routes: Array<RouteConfig> = [
       requiresAuth: true,
     },
     component: () => import('../views/Poem.vue'),
+  },
+  {
+    path: '/comment/:id',
+    props: { id: String },
+    name: 'Comment',
+    meta: {
+      title: 'Comment',
+      requiresAuth: true,
+    },
+    component: () => import('../views/Comment.vue'),
   },
   {
     path: '/search/:q',
@@ -113,12 +122,38 @@ const routes: Array<RouteConfig> = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: 'about' */ '../views/info/About.vue'),
   },
+  {
+    path: '*',
+    name: 'Error404',
+    meta: {
+      title: 'Error 404',
+      requiresAuth: false,
+    },
+    component: () => import('../views/error/Error404.vue'),
+  },
 ];
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes,
+});
+
+router.beforeEach((to: Route, from: Route, next) => {
+  const isAuthenticated = window.localStorage.getItem('user.isAuthenticated') === 'true';
+  if (!isAuthenticated && to.meta?.requiresAuth) {
+    next('/sign-in');
+  } else if (isAuthenticated && to.meta?.disableOnSignedIn) {
+    next('/');
+  } else {
+    next();
+  }
+});
+
+router.afterEach((to) => {
+  document.title = to.meta?.title
+    ? `${to.meta.title} - Cartedepoezii`
+    : 'Cartedepoezii';
 });
 
 export default router;
