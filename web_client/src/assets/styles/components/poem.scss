@@ -1,3 +1,5 @@
+@use "@/assets/styles/globals";
+
 .poem {
   position: relative;
   display: flex;
@@ -8,32 +10,13 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  transition-property: background;
+  transition-duration: 300ms;
 
-  > .sect {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    min-height: 100%;
-    height: 100%;
-  }
-
-  > .sect:nth-child(2) {
-    flex-flow: column;
-    padding: 10px;
-
-    h4 {
-      margin: 5px;
-    }
-
-    > button {
-      padding: 2px 5px;
-    }
-  }
-
-  > .sect:nth-child(3) {
+  > div {
     flex-flow: column;
     width: 100%;
-    padding: 5px;
+    padding: 5px 5px 0 5px;
 
     > div {
       display: flex;
@@ -41,6 +24,7 @@
 
       &.header {
         display: grid;
+        padding: 5px;
         grid-template-columns: auto 1fr auto;
         align-items: center;
         justify-content: center;
@@ -52,52 +36,52 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2px;
-            border: 2px solid greenyellow;
+            box-sizing: content-box;
+            padding: 0.5px;
+            width: 38px;
+            height: 38px;
+            color: black;
+            font-weight: 600;
+            border: 1px solid globals.$primary-color-lighter;
             border-radius: 50%;
 
-            > svg {
-              width: 30px;
-              height: 30px;
+            img {
+              position: absolute;
+              border-radius: 50%;
+              z-index: 5;
+            }
+
+            svg {
+              position: absolute;
+              width: 80%;
+              height: 80%;
+              z-index: 1;
             }
           }
         }
 
         > div:nth-child(2) {
           > a {
+            color: black;
+            font-weight: 600;
             text-decoration: none;
             white-space: nowrap;
             overflow: auto;
             text-overflow: ellipsis;
+
+            &:hover {
+              color: globals.$primary-color-light;
+            }
           }
         }
 
         > div:nth-child(3) {
           position: relative;
-
-          > button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 5px;
-            background: none;
-            border-radius: 50%;
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition-property: background;
-            transition-duration: 300ms;
-            transition-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1);
-
-            &:hover {
-              border-color: gainsboro;
-              background: rgb(172, 172, 172);
-            }
-          }
         }
       }
 
       &.main {
-        margin: 0 40px;
+        padding: 0 40px;
         width: calc(100% - 2 * 40px);
         flex-flow: column;
 
@@ -112,15 +96,21 @@
           justify-content: center;
           height: max-content;
           min-height: 80px;
+          // width: calc(100% - 2 * 40px);
           margin: 0 0 5px 0;
+          padding: 10px max(40px, 25%);
           background: ghostwhite;
           border-radius: 10px;
           border: 1px solid gainsboro;
 
           > p {
-            margin: 10px max(40px, 25%);
-            min-height: 100%;
-            white-space: pre-line;
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+
+            &.hidden {
+              display: none;
+            }
           }
 
           > .nav-btn {
@@ -161,7 +151,7 @@
             display: flex;
             right: 5px;
             bottom: 5px;
-            padding: 2px;
+            padding: 2px 5px;
             font-size: 0.8em;
             background: gainsboro;
             border-radius: 2px;
@@ -174,41 +164,129 @@
         }
       }
 
+      &.creation-time {
+        width: calc(100% - 2 * 20px);
+        margin-bottom: 2.5px;
+        justify-content: flex-end;
+        font-size: x-small;
+        font-weight: 500;
+      }
+
       &.interactions {
         display: flex;
-        padding: 5px 5px 0 5px;
+        width: calc(100% - 2 * 40px);
+        margin: 0 40px;
         align-items: center;
         justify-content: center;
         border-top: 1px solid gainsboro;
 
-        > button {
+        > div.action-box {
           display: grid;
-          padding: 5px;
+          padding: 2px;
           margin: 0 5px;
+          column-gap: 5px;
           grid-template-columns: auto calc(4 * 0.8em);
           align-items: center;
           justify-content: center;
-          background: none;
-          border: 1px solid transparent;
-          border-radius: 5px;
-          cursor: pointer;
-          outline: none;
 
-          > span {
+          > button {
             display: flex;
-            height: 100%;
+            margin: 0;
+            padding: 2px;
             align-items: center;
             justify-content: center;
+            background: none;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            outline: none;
+
+            > span {
+              display: flex;
+              height: 20px;
+              width: 20px;
+              padding: 8px;
+              align-items: center;
+              justify-content: center;
+              border-radius: 50%;
+              transition-property: background;
+              transition-duration: 200ms;
+
+              > svg {
+                width: 20px;
+                height: 20px;
+              }
+            }
+
+            &:hover {
+              > span {
+                background: gainsboro;
+                // > svg.not-liked-icon {
+                //   fill: globals.$primary-color;
+                // }
+              }
+            }
           }
-          &:hover {
-            border: 1px solid gainsboro;
+          > .like-btn {
+            background: transparent;
+            &.liked {
+              > span {
+                > svg.liked-icon {
+                  display: inline;
+                  fill: globals.$primary-color;
+                }
+
+                > svg.not-liked-icon {
+                  display: none;
+                }
+              }
+            }
+
+            &:not(.liked) {
+              > span {
+                > svg.liked-icon {
+                  display: none;
+                }
+
+                > span > svg.not-liked-icon {
+                  display: inline;
+                }
+              }
+            }
+
+            &:hover {
+              > span {
+                background: globals.$primary-color-lightest;
+                > svg.not-liked-icon {
+                  fill: globals.$primary-color;
+                }
+              }
+            }
           }
+        }
+      }
+
+      &.new-comment {
+        flex-direction: column;
+        width: calc(100% - 2 * 40px - 2 * 10px);
+        margin: 0 40px;
+        padding: 5px 10px;
+        align-items: center;
+        justify-content: center;
+
+        > div {
+          display: flex;
+          width: 100%;
+          padding-top: 2.5px;
+          flex-direction: row;
+          align-items: center;
+          justify-content: flex-end;
         }
       }
     }
   }
 
-  > .sect.active {
-    display: flex;
+  &:hover {
+    background: ghostwhite;
   }
 }

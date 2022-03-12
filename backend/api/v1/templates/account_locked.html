@@ -1,0 +1,59 @@
+<div style="height: calc(100% - 2 * 10px); padding: 10px 10%; background: gainsboro;">
+    <div style="padding: 20px; background: white; border-radius: 5px;">
+        <div style="display: flex; align-items: center; justify-content: center;">
+            <a
+                style="padding: 10px; background: #b775e4; text-decoration: none; border-radius: 10px; box-shadow: 0 0 5px 5px #dcdcdcc4;"
+                target="_blank"
+                href="{{ web_client_domain }}"
+            >
+            <img src="https://raw.githubusercontent.com/B3zaleel/Cartedepoezii/main/backend/api/v1/static/Logo.png" width="80" height="70"/>
+            </a>
+        </div>
+        <p>
+            Hi {{ name }},
+            <br/>
+            <br/>
+            Your account's security may be compromised. Multiple failed attempts
+            were made to sign into your account.
+            Please visit the sign in page to request a password reset.
+            <a
+                style="display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 2px;
+                width: fit-content;
+                padding: 2px 10px;
+                border: 1px solid transparent;
+                background: #9b1fee;
+                color: white;
+                fill: white;
+                border-color: #9b1fee;
+                border-radius: 15px;
+                box-shadow: 0 0 2px 2px gainsboro;
+                font-weight: 700;
+                text-decoration: none;
+                cursor: pointer;
+                outline: none;"
+                target="_blank"
+                href="{{ web_client_domain }}/sign-in#reset"
+            >Sign In</a>
+        </p>
+    </div>
+
+    <div style="display: flex; align-items: center; text-align: center; justify-content: center; padding: 10px">
+        <a
+            style="margin: 0 5px; color: #9b1fee; text-decoration: none;"
+            target="_blank"
+            href="https://github.com/B3zaleel/Cartedepoezii/discussions/categories/q-a"
+        >
+            Help Center
+        </a>
+        <a
+            style="margin: 0 5px; color: #9b1fee; text-decoration: none;"
+            target="_blank"
+            href="{{ web_client_domain }}/privacy-policy"
+        >
+            Privacy Policy
+        </a>
+    </div>
+</div>

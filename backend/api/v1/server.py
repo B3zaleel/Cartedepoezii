@@ -15,10 +15,8 @@ app = FastAPI()
 inject_middlewares(app)
 inject_routers(app)
 
-
-@app.exception_handler(StarletteHTTPException)
-async def http_exception_handler(request, exc):
-    default_message = 'Request failed.'
+async def exception_handler(request, exc):
+    default_message = '[{}]: Request failed.'.format(exc.__class__.__name__)
     res = {
         'success': False,
         'message': str(exc) if exc else default_message
@@ -26,14 +24,9 @@ async def http_exception_handler(request, exc):
     return JSONResponse(res)
 
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request, exc):
-    default_message = 'Request failed.'
-    res = {
-        'success': False,
-        'message': str(exc) if exc else default_message
-    }
-    return JSONResponse(res)
+app.add_exception_handler(StarletteHTTPException, exception_handler)
+app.add_exception_handler(RequestValidationError, exception_handler)
+app.add_exception_handler(Exception, exception_handler)
 
 
 if __name__ == '__main__':

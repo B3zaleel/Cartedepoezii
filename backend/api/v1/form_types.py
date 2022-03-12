@@ -29,6 +29,17 @@ class UserDeleteForm(BaseModel):
     userId: str
 
 
+class UserUpdateForm(BaseModel):
+    authToken: str
+    userId: str
+    name: str
+    profilePhoto: Optional[str]
+    profilePhotoId: str
+    removeProfilePhoto: bool
+    email: str
+    bio: str
+
+
 class ConnectionForm(BaseModel):
     authToken: str
     userId: str
@@ -74,4 +85,3 @@ class CommentDeleteForm(BaseModel):
     authToken: str
     userId: str
     commentId: str
-    poemId: str

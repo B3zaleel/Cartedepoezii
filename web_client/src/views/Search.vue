@@ -6,8 +6,9 @@
           <input
             placeholder="Search Cartedepoezii"
             v-model="searchQuery"
+            @keydown.enter="search"
           />
-          <button class="cdp-btn icon">
+          <button @click="search">
             <MagnifyIcon/>
           </button>
         </div>
@@ -24,10 +25,18 @@
           >
             <div>
               <div class="" v-show="selectedId === 1">
-                No Poems found
+                <ItemsLoaderLayout
+                  :itemsName="'poems'"
+                  :itemsFetcher="poemsFetcher"
+                  :reverse="true"
+                />
               </div>
               <div class="" v-show="selectedId === 2">
-                No Users found
+                <ItemsLoaderLayout
+                  :itemsName="'users'"
+                  :itemsFetcher="peopleFetcher"
+                  :reverse="true"
+                />
               </div>
             </div>
           </TabsLayout>
@@ -39,9 +48,11 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { Poem as PoemT, UserMin } from '@/assets/scripts/type_defs';
+import { Page, Item } from '@/assets/scripts/types/interfaces';
+import SearchAPIReq from '@/assets/scripts/api_requests/search';
 import MainLayout from '@/views/layout/Main.vue';
 import TabsLayout from '@/views/layout/Tabs.vue';
+import ItemsLoaderLayout from '@/views/layout/ItemsLoader.vue';
 import Poem from '@/components/Poem.vue';
 import UserItem from '@/components/UserItem.vue';
 import MagnifyIcon from '@/assets/icons/Magnify.vue';
@@ -51,6 +62,7 @@ import MagnifyIcon from '@/assets/icons/Magnify.vue';
   components: {
     MainLayout,
     TabsLayout,
+    ItemsLoaderLayout,
     Poem,
     UserItem,
     MagnifyIcon,
@@ -72,11 +84,51 @@ export default class SearchView extends Vue {
 
   searchQuery = '';
 
+  searchQueryAPIReq: SearchAPIReq = new SearchAPIReq(
+    this.$store.state.API_URL,
+    this.$store.state.user.authToken,
+  );
+
   changeSelectedTab(tabId: number): void {
     this.selectedId = tabId;
   }
 
-  created(): void {
+  getQueryParams(tabId: number):string {
+    if (tabId === 1 || tabId === 2) {
+      return [
+        'q=',
+        this.searchQuery,
+        '&token=',
+        this.$store.state.user.authToken,
+      ].join('');
+    }
+    return '';
+  }
+
+  search(): void {
+    if (this.$route.params.q !== this.searchQuery) {
+      this.$router.push(`/search/${this.searchQuery}`);
+      window.location.reload();
+    }
+  }
+
+  poemsFetcher(page: Page): Promise<{
+      success: boolean,
+      data?: Array<Item>,
+      message?: string
+    }> {
+    return this.searchQueryAPIReq.findPoems(this.$route.params.q, page);
+  }
+
+  peopleFetcher(page: Page): Promise<{
+      success: boolean,
+      data?: Array<Item>,
+      message?: string
+    }> {
+    return this.searchQueryAPIReq.findPeople(this.$route.params.q, page);
+  }
+
+  mounted(): void {
     this.searchQuery = this.$route.params.q;
   }
 }

@@ -1,19 +1,26 @@
 <template>
   <div class="user-item">
     <div>
-      <router-link to="/f">
-        <img/>
-        <AccountIcon/>
-      </router-link>
+      <a :href="`/profile/${user.id}`">
+        <img :src="imageSrc" v-show="imageSrc.length > 0"/>
+        <AccountIcon v-show="imageSrc.length === 0"/>
+      </a>
     </div>
     <div>
-      <router-link to="/f">
+      <a :href="`/profile/${user.id}`">
         {{ user.name }}
-      </router-link>
+      </a>
     </div>
     <div>
       <button
-        :class="{danger: actionText === 'Unfollow'}"
+        :class="{
+          'cdp-btn': true,
+          'text': true,
+          danger: actionText === 'Unfollow',
+          light: actionText === 'Follow',
+          hidden: hideAction
+        }"
+        @click="toggleConnection"
         @mouseenter="onMouseEnterAction"
         @mouseleave="onMouseLeaveAction"
       >
@@ -25,7 +32,9 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { UserMin } from '@/assets/scripts/type_defs';
+import UserMin from '@/assets/scripts/types/user_min';
+import ConnectionAPIReq from '@/assets/scripts/api_requests/connection';
+import UserAPIReq from '@/assets/scripts/api_requests/user';
 import AccountIcon from '@/assets/icons/Account.vue';
 
 @Component({
@@ -39,95 +48,71 @@ export default class UserItemComponent extends Vue {
 
   actionText = '';
 
+  imageSrc = '';
+
   hideAction = false;
+
+  isFollowing = this.user.isFollowing;
+
+  connection!: ConnectionAPIReq;
+
+  userAPIReq!: UserAPIReq;
+
+  loadProfilePhoto(): void {
+    this.userAPIReq.getProfilePhoto(this.user.profilePhotoId)
+      .then((res) => {
+        if (res.success) {
+          if (res.data) {
+            this.imageSrc = `${res.data.url}?tr=w-38,h-38`;
+          }
+        }
+      });
+  }
+
+  toggleConnection(): void {
+    const userId = this.$store.state.user.id;
+    const followId = this.user.id;
+    this.connection.follow(userId, followId)
+      .then((res) => {
+        if (res.success) {
+          if (res.data) {
+            this.isFollowing = res.data.status;
+            this.onMouseEnterAction();
+          }
+        } else if (res.message) {
+          console.error(res.message);
+        }
+      });
+  }
 
   onMouseEnterAction(): void {
     if (!this.hideAction) {
-      this.actionText = this.user.isFollowing ? 'Unfollow' : 'Follow';
+      this.actionText = this.isFollowing ? 'Unfollow' : 'Follow';
     }
   }
 
   onMouseLeaveAction(): void {
     if (!this.hideAction) {
-      this.actionText = this.user.isFollowing ? 'Following' : 'Follow';
+      this.actionText = this.isFollowing ? 'Following' : 'Follow';
     }
   }
 
-  created(): void {
+  mounted(): void {
     this.hideAction = this.user.id === this.$store.state.user.id;
     this.onMouseLeaveAction();
+    this.connection = new ConnectionAPIReq(
+      this.$store.state.API_URL,
+      this.$store.state.user.authToken,
+    );
+    this.userAPIReq = new UserAPIReq(
+      this.$store.state.API_URL,
+      this.$store.state.user.authToken,
+    );
+    this.loadProfilePhoto();
   }
 }
 </script>
 
 <style lang="scss">
-.user-item {
-  display: grid;
-  padding: 5px;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  justify-content: center;
-  column-gap: 5px;
-  border-bottom: 2px solid gainsboro;
-
-  &:first-child{
-    border-top: none;
-  }
-
-  &:last-child{
-    border-bottom: none;
-  }
-
-  > div:nth-child(1) {
-    > a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      // width: 25px;
-      padding: 2px;
-      border: 2px solid greenyellow;
-      border-radius: 50%;
-
-      > svg {
-        width: 30px;
-        height: 30px;
-      }
-    }
-  }
-
-  > div:nth-child(2) {
-    > a {
-      text-decoration: none;
-      white-space: nowrap;
-      overflow: auto;
-      text-overflow: ellipsis;
-    }
-  }
-
-  > div:nth-child(3) {
-    position: relative;
-
-    > button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 5px;
-      background: none;
-      border-radius: 15px;
-      border: 1px solid gainsboro;
-      cursor: pointer;
-      transition-property: background;
-      transition-duration: 300ms;
-      transition-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1);
-
-      &:hover {
-        background: rgb(204, 204, 204);
-      }
-
-      &.danger {
-        background: #eb5757;
-      }
-    }
-  }
-}
+@use "@/assets/styles/components/user_item";
 </style>

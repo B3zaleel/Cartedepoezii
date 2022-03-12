@@ -1,10 +1,10 @@
 # Cartedepoezii
 
-A social platform for poem writers and readers.
+Cartedepoezii is a social platform for poem writers and readers.
 
 ## Architecture
 
-![](planning/2-Architecture.svg)
+![Cartedepoezii architecture](.github/assets/ProjectArchitecture.svg)
 
 ## Discussion
 

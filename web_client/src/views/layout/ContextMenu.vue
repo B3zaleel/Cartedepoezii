@@ -1,6 +1,7 @@
 <template>
   <div
     :class="{menu: true, visible: isMenuOpen,}"
+    :style="positionStyle"
     @mousedown="mouseDownEvent"
   >
     <slot></slot>
@@ -9,9 +10,22 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Position } from '@/assets/scripts/types/interfaces';
 
 @Component({
   name: 'ContextMenuLayout',
+  computed: {
+    positionStyle() {
+      const style = {
+        position: this.$props.position.type,
+        left: this.$props.position.left || 'auto',
+        top: this.$props.position.top || 'auto',
+        right: this.$props.position.right || 'auto',
+        bottom: this.$props.position.bottom || 'auto',
+      };
+      return style;
+    },
+  },
   methods: {
     mouseDownEvent(ev) {
       ev.preventDefault();
@@ -20,6 +34,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
   },
 }) export default class ContextMenuLayout extends Vue {
   @Prop() isMenuOpen!: boolean;
+
+  @Prop() position?: Position;
 
   created(): void {
     window.addEventListener('mousedown', () => {
@@ -30,40 +46,5 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 </script>
 
 <style lang="scss">
-.menu.visible {
-  display: block;
-}
-
-.menu {
-  position: absolute;
-  display: none;
-  right: 0;
-  top: 0;
-  padding: 5px 0;
-  border-radius: 4px;
-  border: 1px solid gray;
-  background: ghostwhite;
-  z-index: 5;
-  box-shadow: 0 0 2px 1.5px #a3a3a3dc;
-
-  > div {
-    display: flex;
-    flex-flow: column;
-
-    .menu-item {
-      padding: 5px;
-      background: none;
-      border: none;
-      cursor: pointer;
-
-      &:not(:first-child) {
-        border-top: 1px solid gainsboro;
-      }
-
-      &:hover {
-        background: gainsboro;
-      }
-    }
-  }
-}
+@use "@/assets/styles/views/layout/context_menu";
 </style>
