@@ -1,0 +1,193 @@
+@use "@/assets/styles/globals";
+
+*::-webkit-scrollbar {
+  width: 8px;
+  background: gainsboro;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: slategray;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: darkslategray;
+}
+
+.content-container > main {
+  display: block;
+  min-height: calc(100% - 54px);
+  padding-top: 54px;
+
+  .header {
+    position: fixed;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    width: calc(100% - 2 * 10px);
+    top: 0;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 5px 5px globals.$shadow-color;
+    backdrop-filter: blur(1px);
+    cursor: context-menu;
+
+    > nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .nav-link {
+        display: flex;
+        box-sizing: content-box;
+        margin: 0 5px;
+        padding: 5px 15px;
+        align-items: center;
+        justify-content: center;
+        font-weight: 550;
+        font-size: 1em;
+        color: black;
+        background: none;
+        border: none;
+        border-radius: 20px;
+        text-decoration: none;
+        outline: none;
+        cursor: pointer;
+        transition-property: background, fill, color;
+        transition-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1), ease-in, ease-in;
+        transition-duration: 500ms, 300ms, 300ms;
+        transition-delay: 0ms, 100ms, 100ms;
+
+        &:hover, &:focus {
+          color: white;
+          fill: white;
+          background: globals.$primary-color;
+          box-shadow: 0 0 2px 2px globals.$shadow-color;
+        }
+      }
+
+      .nav-launch-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+        background: none;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        outline: none;
+        transition-property: fill;
+        transition-duration: 300ms;
+
+        &:hover, &:focus {
+          fill: white;
+          fill: globals.$primary-color;
+        }
+      }
+    }
+  }
+
+  > article.app-about {
+    // min-height: calc(100% - 54px);
+
+    .sect {
+      display: grid;
+      padding: 20px 5%;
+      grid-template-columns: 50% 50%;
+
+      > div {
+        display: flex;
+        justify-content: center;
+      }
+
+      &.feature {
+        > div {
+          justify-content: flex-start;
+        }
+      }
+
+      &.dark-bg {
+        color: white;
+        background: globals.$primary-color;
+      }
+    }
+
+    .mini-sect {
+      display: flex;
+      padding: 15px 5%;
+      justify-content: center;
+      background: lavender;
+
+      > h3 {
+        margin-right: 15px;
+      }
+    }
+
+    .contributor-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      border-radius: 15px;
+      color: black;
+      background: ghostwhite;
+      box-shadow: 0 0 2px 2px globals.$shadow-color;
+      cursor: pointer;
+      user-select: none;
+
+      > img {
+        aspect-ratio: 1/1;
+        width: clamp(50px, 50%, 120px);
+        border-radius: 50%;
+      }
+
+      > .socials {
+        a {
+          margin: 0 5px;
+          text-decoration: none;
+          outline: none;
+          fill: black;
+          transition-property: fill;
+          transition-duration: 200ms;
+
+          > svg {
+            width: 30px;
+            height: 30px;
+          }
+
+          &:hover, &:focus {
+            fill: globals.$primary-color;
+          }
+        }
+      }
+    }
+
+    .footer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      padding: 30px 5%;
+      background: lighten(gainsboro, 10%);
+
+      > div {
+        display: flex;
+      }
+
+      a {
+        display: flex;
+        align-items: center;
+        margin: 0 5px;
+        color: darkslategrey;
+        fill: darkslategrey;
+        font-weight: 450;
+        text-decoration: none;
+        outline: none;
+        transition-property: fill, color;
+        transition-duration: 200ms, 200ms;
+
+        &:hover {
+          color: black;
+          fill: black;
+        }
+      }
+    }
+  }
+}
