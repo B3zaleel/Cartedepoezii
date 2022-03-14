@@ -19,6 +19,7 @@ The required environment variables should be stored in a file named `.env.local`
 | DB_HOST | The host of the database server. |
 | DB_PORT | The database port SQLAlchemy connects to. |
 | DB_NAME | The name of the database. |
+| DB_URL | The URL of the database (for production). |
 | APP_ENV | The application's environment (dev/test) |
 | APP_MAX_SIGNIN_TRIES | The maximum number of sign in attempts a user can make in succession. |
 | IMG_CDN_PUB_KEY | Imagekit.io public key. |
