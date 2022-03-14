@@ -53,7 +53,6 @@ export default class DoughnutStatusIcon extends Vue {
       inner: this.width / 2 - this.thickness,
       outer: this.width / 2,
     };
-    console.info(this.value);
     const angle = Math.floor(this.value * 360);
     const largeFlag = angle >= 180 ? 1 : 0;
     const center = {
