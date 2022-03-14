@@ -50,7 +50,7 @@
             :key="i"
           >
             <div>
-              <img :src="feature.imgSrc ? require(feature.imgSrc) : ''"/>
+              <img :src="feature.imgSrc"/>
             </div>
 
             <div>
@@ -164,7 +164,7 @@ export default class AboutView extends Vue {
     {
       title: 'Join the conversation',
       description: '',
-      imgSrc: '../../assets/images/info_about/Cartedepoezii_Feature_1.webp',
+      imgSrc: 'https://ik.imagekit.io/B3zaleel/cartedepoezii/info_about/Cartedepoezii_Feature_1_Ca9VLIwSy.webp?ik-sdk-version=javascript-1.4.3&updatedAt=1647283283281',
     },
     {
       title: 'Join the conversation',
