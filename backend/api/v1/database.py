@@ -14,14 +14,18 @@ from models.user_following import UserFollowing
 def get_engine():
     '''Gets the database engine.
     '''
-    SQLALCHEMY_DATABASE_URL = '{}://{}:{}@{}:{}/{}'.format(
-        os.getenv('DB_DIALECT_DRIVER'),
-        os.getenv('DB_USER'),
-        os.getenv('DB_PWORD'),
-        os.getenv('DB_HOST'),
-        os.getenv('DB_PORT'),
-        os.getenv('DB_NAME')
-    )
+    SQLALCHEMY_DATABASE_URL = ''
+    if os.getenv('APP_ENV') == 'prod':
+        SQLALCHEMY_DATABASE_URL = os.getenv('DB_URL')
+    else:
+        SQLALCHEMY_DATABASE_URL = '{}://{}:{}@{}:{}/{}'.format(
+            os.getenv('DB_DIALECT_DRIVER'),
+            os.getenv('DB_USER'),
+            os.getenv('DB_PWORD'),
+            os.getenv('DB_HOST'),
+            os.getenv('DB_PORT'),
+            os.getenv('DB_NAME')
+        )
     engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
     return engine
 
