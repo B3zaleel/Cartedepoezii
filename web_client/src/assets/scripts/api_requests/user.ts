@@ -58,6 +58,13 @@ export default class User {
     const result = new Promise<{
       success: boolean, data?: {url: string}, message?: string
     }>((resolve, reject) => {
+      if (!imgId) {
+        resolve({
+          success: true,
+          data: { url: '' },
+        });
+        return;
+      }
       fetch(path, {
         method: 'GET',
         mode: 'cors',
