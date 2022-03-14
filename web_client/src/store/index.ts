@@ -5,7 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    API_URL: 'http://localhost:5000/api/v1',
+    API_URL: 'https://cartedepoezii-api.onrender.com/api/v1',
     user: {
       isAuthenticated: window.localStorage.getItem('user.isAuthenticated') === 'true',
       authToken: window.localStorage.getItem('user.authToken') || '',
