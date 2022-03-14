@@ -60,7 +60,6 @@ export default class ExploreView extends Vue {
   search(): void {
     if (this.$route.params.q !== this.searchQuery) {
       this.$router.push(`/search/${this.searchQuery}`);
-      window.location.reload();
     }
   }
 
