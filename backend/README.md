@@ -13,14 +13,7 @@ The required environment variables should be stored in a file named `.env.local`
 
 | Name | Description |
 |:-|:-|
-| DB_DIALECT_DRIVER | The driver for connecting to the database. |
-| DB_USER | The user with read and write access to the database. |
-| DB_PWORD | The password of the user with read and write access to the database. |
-| DB_HOST | The host of the database server. |
-| DB_PORT | The database port SQLAlchemy connects to. |
-| DB_NAME | The name of the database. |
-| DB_URL | The URL of the database (for production). |
-| APP_ENV | The application's environment (dev/test) |
+| DB_URL | The URL of the postgreSQL database to connect to. |
 | APP_MAX_SIGNIN_TRIES | The maximum number of sign in attempts a user can make in succession. |
 | IMG_CDN_PUB_KEY | Imagekit.io public key. |
 | IMG_CDN_PRI_KEY | Imagekit.io private key. |
