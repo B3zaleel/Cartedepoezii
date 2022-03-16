@@ -72,7 +72,7 @@
               <CommentTextIcon v-show="!isCommentingOnPoem"/>
             </span>
           </button>
-          <b>{{ MathUtils.formatNumber(poem.commentsCount, true) }}</b>
+          <b>{{ MathUtils.formatNumber(poemCommentsCount, true) }}</b>
         </div>
         <div class="action-box">
           <button @click="reactToPoem" :class="{'like-btn': true, liked: isPoemLiked}">
@@ -429,6 +429,7 @@ export default class PoemComponent extends Vue {
       .then((res) => {
         if (res.success) {
           this.comment = '';
+          this.poemCommentsCount += 1;
         }
         this.isCommentUploading = false;
       }).catch(() => {
