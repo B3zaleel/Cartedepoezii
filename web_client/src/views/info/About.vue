@@ -95,7 +95,7 @@
                 href="https://github.com/B3zaleel/Cartedepoezii"
               >
                 <GitHubIcon/>
-                <b>Join the team</b>
+                <b>See the project</b>
               </a>
             </p>
           </div>
@@ -209,7 +209,7 @@ export default class AboutView extends Vue {
     'Just as much as I like reading poems, I also enjoy poetizing',
     'during my free time.',
     'As such, I decided to create a platform where people could share',
-    'one of the most beautiful pieces of literature (poems), which led',
+    'one of the most beautiful literary genres (poetry), which led',
     'to the birth of Cartedepoezii.',
   ].join(' ');
 
