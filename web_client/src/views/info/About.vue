@@ -124,6 +124,12 @@
           </div>
         </div>
 
+        <div class="mini-sect">
+          <div>
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/zOy8zRR0Ac0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+
         <div class="footer">
           <div>
             <a href="/terms-of-service">Terms</a>
@@ -198,7 +204,7 @@ export default class AboutView extends Vue {
     'Cartedepoezii was inspired by my love for poems and how',
     'poems are able to contain a condensed group of words that',
     'touch the soul.',
-    'The name Cartedepoezii is of Norwegian origin and translates',
+    'The name Cartedepoezii is of Romanian origin and translates',
     'to “poem book”.',
     'Just as much as I like reading poems, I also enjoy poetizing',
     'during my free time.',
