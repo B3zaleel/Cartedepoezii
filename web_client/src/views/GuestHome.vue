@@ -15,7 +15,6 @@
 
         <div>
           <div>
-            <h1>It's poetic</h1>
             <h2>Join Cartedepoezii today.</h2>
             <router-link class="cdp-btn text" to="/sign-up">Sign up with email</router-link>
             <div>
