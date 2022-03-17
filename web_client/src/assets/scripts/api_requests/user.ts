@@ -60,8 +60,8 @@ export default class User {
     }>((resolve, reject) => {
       if (!imgId) {
         resolve({
-          success: true,
-          data: { url: '' },
+          success: false,
+          message: 'Profile photo not uploaded.',
         });
         return;
       }

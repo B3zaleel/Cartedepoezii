@@ -332,6 +332,7 @@ export default class ProfileView extends Vue {
   toggleConnection(): void {
     const userId = this.$store.state.user.id;
     const followId = this.$route.params.id;
+    this.isFollowingUser = !this.isFollowingUser;
     this.connectionAPIReq.follow(userId, followId)
       .then((res) => {
         if (res.success) {

@@ -9,53 +9,63 @@
         </div>
 
         <nav>
-          <a class="nav-link" href="#features-section">
+          <a
+            class="nav-link"
+            href="#features-section"
+            @click="ev => scrollToSect(ev, 'features-section')"
+          >
             <span>Features</span>
           </a>
-          <a class="nav-link" href="#about-section">
+          <a
+            class="nav-link"
+            href="#about-section"
+            @click="ev => scrollToSect(ev, 'about-section')"
+          >
             <span>About</span>
           </a>
           <button class="nav-link" @click="visitSite">
             <LaunchIcon/>
             <span>Visit Site</span>
           </button>
-
-          <button class="nav-launch-btn">
-            <DotsHexagonIcon/>
-          </button>
         </nav>
       </div>
 
       <article class='app-about'>
-        <div>
-          <div>
-            <img/>
+        <div class="intro">
+          <div class="preview">
+            <img src="https://ik.imagekit.io/B3zaleel/cartedepoezii/info_about/Intro_YCGH1-rJY.png?tr=pr-true&ik-sdk-version=javascript-1.4.3&updatedAt=1647504057127"/>
           </div>
 
-          <div>
-            <Logo/>
-            <h3>
-              Cartedepoezii
-            </h3>
-            <span>
-              Create and find the poems you love
-            </span>
+          <div class="info">
+            <div>
+              <span class="logo">
+                <Logo/>
+              </span>
+              <h3 class="project-name">
+                {{ name }}
+              </h3>
+              <span class="project-description">
+                {{ description }}
+              </span>
+            </div>
           </div>
         </div>
 
         <div id="features-section">
           <div
-            class="sect feature"
+            :class="{sect:true, feature: true, alt: (i + 1) % 2 === 0}"
             v-for="feature, i in features"
             :key="i"
           >
-            <div>
+            <div class="preview">
               <img :src="feature.imgSrc"/>
             </div>
 
-            <div>
-              <b class="title">{{ feature.title }}</b>
-              <p class="descr">{{ feature.description }}</p>
+            <div class="summary">
+              <div>
+                <b class="title">{{ feature.title }}</b>
+                <p class="description">{{ feature.description }}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -73,10 +83,20 @@
           </a>
         </div>
 
-        <div id="about-section" class="sect dark-bg">
+        <div id="about-section" class="sect about dark-bg">
           <div>
             <p>
-              foo
+              {{ about }}
+              <br/>
+              <br/>
+              <a
+                class="cdp-btn text light"
+                target="_blank"
+                href="https://github.com/B3zaleel/Cartedepoezii"
+              >
+                <GitHubIcon/>
+                <b>See the project</b>
+              </a>
             </p>
           </div>
 
@@ -101,6 +121,12 @@
                 </a>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="mini-sect">
+          <div>
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/zOy8zRR0Ac0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
           </div>
         </div>
 
@@ -129,7 +155,6 @@
 import { Component, Vue } from 'vue-property-decorator';
 import Logo from '@/assets/icons/Logo.vue';
 import LaunchIcon from '@/assets/icons/Launch.vue';
-import DotsHexagonIcon from '@/assets/icons/DotsHexagon.vue';
 import GitHubIcon from '@/assets/icons/social/GitHub.vue';
 import TwitterIcon from '@/assets/icons/social/Twitter.vue';
 import LinkedInIcon from '@/assets/icons/social/LinkedIn.vue';
@@ -138,6 +163,25 @@ import HelpCircleIcon from '@/assets/icons/HelpCircle.vue';
 @Component({
   name: 'AboutView',
   methods: {
+    scrollToSect(ev, sectId) {
+      const el = document.getElementById(sectId);
+      if (el) {
+        const mainElement = el.parentElement?.parentElement;
+        let headerHeight = 54;
+        if (mainElement) {
+          const header = mainElement.getElementsByClassName('header').item(0);
+          if (header) {
+            headerHeight = header.clientHeight;
+          }
+        }
+        window.scrollTo({
+          top: el.offsetTop - headerHeight,
+          behavior: 'smooth',
+        });
+      }
+      ev.preventDefault();
+      ev.stopPropagation();
+    },
     visitSite() {
       window.open('/', '_blank');
     },
@@ -145,7 +189,6 @@ import HelpCircleIcon from '@/assets/icons/HelpCircle.vue';
   components: {
     Logo,
     LaunchIcon,
-    DotsHexagonIcon,
     GitHubIcon,
     TwitterIcon,
     LinkedInIcon,
@@ -153,23 +196,38 @@ import HelpCircleIcon from '@/assets/icons/HelpCircle.vue';
   },
 })
 export default class AboutView extends Vue {
-  userId! : string
+  name = 'Cartedepoezii';
+
+  description = 'Create and find poems you love.';
+
+  about = [
+    'Cartedepoezii was inspired by my love for poems and how',
+    'poems are able to contain a condensed group of words that',
+    'touch the soul.',
+    'The name Cartedepoezii is of Romanian origin and translates',
+    'to “poem book”.',
+    'Just as much as I like reading poems, I also enjoy poetizing',
+    'during my free time.',
+    'As such, I decided to create a platform where people could share',
+    'one of the most beautiful literary genres (poetry), which led',
+    'to the birth of Cartedepoezii.',
+  ].join(' ');
 
   features = [
     {
-      title: 'Post poems',
-      description: '',
-      imgSrc: '',
+      title: 'Create poems.',
+      description: 'Share your words of love, wisdom or humour with the world.',
+      imgSrc: 'https://ik.imagekit.io/B3zaleel/cartedepoezii/info_about/Cartedepoezii_Feature_0_uc2Xrtwdz.webp?tr=pr-true&ik-sdk-version=javascript-1.4.3&updatedAt=1647449192804',
     },
     {
-      title: 'Join the conversation',
-      description: '',
-      imgSrc: 'https://ik.imagekit.io/B3zaleel/cartedepoezii/info_about/Cartedepoezii_Feature_1_Ca9VLIwSy.webp?ik-sdk-version=javascript-1.4.3&updatedAt=1647283283281',
+      title: 'React to poems.',
+      description: 'Like and comment on poems that move you.',
+      imgSrc: 'https://ik.imagekit.io/B3zaleel/cartedepoezii/info_about/Cartedepoezii_Feature_1_SjcJS0MnX.webp?tr=pr-true&ik-sdk-version=javascript-1.4.3&updatedAt=1647449128529',
     },
     {
-      title: 'Join the conversation',
-      description: '',
-      imgSrc: '',
+      title: 'Connect with poets.',
+      description: 'Follow poets you like and get their poems on your timeline.',
+      imgSrc: 'https://ik.imagekit.io/B3zaleel/cartedepoezii/info_about/Cartedepoezii_Feature_2_8w0mjcycr.webp?tr=pr-true&ik-sdk-version=javascript-1.4.3&updatedAt=1647449162208',
     },
   ];
 
@@ -193,10 +251,6 @@ export default class AboutView extends Vue {
       ],
     },
   ];
-
-  created(): void {
-    this.userId = this.$route.params.id;
-  }
 }
 </script>
 

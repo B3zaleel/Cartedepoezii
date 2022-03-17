@@ -1,19 +1,5 @@
 @use "@/assets/styles/globals";
 
-*::-webkit-scrollbar {
-  width: 8px;
-  background: gainsboro;
-}
-
-*::-webkit-scrollbar-thumb {
-  background: slategray;
-  border-radius: 4px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background: darkslategray;
-}
-
 .content-container > main {
   display: block;
   min-height: calc(100% - 54px);
@@ -26,6 +12,7 @@
     width: calc(100% - 2 * 10px);
     top: 0;
     padding: 10px;
+    z-index: 500;
     background: rgba(255, 255, 255, 0.8);
     box-shadow: 0 0 5px 5px globals.$shadow-color;
     backdrop-filter: blur(1px);
@@ -39,7 +26,7 @@
       .nav-link {
         display: flex;
         box-sizing: content-box;
-        margin: 0 5px;
+        margin: 0 2px;
         padding: 5px 15px;
         align-items: center;
         justify-content: center;
@@ -49,6 +36,7 @@
         background: none;
         border: none;
         border-radius: 20px;
+        white-space: pre;
         text-decoration: none;
         outline: none;
         cursor: pointer;
@@ -87,12 +75,80 @@
   }
 
   > article.app-about {
-    // min-height: calc(100% - 54px);
+    > .intro {
+      position: relative;
+      display: grid;
+      grid-template-rows: 100% 100%;
+      height: fit-content;
+      max-height: 640px;
+      background: lavender;
+
+      > div {
+        &.preview {
+          display: flex;
+          height: 100%;
+          width: 100%;
+          align-items: flex-end;
+          justify-content: flex-end;
+
+          > img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: cover;
+          }
+        }
+
+        &.info {
+          position: absolute;
+          display: flex;
+          width: calc(100% - 2 * 10%);
+          height: calc(100% - 10% - 20%);
+          padding: 10% 10% 20% 10%;
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: center;
+          z-index: 5;
+
+          > div {
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
+            align-items: center;
+          }
+
+          .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background: lavender;
+            border: 2px solid globals.$primary-color;
+            border-radius: 15px;
+            box-shadow: 0 0 2px 2px globals.$shadow-color;
+
+            > svg {
+              width: 80px;
+              height: 80px;
+            }
+          }
+
+          .project-name {
+            font-size: 3em;
+            font-weight: 700;
+          }
+
+          .project-description {
+            font-size: 1.0em;
+          }
+        }
+      }
+    }
 
     .sect {
       display: grid;
       padding: 20px 5%;
       grid-template-columns: 50% 50%;
+      grid-template-areas: "left right";
 
       > div {
         display: flex;
@@ -101,7 +157,47 @@
 
       &.feature {
         > div {
-          justify-content: flex-start;
+          display: flex;
+          align-items: center;
+
+          &.preview {
+            justify-content: center;
+
+            > img {
+              max-height: 400px;
+              object-fit: cover;
+            }
+          }
+
+          &.summary {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            .title {
+              font-size: 1.4em;
+            }
+          }
+        }
+
+        &.alt {
+          > .preview {
+            grid-area: right;
+          }
+
+          > .summary {
+            grid-area: left;
+          }
+        }
+
+        &:not(.alt) {
+          > .preview {
+            grid-area: left;
+          }
+
+          > .summary {
+            grid-area: right;
+          }
         }
       }
 
@@ -126,6 +222,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      align-self: center;
+      height: fit-content;
       padding: 10px;
       border-radius: 15px;
       color: black;
@@ -186,6 +284,89 @@
         &:hover {
           color: black;
           fill: black;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 350px) {
+  .content-container > main {
+    min-height: calc(100% - 44px);
+    padding-top: 44px;
+
+    .header {
+      width: calc(100% - 2 * 5px);
+      padding: 5px;
+
+      > nav {
+        .nav-link {
+          padding: 5px 10px;
+          font-size: 0.8em;
+
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
+    }
+
+    > article.app-about {
+      > .intro {
+        grid-template-rows: auto auto;
+        background: none;
+
+        > div {
+          &.preview {
+            background: lavender;
+            object-position: 20%;
+          }
+
+          &.info {
+            position: relative;
+            height: calc(100% - 2 * 10%);
+            padding: 10%;
+
+            .project-name {
+              font-size: 2em;
+            }
+
+            .project-description {
+              font-size: 0.7em;
+            }
+          }
+        }
+      }
+
+      .sect {
+        grid-template-columns: none;
+        grid-template-areas:"left"
+        "right";
+
+        &.feature {
+          > div {
+            &.preview {
+              > img {
+                max-height: 250px;
+              }
+            }
+
+            &.summary {
+              .title {
+                font-size: 1.2em;
+              }
+
+              .description {
+                font-size: 0.8em;
+              }
+            }
+          }
+        }
+        &.about {
+          > div > p {
+            margin-top: 0;
+          }
         }
       }
     }
