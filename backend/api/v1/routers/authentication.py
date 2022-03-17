@@ -107,6 +107,14 @@ async def sign_up(body: SignUpForm):
         db_session = get_session()
         ph = argon2.PasswordHasher()
         try:
+            deliver_message(
+                body.email,
+                'Welcome To Cartedepoezii',
+                render_template(
+                    'welcome',
+                    name=body.name
+                )
+            )
             pwd_hash = ph.hash(body.password)
             gen_id = str(uuid.uuid4())
             cur_time = datetime.utcnow()
@@ -133,14 +141,6 @@ async def sign_up(body: SignUpForm):
                     'authToken': AuthToken.encode(auth_token)
                 }
             }
-            deliver_message(
-                body.email,
-                'Welcome To Cartedepoezii',
-                render_template(
-                    'welcome',
-                    name=body.name
-                )
-            )
         except Exception as ex:
             print(ex.args[0])
             db_session.rollback()

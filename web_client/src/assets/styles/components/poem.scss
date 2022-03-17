@@ -24,6 +24,7 @@
 
       &.header {
         display: grid;
+        width: calc(100% - 2 * 5px);
         padding: 5px;
         grid-template-columns: auto 1fr auto;
         align-items: center;

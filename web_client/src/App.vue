@@ -18,6 +18,20 @@ html, body {
   font-family: globals.$Sans-Serif-Font;
 }
 
+*::-webkit-scrollbar {
+  width: 8px;
+  background: gainsboro;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: slategray;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: darkslategray;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: globals.$Serif-Font;
   margin: 0;

@@ -49,6 +49,7 @@
     border-color: globals.$primary-color;
     background: white;
     color: black;
+    fill: black;
 
     &:hover {
       background: globals.$primary-color-lightest;

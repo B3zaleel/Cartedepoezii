@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 
 
 def inject_middlewares(app: FastAPI):
@@ -12,6 +12,6 @@ def inject_middlewares(app: FastAPI):
         allow_origins=['*'],
         allow_credentials=True,
         allow_methods=['*'],
-        allow_headers=['*'],
+        allow_headers=['*']
     )
     app.add_middleware(GZipMiddleware, minimum_size=1024)

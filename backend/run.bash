@@ -11,15 +11,9 @@ for ((i = 0; i < "${#File_Lines[@]}"; i++)) do
     ENV_VARS["$(echo "$line" | cut -d ':' -f1)"]="$(echo "$line" | cut -d ' ' -f2-)"
 done
 
-env DB_DIALECT_DRIVER="${ENV_VARS['DB_DIALECT_DRIVER']}" \
-    DB_USER="${ENV_VARS['DB_USER']}" \
-    DB_PWORD="${ENV_VARS['DB_PWORD']}" \
-    DB_HOST="${ENV_VARS['DB_HOST']}" \
-    DB_PORT="${ENV_VARS['DB_PORT']}" \
-    DB_NAME="${ENV_VARS['DB_NAME']}" \
-    DB_URL="${ENV_VARS['DB_URL']}" \
-    APP_ENV="${ENV_VARS['APP_ENV']}" \
+env DB_URL="${ENV_VARS['DB_URL']}" \
     APP_MAX_SIGNIN_TRIES="${ENV_VARS['APP_MAX_SIGNIN_TRIES']}" \
+    HOST="${ENV_VARS['HOST']}" \
     IMG_CDN_PUB_KEY="${ENV_VARS['IMG_CDN_PUB_KEY']}" \
     IMG_CDN_PRI_KEY="${ENV_VARS['IMG_CDN_PRI_KEY']}" \
     IMG_CDN_URL_EPT="${ENV_VARS['IMG_CDN_URL_EPT']}" \

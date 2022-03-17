@@ -6,7 +6,7 @@
           <img
             class="bg"
             loading="lazy"
-            src="../assets/images/home_background.jpg"
+            src="https://ik.imagekit.io/B3zaleel/cartedepoezii/home_background_Rt74hKhSK.jpg?tr=pr-true&ik-sdk-version=javascript-1.4.3&updatedAt=1647505084730"
           />
           <div class="bg">
             <Logo/>
