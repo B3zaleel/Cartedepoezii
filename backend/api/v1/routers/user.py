@@ -110,8 +110,8 @@ async def update_user_info(body: UserUpdateForm):
                 imagekit.delete_file(profile_picture_file_id)
                 profile_picture_file_id = ''
         if body.profilePhoto and not body.removeProfilePhoto:
-            if body.profilePhotoId.strip():
-                imagekit.delete_file(body.profilePhotoId)
+            if profile_picture_file_id:
+                imagekit.delete_file(profile_picture_file_id)
             user = db_session.query(User).filter(User.id == body.userId).first()
             if user.profile_photo_id:
                 imagekit.delete_file(user.profile_photo_id)
