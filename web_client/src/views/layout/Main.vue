@@ -359,7 +359,11 @@ export default class MainLayout extends Vue {
 
   signOut(): void {
     this.$store.commit('signOut');
-    this.$router.push('/');
+    if (this.$route.path === '/') {
+      window.location.reload();
+    } else {
+      this.$router.push('/');
+    }
   }
 
   deleteAccount(): void {
