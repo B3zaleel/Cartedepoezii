@@ -53,3 +53,6 @@ pnpm-debug.log*
 *.sln
 *.sw?
 # #endregion
+
+credentials.json
+token.json
