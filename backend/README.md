@@ -11,7 +11,7 @@ This is an API server built using **FastAPI** for [Cartedepoezii](../).
 
 ### APIs
 
-+ A Google API should be created with at least an email sending scope and this API server's root URL should be one of the redirect URIs. The `credetials.json` and `token.json` files should be stored in the root directory of this project.
++ A Google API should be created with at least an email sending scope and this API server's root URL should be one of the redirect URIs. The `credentials.json` and `token.json` files should be stored in the root directory of this project.
 + An Imagekit.IO API should be created. The public key, private key, and URL endpoint should be stored in the `.env.local` file according to the requirements mentioned below.
 
 ### Environment Variables
