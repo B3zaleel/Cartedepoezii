@@ -14,11 +14,11 @@ This project is made up of multiple projects that include the API server and the
 
 ## Installation
 
-+ Visit [FastAPI API server](../backend/) and [Vue SPA](../web_client/) for installation instructions.
++ Visit [FastAPI API server](backend/) and [Vue SPA](web_client/) for installation instructions.
 
 ## Usage
 
-To use this project, visit [Vue SPA](../web_client/) and [FastAPI API server](../backend/) for usage instructions. It would be preferred if you start [FastAPI API server](../backend/) first since [Vue SPA](../web_client/) depends on it.
+To use this project, visit [Vue SPA](web_client/) and [FastAPI API server](backend/) for usage instructions. It would be preferred if you start [FastAPI API server](backend/) first since [Vue SPA](web_client/) depends on it.
 
 ## Contributing
 
@@ -30,8 +30,8 @@ We welcome any contributions but please read our [CONTRIBUTING](./CONTRIBUTING.m
 
 ## Related Projects
 
-+ [FastAPI API server](../backend/)
-+ [Vue SPA](../web_client/)
++ [FastAPI API server](backend/)
++ [Vue SPA](web_client/)
 
 ## License
 
