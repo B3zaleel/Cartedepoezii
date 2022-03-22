@@ -28,7 +28,7 @@ The required environment variables should be stored in a file named `.env.local`
 + Install the Python3 dependencies using `pip3 install -r requirements.txt`.
 + Start the database service using `sudo service postgresql start`.
 + Open an interactive shell with the `postgres` user by running `sudo -s -u postgres`.
-+ Run `psql -f data/DBSetup_PostgreSQL.sql` in the interactive shell and exit.
++ Run `psql -f data/DBSetup.sql` in the interactive shell and exit.
 + Run the server using `./run.bash`.
 
 ## Viewing The Documentation
