@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+'''The API server module.
+'''
 import os
 import uvicorn
 from fastapi import FastAPI
@@ -15,7 +17,10 @@ app = FastAPI()
 inject_middlewares(app)
 inject_routers(app)
 
+
 async def exception_handler(request, exc):
+    '''Converts exceptions to a JSON response.
+    '''
     default_message = '[{}]: Request failed.'.format(exc.__class__.__name__)
     res = {
         'success': False,

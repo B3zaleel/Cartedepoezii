@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+'''A module for decoding and encoding tokens.
+'''
 import os
 from cryptography.fernet import Fernet
 from datetime import datetime, timedelta
@@ -87,7 +89,11 @@ class AuthToken:
                 f.decrypt(bytes(token, 'utf-8')).decode('utf-8')
             )
             valid_keys = {
-                'userId': str, 'email': str, 'secureText': str, 'expires': str}
+                'userId': str,
+                'email': str,
+                'secureText': str,
+                'expires': str
+            }
             if type(auth_token_dict) is not dict:
                 raise TypeError('Invalid token.')
             for key, val in auth_token_dict.items():
@@ -100,12 +106,14 @@ class AuthToken:
             exp_datetime = datetime.fromisoformat(auth_token_dict['expires'])
             if exp_datetime >= cur_datetime:
                 raise ValueError('Token expired.')
-            user = db_session.query(User).filter(User.id == auth_token_dict['userId']).first()
+            user = db_session.query(User).filter(
+                User.id == auth_token_dict['userId']
+            ).first()
             valid_conds = (
                 user is not None,
-                user is not None and user.is_active,
-                user is not None and user.email == auth_token_dict['email'],
-                user is not None and user.password_hash == auth_token_dict['secureText'],
+                user and user.is_active,
+                user and user.email == auth_token_dict['email'],
+                user and user.password_hash == auth_token_dict['secureText'],
             )
             if not all(valid_conds):
                 raise ValueError('Invalid token.')
@@ -220,9 +228,15 @@ class ResetToken:
         f = Fernet(key)
         db_session = get_session()
         try:
-            reset_token_dict = JSONDecoder().decode(f.decrypt(bytes(token, 'utf-8')).decode('utf-8'))
+            reset_token_dict = JSONDecoder().decode(
+                f.decrypt(bytes(token, 'utf-8')
+            ).decode('utf-8'))
             valid_keys = {
-                'userId': str, 'email': str, 'message': str, 'expires': str}
+                'userId': str,
+                'email': str,
+                'message': str,
+                'expires': str
+            }
             if type(reset_token_dict) is not dict:
                 raise TypeError('Invalid token.')
             for key, val in reset_token_dict.items():
@@ -235,7 +249,9 @@ class ResetToken:
             exp_datetime = datetime.fromisoformat(reset_token_dict['expires'])
             if exp_datetime >= cur_datetime:
                 raise ValueError('Token expired.')
-            user = db_session.query(User).filter(User.id == reset_token_dict['id']).first()
+            user = db_session.query(User).filter(
+                User.id == reset_token_dict['id']
+            ).first()
             valid_conds = (
                 user is not None,
                 user and user.is_active,
