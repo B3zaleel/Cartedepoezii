@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''A module for sending GMail messages.
+'''A module for sending Gmail messages.
 '''
 import base64
 import os

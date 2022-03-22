@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+'''A module containing JSON body data representations.
+'''
 from pydantic import BaseModel
 from typing import Optional, List
 
