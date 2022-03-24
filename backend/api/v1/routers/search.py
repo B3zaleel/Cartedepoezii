@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+'''The search router's module.
+'''
 import json
 import re
 from fastapi import APIRouter
@@ -117,6 +119,7 @@ async def find_poems(q='', token='', span='', after='', before=''):
     user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
+        # sanitize span
         span = span.strip()
         if span and re.fullmatch(r'\d+', span) is None:
             response = {
@@ -125,11 +128,13 @@ async def find_poems(q='', token='', span='', after='', before=''):
             }
             return response
         span = int(span if span else '12')
+        # sanitize query
         query = q.replace('"', '')
         query = query.replace('\'', '').strip()
         if not query:
             return response
         query = re.sub('\s+', ' & ', query)
+        # FTS with text and title columns
         text_search_results = db_session.query(Poem).filter(
             Poem.__ts_text_vector__.match(
                 query,
@@ -142,10 +147,10 @@ async def find_poems(q='', token='', span='', after='', before=''):
                 postgresql_regconfig='english'
             )
         ).all()
-        new_result = []
+        poems_found = []
         poems_seen_ids = []
         if text_search_results:
-            new_result.extend(
+            poems_found.extend(
                 get_unique_poems(
                     text_search_results,
                     poems_seen_ids,
@@ -154,7 +159,7 @@ async def find_poems(q='', token='', span='', after='', before=''):
                 )
             )
         if title_search_results:
-            new_result.extend(
+            poems_found.extend(
                 get_unique_poems(
                     title_search_results,
                     poems_seen_ids,
@@ -165,7 +170,7 @@ async def find_poems(q='', token='', span='', after='', before=''):
         response = {
             'success': True,
             'data': extract_page(
-                new_result,
+                poems_found,
                 span,
                 after,
                 before,
@@ -195,6 +200,7 @@ async def find_users(q='', token='', span='', after='', before=''):
     user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
+        # sanitize span
         span = span.strip()
         if span and re.fullmatch(r'\d+', span) is None:
             response = {
@@ -204,11 +210,13 @@ async def find_users(q='', token='', span='', after='', before=''):
             db_session.close()
             return response
         span = int(span if span else '12')
+        # sanitize query
         query = q.replace('"', '')
         query = query.replace('\'', '').strip()
         if not query:
             return response
         query = re.sub('\s+', ' & ', query)
+        # FTS with name and bio columns
         name_search_results = db_session.query(User).filter(
             User.__ts_name_vector__.match(
                 query,
@@ -222,10 +230,10 @@ async def find_users(q='', token='', span='', after='', before=''):
             )
         ).all()
         bio_search_results = []
-        new_result = []
+        users_found = []
         users_seen_ids = []
         if name_search_results:
-            new_result.extend(
+            users_found.extend(
                 get_unique_users(
                     name_search_results,
                     users_seen_ids,
@@ -234,7 +242,7 @@ async def find_users(q='', token='', span='', after='', before=''):
                 )
             )
         if bio_search_results:
-            new_result.extend(
+            users_found.extend(
                 get_unique_users(
                     bio_search_results,
                     users_seen_ids,
@@ -245,7 +253,7 @@ async def find_users(q='', token='', span='', after='', before=''):
         response = {
             'success': True,
             'data': extract_page(
-                new_result,
+                users_found,
                 span,
                 after,
                 before,

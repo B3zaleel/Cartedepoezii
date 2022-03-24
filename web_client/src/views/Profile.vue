@@ -254,6 +254,7 @@ export default class ProfileView extends Vue {
 
   editableProfileInfo: EditProfileForm = {
     userId: '',
+    imageId: '',
     imageURL: '',
     imageUploaded: false,
     removePhoto: false,
@@ -535,6 +536,7 @@ export default class ProfileView extends Vue {
     this.hasFooter = true;
     this.editableProfileInfo = {
       userId: this.user.id,
+      imageId: this.user.profilePhotoId,
       imageURL: this.profilePhotoSrc,
       imageUploaded: false,
       removePhoto: false,

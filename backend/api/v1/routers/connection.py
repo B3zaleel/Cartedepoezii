@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+'''The connection router's module.
+'''
 import re
 import uuid
 from datetime import datetime
@@ -22,6 +24,8 @@ async def get_users_followers(
     after='',
     before=''
     ):
+    '''Retrieves a user's followers.
+    '''
     response = {
         'success': False,
         'message': 'Failed to find followers.'
@@ -30,6 +34,7 @@ async def get_users_followers(
     user_id = auth_token.user_id if auth_token else None
     db_session = get_session()
     try:
+        # sanitize the span
         span = span.strip()
         if span and re.fullmatch(r'\d+', span) is None:
             response = {
@@ -39,17 +44,18 @@ async def get_users_followers(
             db_session.close()
             return response
         span = int(span if span else '12')
-        result = db_session.query(UserFollowing).filter(
+        user_followers = db_session.query(UserFollowing).filter(
             UserFollowing.following_id == id
         ).all()
-        new_result = []
-        if result:
-            for item in result:
+        user_followers_objs = []
+        if user_followers:
+            for user_follower in user_followers:
                 user = db_session.query(User).filter(
-                    User.id == item.follower_id
+                    User.id == user_follower.follower_id
                 ).first()
                 if not user:
                     continue
+                # get current user's connection with this user
                 cur_usr_ctn = db_session.query(UserFollowing).filter(and_(
                     UserFollowing.follower_id == user_id,
                     UserFollowing.following_id == user.id,
@@ -60,11 +66,11 @@ async def get_users_followers(
                     'profilePhotoId': user.profile_photo_id,
                     'isFollowing': cur_usr_ctn is not None,
                 }
-                new_result.append(obj)
+                user_followers_objs.append(obj)
         response = {
             'success': True,
             'data': extract_page(
-                new_result,
+                user_followers_objs,
                 span,
                 after,
                 before,
@@ -85,6 +91,8 @@ async def get_users_followings(
     after='',
     before=''
     ):
+    '''Retrieves users followed by a given user.
+    '''
     response = {
         'success': False,
         'message': 'Failed to find followings.'
@@ -93,6 +101,7 @@ async def get_users_followings(
     user_id = auth_token.user_id if auth_token else None
     db_session = get_session()
     try:
+        # sanitize the span
         span = span.strip()
         if span and re.fullmatch(r'\d+', span) is None:
             response = {
@@ -102,14 +111,14 @@ async def get_users_followings(
             db_session.close()
             return response
         span = int(span if span else '12')
-        result = db_session.query(UserFollowing).filter(
+        users_followings = db_session.query(UserFollowing).filter(
             UserFollowing.follower_id == id
         ).all()
-        new_result = []
-        if result:
-            for item in result:
+        users_followings_objs = []
+        if users_followings:
+            for user_following in users_followings:
                 user = db_session.query(User).filter(
-                    User.id == item.following_id
+                    User.id == user_following.following_id
                 ).first()
                 if not user:
                     continue
@@ -123,11 +132,11 @@ async def get_users_followings(
                     'profilePhotoId': user.profile_photo_id,
                     'isFollowing': cur_usr_ctn is not None,
                 }
-                new_result.append(obj)
+                users_followings_objs.append(obj)
         response = {
             'success': True,
             'data': extract_page(
-                new_result,
+                users_followings_objs,
                 span,
                 after,
                 before,
@@ -142,10 +151,13 @@ async def get_users_followings(
 
 @router.put('/follow')
 async def change_connection(body: ConnectionForm):
+    '''Toggles the connection between two users.
+    '''
     response = {
         'success': False,
         'message': 'Failed to follow user.'
     }
+    # validate body data
     auth_token = AuthToken.decode(body.authToken)
     wrong_conditions = [
         auth_token is None,
@@ -161,7 +173,7 @@ async def change_connection(body: ConnectionForm):
             UserFollowing.following_id == body.followId,
         )).first()
         if cur_usr_ctn:
-            # remove
+            # remove connection
             db_session.query(UserFollowing).filter(and_(
                 UserFollowing.follower_id == auth_token.user_id,
                 UserFollowing.following_id == body.followId,
@@ -174,6 +186,7 @@ async def change_connection(body: ConnectionForm):
                 'data': {'status': False}
             }
         else:
+            # create connection
             new_connection = UserFollowing(
                 id=str(uuid.uuid4()),
                 created_on=datetime.utcnow(),
