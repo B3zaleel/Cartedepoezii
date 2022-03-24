@@ -49,6 +49,7 @@ export interface Point2D {
 
 export interface EditProfileForm {
   userId: string;
+  imageId: string;
   imageURL: string;
   imageUploaded: boolean;
   removePhoto: boolean;

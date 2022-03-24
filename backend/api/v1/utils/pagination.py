@@ -1,9 +1,12 @@
 #!/usr/bin/python3
+'''A module for paginating responses.
+'''
 import re
 
 
 def range_slicer(span: str, items: list):
-    '''Retrieves a section of a list of items with a given span.'''
+    '''Retrieves a section of a list of items with a given span.
+    '''
     if span is None:
         return items
     span_match = re.fullmatch(
@@ -49,9 +52,9 @@ def extract_page(
                 break
             else:
                 n += 1
-        a = n - (span + 1) if n > (span + 1) else 0
-        b = n - 1 if n > 1 else 0
-        sub_data = data[a:b]
+        start = n - (span + 1) if n > (span + 1) else 0
+        end = n - 1 if n > 1 else 0
+        sub_data = data[start:end]
     else:
         sub_data = data[0:span] if pop_top else data[-span:]
     return sub_data

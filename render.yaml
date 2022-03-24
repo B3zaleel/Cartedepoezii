@@ -1,0 +1,16 @@
+databases:
+  - name: Cartedepoezii Database
+    databaseName: cartedepoezii_prod_db
+    user: cartedepoezii_prod
+    postgresMajorVersion: 14
+
+services:
+  type: web
+  name: Cartedepoezii API
+  env: python
+  repo: https://github.com/B3zaleel/Cartedepoezii.git
+  region: oregon
+  plan: free
+  branch: main
+  buildCommand: pip3 install -r backend/requirements.txt
+  startCommand: cp .env.local backend/.env.local; cp credentials.json backend/credentials.json; cp token.json backend/token.json; cd backend; ./run.bash

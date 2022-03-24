@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-import io
+'''The home router's module.
+'''
 import os
 from fastapi import APIRouter
 from starlette.responses import FileResponse
@@ -13,21 +14,23 @@ home_router = APIRouter()
 @home_router.get('/api')
 @home_router.get('/api/v1')
 async def root():
-    return {
+    '''Retrieves the welcome page.
+    '''
+    response = {
         'success': True,
         'data': {
             'message': 'Welcome to the Cartedepoezii API.'
         }
     }
+    return response
 
 
 @home_router.get('/favicon')
 @home_router.get('/favicon.ico')
 async def favicon():
+    '''Retrieves the API's favicon.
+    '''
     favicon_path = 'api/v1/static/Logo.png'
-    # favicon_data = []
-    # with open(favicon_path, 'rb') as file:
-    #     favicon_data = file.read()
     favicon_content = FileResponse(
         path=favicon_path,
         media_type="image/png"
@@ -37,6 +40,9 @@ async def favicon():
 
 @home_router.get('/api/v1/profile-photo')
 async def get_profile_photo(imgId: str):
+    '''Retrieves a user's profile photo.
+    '''
+    # initialize credentials
     imagekit = ImageKit(
         private_key=os.getenv('IMG_CDN_PRI_KEY'),
         public_key=os.getenv('IMG_CDN_PUB_KEY'),

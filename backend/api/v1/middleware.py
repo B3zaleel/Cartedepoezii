@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+'''The middlewares module.
+'''
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware

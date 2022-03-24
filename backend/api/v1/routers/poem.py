@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+'''The poem router's module.
+'''
 import json
 import re
 import uuid
@@ -29,6 +31,8 @@ router = APIRouter(prefix='/api/v1')
 
 @router.get('/poem')
 async def get_poem(id: str, token: str):
+    '''Retrieves information about a given poem.
+    '''
     response = {
         'success': False,
         'message': 'Failed to find poem.'
@@ -41,6 +45,7 @@ async def get_poem(id: str, token: str):
             Poem.id == id
         ).first()
         if poem:
+            # get the relevant information related to the poem
             user = db_session.query(User).filter(
                 User.id == poem.user_id
             ).first()
@@ -57,6 +62,7 @@ async def get_poem(id: str, token: str):
             likes_count = len(likes) if likes else 0
             is_liked_by_user = False
             if user_id:
+                # check current users reaction on this poem
                 poem_interaction = db_session.query(PoemLike).filter(and_(
                     PoemLike.poem_id == id,
                     PoemLike.user_id == user_id
@@ -87,10 +93,13 @@ async def get_poem(id: str, token: str):
 
 @router.post('/poem')
 async def add_poem(body: PoemAddForm):
+    '''Creates a new poem.
+    '''
     response = {
         'success': False,
         'message': 'Failed to add poem.'
     }
+    # validate body data
     auth_token = AuthToken.decode(body.authToken)
     if auth_token is None or auth_token.user_id != body.userId:
         response['message'] = 'Invalid authentication token.'
@@ -138,10 +147,13 @@ async def add_poem(body: PoemAddForm):
 
 @router.put('/poem')
 async def update_poem(body: PoemUpdateForm):
+    '''Edits an existing poem.
+    '''
     response = {
         'success': False,
         'message': 'Failed to update poem.'
     }
+    # validate body data
     auth_token = AuthToken.decode(body.authToken)
     if auth_token is None or auth_token.user_id != body.userId:
         response['message'] = 'Invalid authentication token.'
@@ -182,6 +194,8 @@ async def update_poem(body: PoemUpdateForm):
 
 @router.delete('/poem')
 async def remove_poem(body: PoemDeleteForm):
+    '''Deletes a poem.
+    '''
     response = {
         'success': False,
         'message': 'Failed to remove poem.'
@@ -225,6 +239,8 @@ async def remove_poem(body: PoemDeleteForm):
 
 @router.put('/like-poem')
 async def like_poem(body: PoemLikeForm):
+    '''Toggles a user's reaction on a poem.
+    '''
     response = {
         'success': False,
         'message': 'Failed to like poem.'
@@ -240,6 +256,7 @@ async def like_poem(body: PoemLikeForm):
             PoemLike.poem_id == body.poemId,
         )).first()
         if cur_usr_fav:
+            # dislike poem
             db_session.query(PoemLike).filter(and_(
                 PoemLike.user_id == auth_token.user_id,
                 PoemLike.poem_id == body.poemId,
@@ -252,6 +269,7 @@ async def like_poem(body: PoemLikeForm):
                 'data': {'status': False}
             }
         else:
+            # like poem
             new_favourite = PoemLike(
                 id=str(uuid.uuid4()),
                 created_on=datetime.utcnow(),
@@ -274,6 +292,8 @@ async def like_poem(body: PoemLikeForm):
 
 @router.get('/poems-user-created')
 async def get_created_poems(userId, token='', span='', after='', before=''):
+    '''Retrieves poems created by the current user.
+    '''
     response = {
         'success': False,
         'message': 'Failed to find poems created by the user.'
@@ -284,6 +304,7 @@ async def get_created_poems(userId, token='', span='', after='', before=''):
     user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
+        # sanitize span
         span = span.strip()
         if span and re.fullmatch(r'\d+', span) is None:
             response = {
@@ -293,44 +314,45 @@ async def get_created_poems(userId, token='', span='', after='', before=''):
             db_session.close()
             return response
         span = int(span if span else '12')
-        result = db_session.query(Poem).filter(
+        poems_created = db_session.query(Poem).filter(
             Poem.user_id == userId
         ).all()
         user_poems = []
-        if result is not None:
+        if poems_created:
             user = db_session.query(User).filter(
                 User.id == userId
             ).first()
             if not user:
                 return response
-            for item in result:
+            for poem in poems_created:
+                # retrieve information related to the current poem
                 comments = db_session.query(Comment).filter(and_(
-                    Comment.poem_id == item.id,
+                    Comment.poem_id == poem.id,
                     Comment.comment_id == None
                 )).all()
                 comments_count = len(comments) if comments else 0
                 likes = db_session.query(PoemLike).filter(
-                    PoemLike.poem_id == item.id
+                    PoemLike.poem_id == poem.id
                 ).all()
                 likes_count = len(likes) if likes else 0
                 is_liked_by_user = False
                 if user_id:
                     poem_interaction = db_session.query(PoemLike).filter(and_(
-                        PoemLike.poem_id == item.id,
+                        PoemLike.poem_id == poem.id,
                         PoemLike.user_id == user_id
                     )).first()
                     if poem_interaction:
                         is_liked_by_user = True
                 obj = {
-                    'id': item.id,
+                    'id': poem.id,
                     'user': {
                         'id': user.id,
                         'name': user.name,
                         'profilePhotoId': user.profile_photo_id,
                     },
-                    'title': item.title,
-                    'publishedOn': item.created_on.isoformat(),
-                    'verses': json.JSONDecoder().decode(item.text),
+                    'title': poem.title,
+                    'publishedOn': poem.created_on.isoformat(),
+                    'verses': json.JSONDecoder().decode(poem.text),
                     'commentsCount': comments_count,
                     'likesCount': likes_count,
                     'isLiked': is_liked_by_user
@@ -358,6 +380,8 @@ async def get_created_poems(userId, token='', span='', after='', before=''):
 
 @router.get('/poems-user-likes')
 async def get_liked_poems(userId, token='', span='', after='', before=''):
+    '''Retrieves poems liked by a given user.
+    '''
     response = {
         'success': False,
         'message': 'Failed to find poems liked by the user.'
@@ -368,6 +392,7 @@ async def get_liked_poems(userId, token='', span='', after='', before=''):
     user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
+        # sanitize span
         span = span.strip()
         if span and re.fullmatch(r'\d+', span) is None:
             response = {
@@ -382,6 +407,7 @@ async def get_liked_poems(userId, token='', span='', after='', before=''):
         ).all()
         user_poems_liked = []
         for poem_like in likes:
+            # retrieve information related to the current reaction
             poem = db_session.query(Poem).filter(
                 Poem.id == poem_like.poem_id
             ).first()
@@ -443,6 +469,8 @@ async def get_liked_poems(userId, token='', span='', after='', before=''):
 
 @router.get('/poems-channel')
 async def get_channel_poems(token, span='', after='', before=''):
+    '''Retrieves poems for a user's timeline or home section.
+    '''
     response = {
         'success': False,
         'message': 'Failed to find poems for the channel.'
@@ -454,6 +482,7 @@ async def get_channel_poems(token, span='', after='', before=''):
     user_id = auth_token.user_id
     db_session = get_session()
     try:
+        # sanitize span
         span = span.strip()
         if span and re.fullmatch(r'\d+', span) is None:
             response = {
@@ -467,20 +496,22 @@ async def get_channel_poems(token, span='', after='', before=''):
             UserFollowing.follower_id == user_id
         ).all()
         max_size = 2**32 - 1
-        m = len(followings) + 1 if followings else 1
-        n = max_size // m
+        followings_count = len(followings) + 1 if followings else 1
+        poems_per_following = max_size // followings_count
         poem_users_ids = [user_id]
         if followings:
             poem_users_ids.extend(list(map(lambda x: x.following_id, followings)))
         users_poems = []
         for id in poem_users_ids:
+            # fetch poems_per_following poems for each following
             poems = db_session.query(Poem).filter(
                 Poem.user_id == id
-            ).limit(n).all()
+            ).limit(poems_per_following).all()
             user = db_session.query(User).filter(
                 User.id == id
             ).first()
             for poem in poems:
+                # retrieve information related to the current poem
                 comments = db_session.query(Comment).filter(and_(
                     Comment.poem_id == poem.id,
                     Comment.comment_id == None
@@ -536,6 +567,8 @@ async def get_channel_poems(token, span='', after='', before=''):
 
 @router.get('/poems-explore')
 async def get_exploratory_poems(token, span='', after='', before=''):
+    '''Retrieves poems a user can explore.
+    '''
     response = {
         'success': False,
         'message': 'Failed to find poems for the user.'
@@ -547,6 +580,7 @@ async def get_exploratory_poems(token, span='', after='', before=''):
     user_id = auth_token.user_id if auth_token is not None else None
     db_session = get_session()
     try:
+        # sanitize span
         span = span.strip()
         if span and re.fullmatch(r'\d+', span) is None:
             response = {
@@ -559,15 +593,20 @@ async def get_exploratory_poems(token, span='', after='', before=''):
         followings = db_session.query(UserFollowing).filter(
             UserFollowing.follower_id == user_id
         ).all()
-        n = 48
+        max_poems_count = 48
         poem_users_ids = [user_id]
         if followings:
-            poem_users_ids.extend(list(map(lambda x: x.following_id, followings)))
+            poem_users_ids.extend(
+                list(map(lambda x: x.following_id, followings))
+            )
         explore_poems = []
+        # fetch max_poems_count for the user from people
+        # the user isn't following
         poems = db_session.query(Poem).filter(
             Poem.user_id.notin_(poem_users_ids)
-        ).limit(n).all()
+        ).limit(max_poems_count).all()
         for poem in poems:
+            # retrieve information related to the current poem
             user = db_session.query(User).filter(
                 User.id == poem.user_id
             ).first()

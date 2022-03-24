@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+'''The router module.
+'''
 from fastapi import FastAPI
 
 from .routers import (

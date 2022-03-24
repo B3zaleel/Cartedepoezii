@@ -39,7 +39,10 @@
     }
 
     > div:nth-child(2) {
+      display: flex;
       padding: 20px;
+      flex-direction: column;
+      justify-content: center;
 
       > div {
         display: flex;

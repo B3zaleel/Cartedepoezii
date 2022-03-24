@@ -16,6 +16,7 @@ def render_template(template_name, **vars):
     Returns:
         An expanded HTML-formatted string.
     '''
+    # build template path from the given file name (without extension)
     template_path = os.path.join(
         'api',
         'v1',

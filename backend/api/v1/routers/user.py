@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+'''The user router's module.
+'''
 import os
 import email_validator
 from datetime import datetime
@@ -23,6 +25,8 @@ router = APIRouter(prefix='/api/v1')
 
 @router.get('/user')
 async def get_user(id: str, token=''):
+    '''Retrieves information about a given user.
+    '''
     response = {
         'success': False,
         'message': 'Failed to find user.'
@@ -35,6 +39,7 @@ async def get_user(id: str, token=''):
     try:
         user = db_session.query(User).filter(User.id == id).first()
         if user:
+            # find related information about the user
             followers = db_session.query(UserFollowing).filter(
                 UserFollowing.following_id == user.id
             ).all()
@@ -83,10 +88,13 @@ async def get_user(id: str, token=''):
 
 @router.put('/user')
 async def update_user_info(body: UserUpdateForm):
+    '''Updates a user's information.
+    '''
     response = {
         'success': False,
         'message': 'Failed to update user info.'
     }
+    # validate body
     auth_token = AuthToken.decode(body.authToken)
     if auth_token is None or (auth_token.user_id != body.userId):
         response['message'] = 'Invalid authentication token.'
@@ -110,8 +118,8 @@ async def update_user_info(body: UserUpdateForm):
                 imagekit.delete_file(profile_picture_file_id)
                 profile_picture_file_id = ''
         if body.profilePhoto and not body.removeProfilePhoto:
-            if body.profilePhotoId.strip():
-                imagekit.delete_file(body.profilePhotoId)
+            if profile_picture_file_id:
+                imagekit.delete_file(profile_picture_file_id)
             user = db_session.query(User).filter(User.id == body.userId).first()
             if user.profile_photo_id:
                 imagekit.delete_file(user.profile_photo_id)
@@ -165,6 +173,8 @@ async def update_user_info(body: UserUpdateForm):
 
 @router.delete('/user')
 async def remove_user(body: UserDeleteForm):
+    '''Deletes a user's account.
+    '''
     response = {
         'success': False,
         'message': 'Failed to remove user.'
@@ -175,6 +185,7 @@ async def remove_user(body: UserDeleteForm):
         return response
     db_session = get_session()
     try:
+        # remove all user-related info
         db_session.query(UserFollowing).filter(or_(
             UserFollowing.follower_id == body.userId,
             UserFollowing.following_id == body.userId,

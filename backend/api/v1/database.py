@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+'''A module for creating connections to the database.
+'''
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker

@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+'''The comment router's module.
+'''
 import re
 import uuid
 from datetime import datetime
@@ -16,6 +18,8 @@ router = APIRouter(prefix='/api/v1')
 
 @router.get('/comment')
 async def get_comment(id=''):
+    '''Retrieves information about a given comment.
+    '''
     response = {
         'success': False,
         'message': 'Failed to find comment.'
@@ -26,11 +30,13 @@ async def get_comment(id=''):
             Comment.id == id
         ).first()
         if comment:
+            # find the user that created the comment
             user = db_session.query(User).filter(
                 User.id == comment.user_id
             ).first()
             if not user:
                 return response
+            # find the number of replies to the comment
             replies = db_session.query(Comment).filter(
                 Comment.comment_id == comment.id,
             ).all()
@@ -58,12 +64,15 @@ async def get_comment(id=''):
 
 @router.get('/comments-of-poem')
 async def get_poem_comments(id='', span='', after='', before=''):
+    '''Retrieves all comments made directly under a poem.
+    '''
     response = {
         'success': False,
         'message': 'Failed to find comments.'
     }
     db_session = get_session()
     try:
+        # sanitize the span
         span = span.strip()
         if span and re.fullmatch(r'\d+', span) is None:
             response = {
@@ -80,11 +89,13 @@ async def get_poem_comments(id='', span='', after='', before=''):
         new_comments = []
         if comments:
             for comment in comments:
+                # get the user that created the comment
                 user = db_session.query(User).filter(
                     User.id == comment.user_id
                 ).first()
                 if not user:
                     continue
+                # get the number of replies to comment
                 replies = db_session.query(Comment).filter(and_(
                     Comment.poem_id == id,
                     Comment.comment_id == comment.id,
@@ -125,6 +136,8 @@ async def get_poem_comments(id='', span='', after='', before=''):
 
 @router.get('/comment-replies')
 async def get_comment_replies(id='', span='', after='', before=''):
+    '''Retrieves all comments made directly under another comment.
+    '''
     response = {
         'success': False,
         'message': 'Failed to find replies to comment.'
@@ -148,11 +161,13 @@ async def get_comment_replies(id='', span='', after='', before=''):
         new_replies = []
         if comments:
             for comment in comments:
+                # get the user that created the comment
                 user = db_session.query(User).filter(
                     User.id == comment.user_id
                 ).first()
                 if not user:
                     continue
+                # get the number of replies to comment
                 replies = db_session.query(Comment).filter(and_(
                     Comment.poem_id == id,
                     Comment.comment_id == comment.id,
@@ -193,6 +208,8 @@ async def get_comment_replies(id='', span='', after='', before=''):
 
 @router.get('/comments-by-user')
 async def get_comments_by_user(id='', span='', after='', before=''):
+    '''Retrieves all comments made by a user.
+    '''
     response = {
         'success': False,
         'message': 'User id is required.'
@@ -222,6 +239,7 @@ async def get_comments_by_user(id='', span='', after='', before=''):
         new_comments = []
         if comments:
             for comment in comments:
+                # get the number of replies to comment
                 replies = db_session.query(Comment).filter(
                     Comment.comment_id == comment.id
                 ).all()
@@ -261,10 +279,13 @@ async def get_comments_by_user(id='', span='', after='', before=''):
 
 @router.post('/comment')
 async def add_comment(body: CommentAddForm):
+    '''Creates a new comment.
+    '''
     response = {
         'success': False,
         'message': 'Failed to add comment.'
     }
+    # validate body data
     auth_token = AuthToken.decode(body.authToken)
     if auth_token is None or auth_token.user_id != body.userId:
         response['message'] = 'Invalid authentication token.'
@@ -276,6 +297,7 @@ async def add_comment(body: CommentAddForm):
     try:
         replyId = body.replyTo.strip() if body.replyTo else None
         if replyId:
+            # validate comment being replied to
             result = db_session.query(Comment).filter(and_(
                 Comment.id == replyId,
                 Comment.comment_id == None
@@ -315,6 +337,8 @@ async def add_comment(body: CommentAddForm):
 
 @router.delete('/comment')
 async def remove_comment(body: CommentDeleteForm):
+    '''Deletes a comment made by a user.
+    '''
     response = {
         'success': False,
         'message': 'Failed to remove comment.'
@@ -325,6 +349,7 @@ async def remove_comment(body: CommentDeleteForm):
         return response
     db_session = get_session()
     try:
+        # remove all info related to the comment
         db_session.query(Comment).filter(
             Comment.comment_id == body.commentId,
         ).delete(

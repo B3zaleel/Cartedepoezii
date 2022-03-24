@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+'''The authentication router's module.
+'''
 import argon2
 import email_validator
 import os
@@ -63,7 +65,8 @@ async def sign_in(body: SignInForm):
                     }
                 }
             except argon2.exceptions.VerificationError:
-                is_active = True
+                # try to lock the user's account
+                is_active = user.is_active
                 if user.sign_in_attempts + 1 == max_sign_in_attempts:
                     is_active = False
                 db_session.query(User).filter(User.email == body.email).update(
@@ -100,6 +103,7 @@ async def sign_up(body: SignUpForm):
         'message': 'Failed to create account.'
     }
     try:
+        # validate body data
         email_validator.validate_email(body.email)
         if len(body.name) > 64:
             response['message'] = 'Name is too long.'
@@ -168,6 +172,7 @@ async def request_reset_password(body: PasswordResetRequestForm):
             User.email == body.email
         ).first()
         if result:
+            # create reset token
             reset_token = ResetToken(user_id=result.user_id, email=body.email, message='password_reset')
             reset_token_str = ResetToken.encode(reset_token)
             db_session.query(User).filter(and_(
@@ -209,6 +214,7 @@ async def reset_password(body: PasswordResetForm):
     }
     db_session = get_session()
     try:
+        # validate body data and token
         email_validator.validate_email(body.email)
         user = db_session.query(User).filter(
             User.email == body.email
@@ -230,6 +236,7 @@ async def reset_password(body: PasswordResetForm):
         if all(valid_conditions):
             ph = argon2.PasswordHasher()
             pwd_hash = ph.hash(body.password)
+            # reset account
             db_session.query(User).filter(User.email == body.email).update(
                 {
                     User.password_hash: pwd_hash,
