@@ -319,7 +319,7 @@ export default class CommentComponent extends Vue {
     this.commentAPIReq.deleteComment(userId, commentId)
       .then((res) => {
         if (res.success) {
-          window.location.reload();
+          this.$emit('delete');
         } else {
           console.error(res.message);
         }
