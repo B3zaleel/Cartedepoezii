@@ -125,9 +125,21 @@
         </div>
 
         <div class="mini-sect">
-          <div>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/zOy8zRR0Ac0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-          </div>
+          <iframe
+            width="560"
+            height="315"
+            id="project-info-yt-vid-iframe"
+            src="https://www.youtube.com/embed/zOy8zRR0Ac0"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer;
+            autoplay;
+            clipboard-write;
+            encrypted-media;
+            gyroscope;
+            picture-in-picture"
+            allowfullscreen
+          ></iframe>
         </div>
 
         <div class="footer">
@@ -251,6 +263,32 @@ export default class AboutView extends Vue {
       ],
     },
   ];
+
+  adjustVideoFrame = (): void => {
+    const originalDims = {
+      width: 560,
+      height: 315,
+    };
+    const iframe = document.getElementById('project-info-yt-vid-iframe');
+
+    let newWidth = originalDims.width + 0;
+    let newHeight = originalDims.height + 0;
+    if (iframe?.parentElement) {
+      newWidth = iframe.parentElement.clientWidth * 0.8;
+      newHeight = newWidth * (originalDims.height / originalDims.width);
+    }
+    if (iframe?.style) {
+      iframe.style.width = `${newWidth}px`;
+      iframe.style.height = `${newHeight}px`;
+    }
+  };
+
+  mounted(): void {
+    this.adjustVideoFrame();
+    window.addEventListener('resize', () => {
+      this.adjustVideoFrame();
+    });
+  }
 }
 </script>
 

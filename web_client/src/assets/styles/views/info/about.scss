@@ -290,7 +290,7 @@
   }
 }
 
-@media (max-width: 350px) {
+@media (max-width: 450px) {
   .content-container > main {
     min-height: calc(100% - 44px);
     padding-top: 44px;
@@ -327,6 +327,7 @@
             position: relative;
             height: calc(100% - 2 * 10%);
             padding: 10%;
+            align-items: center;
 
             .project-name {
               font-size: 2em;
@@ -353,6 +354,13 @@
             }
 
             &.summary {
+              > div {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+              }
+
               .title {
                 font-size: 1.2em;
               }
@@ -363,6 +371,7 @@
             }
           }
         }
+
         &.about {
           > div > p {
             margin-top: 0;
