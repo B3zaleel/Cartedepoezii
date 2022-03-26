@@ -456,7 +456,7 @@ export default class PoemComponent extends Vue {
     this.poemAPIReq.deletePoem(userId, this.poem.id)
       .then((res) => {
         if (res.success) {
-          window.location.reload();
+          this.$emit('delete');
         } else {
           console.error(res.message);
         }

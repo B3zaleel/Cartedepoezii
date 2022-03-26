@@ -104,7 +104,7 @@ class AuthToken:
                     raise KeyError('Invalid token.')
             cur_datetime = datetime.utcnow()
             exp_datetime = datetime.fromisoformat(auth_token_dict['expires'])
-            if exp_datetime >= cur_datetime:
+            if cur_datetime >= exp_datetime:
                 raise ValueError('Token expired.')
             user = db_session.query(User).filter(
                 User.id == auth_token_dict['userId']
@@ -138,7 +138,7 @@ class AuthToken:
         try:
             cur_datetime = datetime.utcnow()
             time_span = timedelta(days=30)
-            exp_datetime = cur_datetime - time_span
+            exp_datetime = cur_datetime + time_span
             auth_token_txt = JSONEncoder().encode(
                 {
                     'userId': auth_token.user_id,
@@ -247,7 +247,7 @@ class ResetToken:
                     raise KeyError('Invalid token.')
             cur_datetime = datetime.utcnow()
             exp_datetime = datetime.fromisoformat(reset_token_dict['expires'])
-            if exp_datetime >= cur_datetime:
+            if cur_datetime >= exp_datetime:
                 raise ValueError('Token expired.')
             user = db_session.query(User).filter(
                 User.id == reset_token_dict['id']
@@ -279,7 +279,7 @@ class ResetToken:
         try:
             cur_datetime = datetime.utcnow()
             time_span = timedelta(days=30)
-            exp_datetime = cur_datetime - time_span
+            exp_datetime = cur_datetime + time_span
             reset_token_txt = JSONEncoder().encode(
                 {
                     'id': reset_token.user_id,

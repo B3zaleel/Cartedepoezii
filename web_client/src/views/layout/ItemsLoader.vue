@@ -7,6 +7,7 @@
             v-for="item in getUsers(group.id)"
             :key="item.id"
             :user="item"
+            @delete="deleteItem(group.id, item.id)"
           />
         </div>
         <div v-if="itemsName === 'poems'">
@@ -15,6 +16,7 @@
             :key="item.id"
             :poem="item"
             :updateDisplay="updateItemView"
+            @delete="deleteItem(group.id, item.id)"
           />
         </div>
         <div v-if="itemsName === 'comments'">
@@ -22,6 +24,7 @@
             v-for="item in getComments(group.id)"
             :key="item.id"
             :comment="item"
+            @delete="deleteItem(group.id, item.id)"
           />
         </div>
       </div>
@@ -163,6 +166,32 @@ export default class ItemsLoaderLayout extends Vue {
       items = this.itemGroups[groupId].group;
     }
     return items;
+  }
+
+  deleteItem(groupId: number, itemId: string): void {
+    const newItemGroups = [];
+
+    for (let i = 0; i < this.itemGroups.length; i += 1) {
+      const newGroup = this.itemGroups[i].group.filter(
+        (o) => o.id !== itemId,
+      );
+      if (newGroup) {
+        newItemGroups.push(
+          {
+            id: this.itemGroups[i].id,
+            group: newGroup,
+          },
+        );
+      }
+    }
+    if (newItemGroups) {
+      const m = newItemGroups.length;
+      const n = newItemGroups[m - 1].group.length;
+      this.lastItemId = newItemGroups[m - 1].group[n - 1].id;
+    } else {
+      this.lastItemId = '';
+    }
+    this.itemGroups = newItemGroups;
   }
 
   mounted(): void {

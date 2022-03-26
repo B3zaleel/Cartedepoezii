@@ -19,10 +19,8 @@
     position: relative;
     display: flex;
     flex-flow: column;
-    width: fit-content;
+    width: clamp(225px, 40%, 450px);
     max-height: calc(100% - 2 * 10px);
-    max-width: 600px;
-    min-width: 100px;
     margin: 10px;
     background: white;
     border-radius: 10px;
